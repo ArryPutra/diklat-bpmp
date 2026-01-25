@@ -3,13 +3,11 @@
 import Layout from "@/components/layouts/layout";
 import StatsCard from "@/components/shared/stats-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CardSim, CardSimIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { BiBuilding, BiColumns, BiMenu, BiRightArrowAlt, BiSolidCity, BiUser, BiX } from "react-icons/bi";
+import { BiBuilding, BiCalendar, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
 
 export default function Home() {
   return (
@@ -19,6 +17,8 @@ export default function Home() {
       <Beranda />
       <Statistik />
       <Diklat />
+      <Faq />
+
       <Footer />
     </>
   );
@@ -42,7 +42,9 @@ function Header() {
             <li className="hover:text-primary"><a href="#diklat">Diklat</a></li>
             <li className="hover:text-primary"><a href="#faq">FAQ</a></li>
           </ul>
-          <Button>Masuk</Button>
+          <Link href='/masuk'>
+            <Button>Masuk</Button>
+          </Link>
         </div>
 
         <div className="hidden 
@@ -50,9 +52,9 @@ function Header() {
           {
             menuOpen
               ?
-              <BiX size={42} onClick={() => setMenuOpen(false)} />
+              <BiX size={36} onClick={() => setMenuOpen(false)} />
               :
-              <BiMenu size={42} onClick={() => setMenuOpen(true)} />
+              <BiMenu size={36} onClick={() => setMenuOpen(true)} />
           }
         </div>
       </div>
@@ -71,14 +73,21 @@ function Beranda() {
         <h1 className="text-2xl font-bold">Sistem Informasi Diklat & Pelatihan Pendidikan</h1>
         <p>Program pendidikan dan pelatihan (diklat) yang dirancang untuk mendukung pengembangan kompetensi.</p>
         <div className="mt-4 flex gap-3 flex-wrap">
-          <Button>Cari Diklat <BiRightArrowAlt /></Button>
-          <Button variant='outline'>Daftarkan Instansi</Button>
+          <a href="#diklat">
+            <Button>Cari Diklat <BiRightArrowAlt /></Button>
+          </a>
+          <Link href='/daftar-instansi'>
+            <Button variant='outline'>Daftarkan Instansi</Button>
+          </Link>
         </div>
       </div>
-      <div className="w-1/2 flex justify-end 
-        max-md:w-full max-md:justify-start">
-        <Image src='/images/diklat-illustration.png' alt="" width={350} height={350} priority />
-      </div>
+
+      <Image
+        src='/images/diklat-illustration.png'
+        alt="Ilustrasi Gambar Diklat"
+        width={350}
+        height={350}
+        priority />
     </Layout>
   )
 }
@@ -113,7 +122,7 @@ function Diklat() {
 
       <div className="mt-16">
         <section className="flex gap-6
-        max-md:flex-col">
+        max-md:flex-col max-md:gap-4">
           <div className="w-80 flex
           max-md:w-full max-md:h-52">
             <Image
@@ -139,11 +148,19 @@ function Diklat() {
               </div>
             </div>
 
-            <div className="flex gap-3
-            max-md:p-4 max-md:flex-col max-md:border max-md:rounded-xl max-md:gap-1">
-              <p className="text-sm">Periode Pelaksanaan: <span className="font-semibold">1 Januari 2025 - 3 Januari 2025</span></p>
+            <div className="text-sm flex gap-3
+            max-md:p-4 max-md:border max-md:flex-wrap max-md:rounded-lg">
+              <p className="flex gap-1.5  
+              max-md:flex-col max-md:gap-1">
+                <span className="flex items-center gap-1"><BiCalendar size={14} /> Tanggal Pelaksanaan:</span>
+                <span className="font-semibold">1 Februari 2026</span>
+              </p>
               <Separator orientation="vertical" className="max-md:hidden" />
-              <p className="text-sm">Kuota Terisi: <span className="font-semibold">13/30</span></p>
+              <p className="flex gap-1.5 
+              max-md:flex-col max-md:gap-1">
+                <span className="flex items-center gap-1"><BiUser size={14} /> Kuota Terisi:</span>
+                <span className="font-semibold">14/30</span>
+              </p>
             </div>
 
             <div className="flex items-center justify-between
@@ -156,6 +173,66 @@ function Diklat() {
 
           </div>
         </section>
+      </div>
+    </Layout>
+  )
+}
+
+function Faq() {
+  const [questionIndexSelected, setQuestionIndexSelected] = useState<number | null>(null);
+
+  const faqList = [
+    {
+      question: "Apakah peserta bisa mendaftar langsung tanpa melalui instansi?",
+      answer: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae."
+    },
+    {
+      question: "Apakah peserta bisa mendaftar langsung tanpa melalui instansi?",
+      answer: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, quae."
+    }
+  ];
+
+  return (
+    <Layout parentClassName="bg-primary/5"
+      className="flex gap-12 max-md:flex-col" id="faq">
+      <Image
+        src='/images/question-illustration.png'
+        alt="Ilustrasi Pertanyaan"
+        width={1000}
+        height={100}
+        className="h-52 w-52 max-md:h-36 max-md:w-36"
+      />
+
+      <div className="flex flex-col w-full">
+        <h1 className="font-bold text-2xl">Daftar Pertanyaan Umum</h1>
+
+        <div className="mt-8">
+          {
+            faqList.map((faq, index) => (
+              <div key={index}
+                onClick={() => {
+                  if (questionIndexSelected === index) {
+                    return setQuestionIndexSelected(null)
+                  }
+                  setQuestionIndexSelected(index)
+                }}
+                className={`w-full hover:bg-primary/5 
+                ${questionIndexSelected === index ? 'bg-primary/5' : ''}`}>
+                <div className="p-4">
+                  <div className="flex items-center justify-between w-full">
+                    <h1 className="font-medium">{faq.question}</h1>
+                    <BiChevronDown size={28}
+                      className={`duration-300 min-h-7 min-w-7 ${questionIndexSelected === index ? 'rotate-180' : ''}`} />
+                  </div>
+                  <p className={`text-sm mt-1 opacity-70
+                    ${questionIndexSelected === index ? '' : 'hidden'}`}>{faq.answer}</p>
+                </div>
+                <Separator />
+              </div>
+            ))
+          }
+        </div>
+
       </div>
     </Layout>
   )

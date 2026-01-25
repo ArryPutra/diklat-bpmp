@@ -122,3 +122,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Scrollbar halus dan minimal */
+.scrollbar-smooth {
+  scrollbar-width: thin;
+  /* Firefox: tipis */
+  scrollbar-color: #888 transparent;
+  /* warna thumb dan track */
+}
+
+.scrollbar-smooth::-webkit-scrollbar {
+  width: 6px;
+  /* lebar scrollbar */
+}
+
+.scrollbar-smooth::-webkit-scrollbar-thumb {
+  background-color: #888;
+  /* warna thumb */
+  border-radius: 3px;
+  /* sudut bulat */
+}
+
+.scrollbar-smooth::-webkit-scrollbar-track {
+  background: transparent;
+  /* track transparan */
+}
