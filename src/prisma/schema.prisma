@@ -118,3 +118,89 @@ model RegistrasiPicInstansi {
 
   @@map("registrasi_pic_instansi")
 }
+
+// =====================
+// MODEL DIKLAT
+// =====================
+
+model Diklat {
+  id                String              @id @default(cuid())
+  nama              String
+  deskripsi         String?             @db.Text
+  metode            MetodeDiklat        @default(ONLINE)
+  target            String?
+  tanggalMulai      DateTime
+  tanggalSelesai    DateTime
+  waktuMulai        String?             // "08:00"
+  waktuSelesai      String?             // "16:00"
+  batasPendaftaran  DateTime
+  kuota             Int                 @default(30)
+  lokasi            String?
+  linkMeeting       String?
+  materi            String[]            @default([])
+  persyaratan       String[]            @default([])
+  fasilitas         String[]            @default([])
+  gambar            String?
+  isActive          Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  pendaftaranDiklat PendaftaranDiklat[]
+
+  @@map("diklat")
+}
+
+enum MetodeDiklat {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+model PendaftaranDiklat {
+  id                   String                   @id @default(cuid())
+  diklatId             String
+  diklat               Diklat                   @relation(fields: [diklatId], references: [id], onDelete: Cascade)
+  registrasiInstansiId String
+  namaPeserta          String
+  email                String
+  nomorTelepon         String
+  jabatan              String?
+  status               StatusPendaftaranDiklat  @default(MENUNGGU)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  @@map("pendaftaran_diklat")
+}
+
+enum StatusPendaftaranDiklat {
+  MENUNGGU
+  DITERIMA
+  DITOLAK
+  HADIR
+  TIDAK_HADIR
+}
+
+// =====================
+// MODEL AKTIVITAS LOG
+// =====================
+
+model Aktivitas {
+  id        String        @id @default(cuid())
+  aksi      String
+  detail    String?
+  tipe      TipeAktivitas @default(INFO)
+  userId    String?
+  createdAt DateTime      @default(now())
+
+  @@map("aktivitas")
+}
+
+enum TipeAktivitas {
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  REGISTER
+  LOGIN
+  INFO
+}

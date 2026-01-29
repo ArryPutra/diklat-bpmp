@@ -6,7 +6,9 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { updateStatusRegistrasiInstansi } from '@/actions/dashboard-action';
+import { logoutAction } from '@/actions/auth-action';
 import {
     BiBarChart,
     BiBell,
@@ -45,65 +47,21 @@ import {
     BiUser,
     BiX
 } from 'react-icons/bi';
+import { TipeAktivitas } from '@/generated/prisma/enums';
 
-// Data dummy untuk statistik
-const statsData = [
-    { label: "Total Diklat", value: 24, icon: BiBookOpen, change: "+3", changeValue: 3, trend: "up", color: "bg-gradient-to-br from-blue-500 to-blue-600", lightColor: "bg-blue-50", textColor: "text-blue-600" },
-    { label: "Peserta Aktif", value: 856, icon: BiGroup, change: "+12%", changeValue: 12, trend: "up", color: "bg-gradient-to-br from-emerald-500 to-emerald-600", lightColor: "bg-emerald-50", textColor: "text-emerald-600" },
-    { label: "Instansi Terdaftar", value: 142, icon: BiBuilding, change: "+5", changeValue: 5, trend: "up", color: "bg-gradient-to-br from-violet-500 to-violet-600", lightColor: "bg-violet-50", textColor: "text-violet-600" },
-    { label: "Diklat Berlangsung", value: 8, icon: BiCalendar, change: "-2", changeValue: -2, trend: "down", color: "bg-gradient-to-br from-amber-500 to-amber-600", lightColor: "bg-amber-50", textColor: "text-amber-600" },
-];
-
-// Data dummy untuk chart mingguan
-const weeklyData = [
-    { day: "Sen", peserta: 45, diklat: 2 },
-    { day: "Sel", peserta: 52, diklat: 3 },
-    { day: "Rab", peserta: 38, diklat: 1 },
-    { day: "Kam", peserta: 65, diklat: 4 },
-    { day: "Jum", peserta: 48, diklat: 2 },
-    { day: "Sab", peserta: 72, diklat: 5 },
-    { day: "Min", peserta: 30, diklat: 1 },
-];
-
-// Data dummy untuk diklat terbaru
-const recentDiklat = [
-    { id: 1, nama: "Peningkatan Kompetensi Guru Teknologi", peserta: 14, kuota: 30, status: "active", tanggal: "1 Feb 2026", metode: "Online", progress: 47 },
-    { id: 2, nama: "Workshop Kurikulum Merdeka", peserta: 28, kuota: 30, status: "almost-full", tanggal: "15 Feb 2026", metode: "Offline", progress: 93 },
-    { id: 3, nama: "Pelatihan Kepala Sekolah", peserta: 20, kuota: 25, status: "active", tanggal: "20 Feb 2026", metode: "Hybrid", progress: 80 },
-    { id: 4, nama: "Sertifikasi Guru Penggerak", peserta: 50, kuota: 50, status: "full", tanggal: "1 Mar 2026", metode: "Online", progress: 100 },
-];
-
-// Data dummy untuk pendaftaran terbaru
-const recentRegistrations = [
-    { id: 1, nama: "SDN 1 Banjarmasin", pic: "Ahmad Fauzi", email: "ahmad@sdn1bjm.sch.id", phone: "0812xxxx1234", status: "pending", waktu: "2 jam lalu", avatar: "AF" },
-    { id: 2, nama: "SMPN 3 Banjarbaru", pic: "Siti Rahmah", email: "siti@smpn3bjb.sch.id", phone: "0813xxxx5678", status: "approved", waktu: "5 jam lalu", avatar: "SR" },
-    { id: 3, nama: "SMAN 1 Martapura", pic: "Budi Santoso", email: "budi@sman1mtp.sch.id", phone: "0857xxxx9012", status: "pending", waktu: "1 hari lalu", avatar: "BS" },
-    { id: 4, nama: "SMK 2 Banjarmasin", pic: "Dewi Lestari", email: "dewi@smk2bjm.sch.id", phone: "0878xxxx3456", status: "approved", waktu: "2 hari lalu", avatar: "DL" },
-    { id: 5, nama: "SMA 5 Banjarmasin", pic: "Rizky Pratama", email: "rizky@sma5bjm.sch.id", phone: "0821xxxx7890", status: "rejected", waktu: "3 hari lalu", avatar: "RP" },
-];
-
-// Data dummy untuk aktivitas
-const activities = [
-    { id: 1, action: "Diklat baru ditambahkan", detail: "Workshop Kurikulum Merdeka", time: "10 menit lalu", icon: BiPlus, type: "create" },
-    { id: 2, action: "Pendaftaran disetujui", detail: "SMPN 3 Banjarbaru", time: "1 jam lalu", icon: BiCheckCircle, type: "approve" },
-    { id: 3, action: "Peserta baru mendaftar", detail: "14 peserta untuk Diklat Teknologi", time: "3 jam lalu", icon: BiUser, type: "register" },
-    { id: 4, action: "Diklat selesai", detail: "Pelatihan Dasar TIK", time: "1 hari lalu", icon: BiBookOpen, type: "complete" },
-    { id: 5, action: "Pendaftaran ditolak", detail: "Data tidak lengkap - SMA 5 Banjarmasin", time: "3 hari lalu", icon: BiErrorCircle, type: "reject" },
-];
-
-// Data dummy untuk notifikasi
+// Data dummy untuk notifikasi (tetap dummy untuk sekarang)
 const notifications = [
-    { id: 1, title: "Pendaftaran Baru", message: "SDN 1 Banjarmasin mengajukan pendaftaran", time: "2 jam lalu", read: false },
-    { id: 2, title: "Kuota Hampir Penuh", message: "Workshop Kurikulum Merdeka (28/30)", time: "5 jam lalu", read: false },
-    { id: 3, title: "Diklat Akan Dimulai", message: "Pelatihan Kepala Sekolah dimulai dalam 3 hari", time: "1 hari lalu", read: true },
+    { id: 1, title: "Pendaftaran Baru", message: "Ada instansi baru mengajukan pendaftaran", time: "2 jam lalu", read: false },
+    { id: 2, title: "Kuota Hampir Penuh", message: "Workshop hampir mencapai kuota maksimal", time: "5 jam lalu", read: false },
+    { id: 3, title: "Diklat Akan Dimulai", message: "Pelatihan akan dimulai dalam 3 hari", time: "1 hari lalu", read: true },
 ];
 
 // Data dummy untuk quick actions
 const quickActions = [
-    { icon: BiPlus, label: "Tambah Diklat", color: "bg-blue-500 hover:bg-blue-600" },
-    { icon: BiBuilding, label: "Verifikasi Instansi", color: "bg-emerald-500 hover:bg-emerald-600" },
-    { icon: BiDownload, label: "Export Laporan", color: "bg-violet-500 hover:bg-violet-600" },
-    { icon: BiEnvelope, label: "Kirim Broadcast", color: "bg-amber-500 hover:bg-amber-600" },
+    { icon: BiPlus, label: "Tambah Diklat", color: "bg-blue-500 hover:bg-blue-600", href: "/dashboard/admin/diklat/tambah" },
+    { icon: BiBuilding, label: "Verifikasi Instansi", color: "bg-emerald-500 hover:bg-emerald-600", href: "/dashboard/admin/instansi" },
+    { icon: BiDownload, label: "Export Laporan", color: "bg-violet-500 hover:bg-violet-600", href: "/dashboard/admin/laporan" },
+    { icon: BiEnvelope, label: "Kelola Peserta", color: "bg-amber-500 hover:bg-amber-600", href: "/dashboard/admin/peserta" },
 ];
 
 // Data untuk jadwal mendatang
@@ -115,16 +73,71 @@ const upcomingSchedule = [
 
 const menuItems = [
     { icon: BiHome, label: "Dashboard", href: "/dashboard/admin", active: true },
-    { icon: BiBookOpen, label: "Kelola Diklat", href: "/dashboard/admin/diklat", badge: 3 },
-    { icon: BiBuilding, label: "Instansi", href: "/dashboard/admin/instansi", badge: 2 },
+    { icon: BiBookOpen, label: "Kelola Diklat", href: "/dashboard/admin/diklat", badge: 0 },
+    { icon: BiBuilding, label: "Instansi", href: "/dashboard/admin/instansi", badge: 0 },
     { icon: BiGroup, label: "Peserta", href: "/dashboard/admin/peserta" },
     { icon: BiBarChart, label: "Laporan", href: "/dashboard/admin/laporan" },
     { icon: BiCog, label: "Pengaturan", href: "/dashboard/admin/pengaturan" },
+    { icon: BiHelpCircle, label: "Bantuan", href: "/dashboard/admin/bantuan" },
 ];
 
+// Types for props
+interface DashboardStats {
+    totalDiklat: number;
+    diklatAktif: number;
+    totalInstansi: number;
+    instansiMenunggu: number;
+    totalPeserta: number;
+    pesertaBulanIni: number;
+}
+
+interface DiklatItem {
+    id: string;
+    nama: string;
+    metode: string;
+    tanggalMulai: Date;
+    tanggalSelesai: Date;
+    kuota: number;
+    isActive: boolean;
+    _count: {
+        pendaftaranDiklat: number;
+    };
+}
+
+interface InstansiItem {
+    id: string;
+    nama: string;
+    email: string;
+    nomorTelepon: string;
+    createdAt: Date;
+    statusRegistrasiInstansi: {
+        id: number;
+        nama: string;
+    };
+    registrasiPicInstansi: {
+        nama: string;
+        email: string;
+        nomorTelepon: string;
+    } | null;
+}
+
+interface AktivitasItem {
+    id: string;
+    aksi: string;
+    detail: string | null;
+    tipe: TipeAktivitas;
+    createdAt: Date;
+}
+
+interface WeeklyDataItem {
+    day: string;
+    peserta: number;
+    diklat: number;
+}
+
 // Simple bar chart component
-function MiniBarChart({ data }: { data: typeof weeklyData }) {
-    const maxValue = Math.max(...data.map(d => d.peserta));
+function MiniBarChart({ data }: { data: WeeklyDataItem[] }) {
+    const maxValue = Math.max(...data.map(d => d.peserta), 1);
 
     return (
         <div className="flex items-end justify-between gap-2 h-32 px-2">
@@ -134,7 +147,7 @@ function MiniBarChart({ data }: { data: typeof weeklyData }) {
                         <span className="text-xs text-gray-500">{item.peserta}</span>
                         <div
                             className="w-full bg-gradient-to-t from-primary to-primary/70 rounded-t-md transition-all duration-500 hover:from-primary/90 hover:to-primary/60"
-                            style={{ height: `${(item.peserta / maxValue) * 80}px` }}
+                            style={{ height: `${Math.max((item.peserta / maxValue) * 80, 4)}px` }}
                         />
                     </div>
                     <span className="text-xs text-gray-400">{item.day}</span>
@@ -160,9 +173,19 @@ function ProgressBar({ value, className }: { value: number; className?: string }
 }
 
 export default function DashboardView({
-    user
+    user,
+    stats,
+    diklatList,
+    instansiList,
+    aktivitasList,
+    weeklyData
 }: {
-    user: any
+    user: any;
+    stats: DashboardStats | null;
+    diklatList: DiklatItem[];
+    instansiList: InstansiItem[];
+    aktivitasList: AktivitasItem[];
+    weeklyData: WeeklyDataItem[];
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -170,6 +193,49 @@ export default function DashboardView({
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedPeriod, setSelectedPeriod] = useState("Minggu Ini");
+    const [isPending, startTransition] = useTransition();
+
+    // Build stats data from real data
+    const statsData = [
+        { label: "Total Diklat", value: stats?.totalDiklat || 0, icon: BiBookOpen, change: `+${stats?.diklatAktif || 0} aktif`, trend: "up", color: "bg-gradient-to-br from-blue-500 to-blue-600" },
+        { label: "Peserta Aktif", value: stats?.totalPeserta || 0, icon: BiGroup, change: `+${stats?.pesertaBulanIni || 0} bulan ini`, trend: "up", color: "bg-gradient-to-br from-emerald-500 to-emerald-600" },
+        { label: "Instansi Terdaftar", value: stats?.totalInstansi || 0, icon: BiBuilding, change: `${stats?.instansiMenunggu || 0} menunggu`, trend: "up", color: "bg-gradient-to-br from-violet-500 to-violet-600" },
+        { label: "Diklat Aktif", value: stats?.diklatAktif || 0, icon: BiCalendar, change: "sedang berjalan", trend: "up", color: "bg-gradient-to-br from-amber-500 to-amber-600" },
+    ];
+
+    // Format relative time
+    const formatRelativeTime = (date: Date) => {
+        const now = new Date();
+        const diffMs = now.getTime() - new Date(date).getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return "Baru saja";
+        if (diffMins < 60) return `${diffMins} menit lalu`;
+        if (diffHours < 24) return `${diffHours} jam lalu`;
+        return `${diffDays} hari lalu`;
+    };
+
+    // Get activity icon based on type
+    const getActivityIcon = (tipe: TipeAktivitas) => {
+        switch (tipe) {
+            case 'CREATE': return BiPlus;
+            case 'APPROVE': return BiCheckCircle;
+            case 'REJECT': return BiErrorCircle;
+            case 'REGISTER': return BiUser;
+            case 'UPDATE': return BiEdit;
+            case 'DELETE': return BiTrash;
+            default: return BiInfoCircle;
+        }
+    };
+
+    // Handle approve/reject instansi
+    const handleUpdateStatus = (id: string, statusId: number) => {
+        startTransition(async () => {
+            await updateStatusRegistrasiInstansi(id, statusId, user?.id);
+        });
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -251,17 +317,6 @@ export default function DashboardView({
                                 )}
                             </Link>
                         ))}
-
-                        <Separator className="my-4" />
-
-                        <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Lainnya</p>
-                        <Link
-                            href="/dashboard/admin/bantuan"
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-primary transition-all duration-200 hover:translate-x-1"
-                        >
-                            <BiHelpCircle size={20} />
-                            <span className="font-medium">Bantuan</span>
-                        </Link>
                     </nav>
 
                     {/* User Profile */}
@@ -394,16 +449,25 @@ export default function DashboardView({
                                             <p className="text-xs text-gray-500">{user?.email || "admin@bpmp.go.id"}</p>
                                         </div>
                                         <div className="py-2">
-                                            <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3">
+                                            <Link 
+                                                href="/dashboard/admin/pengaturan"
+                                                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3"
+                                            >
                                                 <BiUser /> Profil Saya
-                                            </button>
-                                            <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3">
+                                            </Link>
+                                            <Link 
+                                                href="/dashboard/admin/pengaturan"
+                                                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3"
+                                            >
                                                 <BiCog /> Pengaturan
-                                            </button>
+                                            </Link>
                                         </div>
                                         <div className="border-t py-2">
-                                            <form action="/api/auth/logout" method="POST">
-                                                <button className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-3">
+                                            <form action={logoutAction}>
+                                                <button 
+                                                    type="submit"
+                                                    className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-3"
+                                                >
                                                     <BiLogOut /> Keluar
                                                 </button>
                                             </form>
@@ -594,52 +658,69 @@ export default function DashboardView({
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {recentDiklat.map((diklat) => (
-                                        <div
-                                            key={diklat.id}
-                                            className="group flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-200"
-                                        >
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <p className="font-semibold truncate">{diklat.nama}</p>
-                                                    <span className={cn(
-                                                        "px-2 py-0.5 rounded text-xs font-medium",
-                                                        diklat.metode === "Online" ? "bg-blue-100 text-blue-700" :
-                                                            diklat.metode === "Offline" ? "bg-green-100 text-green-700" :
-                                                                "bg-violet-100 text-violet-700"
-                                                    )}>
-                                                        {diklat.metode}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                                    <span className="flex items-center gap-1">
-                                                        <BiCalendar /> {diklat.tanggal}
-                                                    </span>
-                                                    <span className="flex items-center gap-1">
-                                                        <BiGroup /> {diklat.peserta}/{diklat.kuota} peserta
-                                                    </span>
-                                                </div>
-                                                <div className="mt-3">
-                                                    <ProgressBar value={diklat.progress} />
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 ml-4">
-                                                <span className={cn(
-                                                    "px-3 py-1.5 rounded-full text-xs font-semibold",
-                                                    diklat.status === "active" && "bg-emerald-100 text-emerald-700",
-                                                    diklat.status === "almost-full" && "bg-amber-100 text-amber-700",
-                                                    diklat.status === "full" && "bg-red-100 text-red-700"
-                                                )}>
-                                                    {diklat.status === "active" && "Aktif"}
-                                                    {diklat.status === "almost-full" && "Hampir Penuh"}
-                                                    {diklat.status === "full" && "Penuh"}
-                                                </span>
-                                                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <BiDotsVerticalRounded />
+                                    {diklatList.length === 0 ? (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <BiBookOpen className="mx-auto text-4xl mb-2 text-gray-300" />
+                                            <p>Belum ada diklat</p>
+                                            <Link href="/dashboard/admin/diklat/tambah">
+                                                <Button size="sm" className="mt-2">
+                                                    <BiPlus /> Tambah Diklat Pertama
                                                 </Button>
-                                            </div>
+                                            </Link>
                                         </div>
-                                    ))}
+                                    ) : diklatList.map((diklat) => {
+                                        const pesertaCount = diklat._count.pendaftaranDiklat;
+                                        const progress = Math.round((pesertaCount / diklat.kuota) * 100);
+                                        const status = progress >= 100 ? "full" : progress >= 80 ? "almost-full" : "active";
+                                        const tanggalFormatted = new Date(diklat.tanggalMulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                                        return (
+                                            <div
+                                                key={diklat.id}
+                                                className="group flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-200"
+                                            >
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-semibold truncate">{diklat.nama}</p>
+                                                        <span className={cn(
+                                                            "px-2 py-0.5 rounded text-xs font-medium",
+                                                            diklat.metode === "ONLINE" ? "bg-blue-100 text-blue-700" :
+                                                                diklat.metode === "OFFLINE" ? "bg-green-100 text-green-700" :
+                                                                    "bg-violet-100 text-violet-700"
+                                                        )}>
+                                                            {diklat.metode}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                                        <span className="flex items-center gap-1">
+                                                            <BiCalendar /> {tanggalFormatted}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <BiGroup /> {pesertaCount}/{diklat.kuota} peserta
+                                                        </span>
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <ProgressBar value={progress} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3 ml-4">
+                                                    <span className={cn(
+                                                        "px-3 py-1.5 rounded-full text-xs font-semibold",
+                                                        status === "active" && "bg-emerald-100 text-emerald-700",
+                                                        status === "almost-full" && "bg-amber-100 text-amber-700",
+                                                        status === "full" && "bg-red-100 text-red-700"
+                                                    )}>
+                                                        {status === "active" && "Aktif"}
+                                                        {status === "almost-full" && "Hampir Penuh"}
+                                                        {status === "full" && "Penuh"}
+                                                    </span>
+                                                    <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <BiDotsVerticalRounded />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </CardContent>
                         </Card>
@@ -658,25 +739,34 @@ export default function DashboardView({
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {activities.map((activity) => (
-                                        <div key={activity.id} className="flex gap-3 group">
-                                            <div className={cn(
-                                                "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110",
-                                                activity.type === "create" && "bg-blue-100 text-blue-600",
-                                                activity.type === "approve" && "bg-emerald-100 text-emerald-600",
-                                                activity.type === "register" && "bg-violet-100 text-violet-600",
-                                                activity.type === "complete" && "bg-amber-100 text-amber-600",
-                                                activity.type === "reject" && "bg-red-100 text-red-600"
-                                            )}>
-                                                <activity.icon size={16} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium">{activity.action}</p>
-                                                <p className="text-xs text-gray-500 truncate">{activity.detail}</p>
-                                                <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
-                                            </div>
+                                    {aktivitasList.length === 0 ? (
+                                        <div className="text-center py-4 text-gray-500 text-sm">
+                                            Belum ada aktivitas
                                         </div>
-                                    ))}
+                                    ) : aktivitasList.map((activity) => {
+                                        const ActivityIcon = getActivityIcon(activity.tipe);
+                                        return (
+                                            <div key={activity.id} className="flex gap-3 group">
+                                                <div className={cn(
+                                                    "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110",
+                                                    activity.tipe === "CREATE" && "bg-blue-100 text-blue-600",
+                                                    activity.tipe === "APPROVE" && "bg-emerald-100 text-emerald-600",
+                                                    activity.tipe === "REGISTER" && "bg-violet-100 text-violet-600",
+                                                    activity.tipe === "UPDATE" && "bg-amber-100 text-amber-600",
+                                                    activity.tipe === "REJECT" && "bg-red-100 text-red-600",
+                                                    activity.tipe === "DELETE" && "bg-red-100 text-red-600",
+                                                    activity.tipe === "INFO" && "bg-gray-100 text-gray-600"
+                                                )}>
+                                                    <ActivityIcon size={16} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium">{activity.aksi}</p>
+                                                    <p className="text-xs text-gray-500 truncate">{activity.detail}</p>
+                                                    <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(activity.createdAt)}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                                 <Button variant="ghost" className="w-full mt-4 text-primary hover:text-primary/80">
                                     Lihat Semua Aktivitas
@@ -708,67 +798,93 @@ export default function DashboardView({
                             </CardHeader>
                             <CardContent>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="text-left text-sm text-gray-500 border-b">
-                                                <th className="pb-4 font-semibold">Instansi</th>
-                                                <th className="pb-4 font-semibold">PIC</th>
-                                                <th className="pb-4 font-semibold max-md:hidden">Kontak</th>
-                                                <th className="pb-4 font-semibold">Status</th>
-                                                <th className="pb-4 font-semibold max-sm:hidden">Waktu</th>
-                                                <th className="pb-4 font-semibold text-right">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="text-sm">
-                                            {recentRegistrations.map((reg) => (
-                                                <tr key={reg.id} className="border-b last:border-0 hover:bg-gray-50 group transition-colors">
-                                                    <td className="py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center font-bold text-primary text-sm">
-                                                                {reg.avatar}
-                                                            </div>
-                                                            <span className="font-medium">{reg.nama}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 text-gray-600">{reg.pic}</td>
-                                                    <td className="py-4 text-gray-600 max-md:hidden">
-                                                        <div>
-                                                            <p className="text-xs">{reg.email}</p>
-                                                            <p className="text-xs text-gray-400">{reg.phone}</p>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4">
-                                                        <span className={cn(
-                                                            "px-3 py-1.5 rounded-full text-xs font-semibold",
-                                                            reg.status === "pending" && "bg-amber-100 text-amber-700",
-                                                            reg.status === "approved" && "bg-emerald-100 text-emerald-700",
-                                                            reg.status === "rejected" && "bg-red-100 text-red-700"
-                                                        )}>
-                                                            {reg.status === "pending" ? "Menunggu" : reg.status === "approved" ? "Disetujui" : "Ditolak"}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 text-gray-500 max-sm:hidden">{reg.waktu}</td>
-                                                    <td className="py-4">
-                                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            {reg.status === "pending" && (
-                                                                <>
-                                                                    <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 p-2">
-                                                                        <BiCheck size={18} />
-                                                                    </Button>
-                                                                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2">
-                                                                        <BiX size={18} />
-                                                                    </Button>
-                                                                </>
-                                                            )}
-                                                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-2">
-                                                                <BiInfoCircle size={18} />
-                                                            </Button>
-                                                        </div>
-                                                    </td>
+                                    {instansiList.length === 0 ? (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <BiBuilding className="mx-auto text-4xl mb-2 text-gray-300" />
+                                            <p>Belum ada pendaftaran instansi</p>
+                                        </div>
+                                    ) : (
+                                        <table className="w-full">
+                                            <thead>
+                                                <tr className="text-left text-sm text-gray-500 border-b">
+                                                    <th className="pb-4 font-semibold">Instansi</th>
+                                                    <th className="pb-4 font-semibold">PIC</th>
+                                                    <th className="pb-4 font-semibold max-md:hidden">Kontak</th>
+                                                    <th className="pb-4 font-semibold">Status</th>
+                                                    <th className="pb-4 font-semibold max-sm:hidden">Waktu</th>
+                                                    <th className="pb-4 font-semibold text-right">Aksi</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody className="text-sm">
+                                                {instansiList.map((reg) => {
+                                                    const avatar = reg.nama.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+                                                    const statusId = reg.statusRegistrasiInstansi.id;
+                                                    const statusNama = reg.statusRegistrasiInstansi.nama;
+
+                                                    return (
+                                                        <tr key={reg.id} className="border-b last:border-0 hover:bg-gray-50 group transition-colors">
+                                                            <td className="py-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                                                                        {avatar}
+                                                                    </div>
+                                                                    <span className="font-medium">{reg.nama}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="py-4 text-gray-600">{reg.registrasiPicInstansi?.nama || '-'}</td>
+                                                            <td className="py-4 text-gray-600 max-md:hidden">
+                                                                <div>
+                                                                    <p className="text-xs">{reg.email}</p>
+                                                                    <p className="text-xs text-gray-400">{reg.nomorTelepon}</p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="py-4">
+                                                                <span className={cn(
+                                                                    "px-3 py-1.5 rounded-full text-xs font-semibold",
+                                                                    statusId === 1 && "bg-amber-100 text-amber-700",
+                                                                    statusId === 2 && "bg-blue-100 text-blue-700",
+                                                                    statusId === 3 && "bg-emerald-100 text-emerald-700",
+                                                                    statusId === 4 && "bg-red-100 text-red-700"
+                                                                )}>
+                                                                    {statusNama}
+                                                                </span>
+                                                            </td>
+                                                            <td className="py-4 text-gray-500 max-sm:hidden">{formatRelativeTime(reg.createdAt)}</td>
+                                                            <td className="py-4">
+                                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    {statusId === 1 && (
+                                                                        <>
+                                                                            <Button 
+                                                                                variant="ghost" 
+                                                                                size="sm" 
+                                                                                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 p-2"
+                                                                                onClick={() => handleUpdateStatus(reg.id, 3)}
+                                                                                disabled={isPending}
+                                                                            >
+                                                                                <BiCheck size={18} />
+                                                                            </Button>
+                                                                            <Button 
+                                                                                variant="ghost" 
+                                                                                size="sm" 
+                                                                                className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2"
+                                                                                onClick={() => handleUpdateStatus(reg.id, 4)}
+                                                                                disabled={isPending}
+                                                                            >
+                                                                                <BiX size={18} />
+                                                                            </Button>
+                                                                        </>
+                                                                    )}
+                                                                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 p-2">
+                                                                        <BiInfoCircle size={18} />
+                                                                    </Button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -780,9 +896,9 @@ export default function DashboardView({
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                         <p>© 2026 BPMP Provinsi Kalimantan Selatan. All rights reserved.</p>
                         <div className="flex items-center gap-4">
-                            <Link href="#" className="hover:text-primary transition-colors">Bantuan</Link>
-                            <Link href="#" className="hover:text-primary transition-colors">Kebijakan Privasi</Link>
-                            <Link href="#" className="hover:text-primary transition-colors">Syarat & Ketentuan</Link>
+                            <Link href="/dashboard/admin/bantuan" className="hover:text-primary transition-colors">Bantuan</Link>
+                            <Link href="/dashboard/admin/pengaturan" className="hover:text-primary transition-colors">Kebijakan Privasi</Link>
+                            <Link href="/dashboard/admin/pengaturan" className="hover:text-primary transition-colors">Syarat & Ketentuan</Link>
                         </div>
                     </div>
                 </footer>

@@ -464,9 +464,9 @@ function Footer() {
           <h4 className="font-semibold">Menu</h4>
           <ul className="text-sm opacity-70 mt-6 space-y-1
           max-md:mt-1.5">
-            <li><a href="#" className="animated-underline hover:opacity-100 transition-opacity">Beranda</a></li>
-            <li><a href="#" className="animated-underline hover:opacity-100 transition-opacity">Diklat</a></li>
-            <li><a href="#" className="animated-underline hover:opacity-100 transition-opacity">FAQ</a></li>
+            <li><a href="#beranda" className="animated-underline hover:opacity-100 transition-opacity">Beranda</a></li>
+            <li><a href="#diklat" className="animated-underline hover:opacity-100 transition-opacity">Diklat</a></li>
+            <li><a href="#faq" className="animated-underline hover:opacity-100 transition-opacity">FAQ</a></li>
           </ul>
         </div>
         <div className={cn(
@@ -476,8 +476,8 @@ function Footer() {
           <h4 className="font-semibold">Kontak</h4>
           <ul className="text-sm opacity-70 mt-6 space-y-1
           max-md:mt-1.5">
-            <li className="wrap-break-word"><a href="#" className="animated-underline hover:opacity-100 transition-opacity">bpmpkalsel@kemendikdasmen.go.id</a></li>
-            <li><a href="#" className="animated-underline hover:opacity-100 transition-opacity">+62 8123456789</a></li>
+            <li className="wrap-break-word"><a href="mailto:bpmpkalsel@kemendikdasmen.go.id" className="animated-underline hover:opacity-100 transition-opacity">bpmpkalsel@kemendikdasmen.go.id</a></li>
+            <li><a href="https://wa.me/628123456789" target="_blank" rel="noopener noreferrer" className="animated-underline hover:opacity-100 transition-opacity">+62 8123456789</a></li>
           </ul>
         </div>
 

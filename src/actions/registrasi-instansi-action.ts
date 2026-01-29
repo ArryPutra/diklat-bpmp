@@ -132,6 +132,8 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
     }
 
     try {
+        // Simpan password tanpa hash - akan di-hash oleh better-auth saat approve
+        // Ini aman karena hanya digunakan sekali untuk membuat akun user
         const data = await prisma.registrasiInstansi.create(
             {
                 data: {
@@ -141,7 +143,7 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
                     desaKelurahan: resultData.data.desaKelurahan,
                     kecamatan: resultData.data.kecamatan,
                     kabupatenKota: resultData.data.kabupatenKota,
-                    password: resultData.data.password,
+                    password: resultData.data.password, // Plain text - akan di-hash oleh better-auth
                     alamat: resultData.data.alamat,
 
                 }
