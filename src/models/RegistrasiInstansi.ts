@@ -1,4 +1,4 @@
-export type Instansi = {
+export type RegistrasiInstansi = {
     nama: string,
     email: string,
     nomorTelepon: string,
@@ -10,4 +10,4 @@ export type Instansi = {
     alamat: string,
 }
 
-export default Instansi;
+export default RegistrasiInstansi;

@@ -1,8 +1,8 @@
-export type PicInstansi = {
+export type RegistrasiPicInstansi = {
     nama: string,
     email: string,
     nomorTelepon: string,
     jabatan: string
 }
 
-export default PicInstansi;
+export default RegistrasiPicInstansi;

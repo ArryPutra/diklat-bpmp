@@ -13,22 +13,108 @@ datasource db {
   provider = "postgresql"
 }
 
-model RegistrasiInstansi {
-  id                       Int                      @id @default(autoincrement())
-  statusRegistrasiInstansi StatusRegistrasiInstansi @default(BELUM)
-  nama                     String
-  email                    String
-  nomorTelepon             String
-  desaKelurahan            String
-  kecamatan                String
-  kabupatenKota            String
-  password                 String
-  alamat                   String
-  createdAt                DateTime                 @default(now())
-  updatedAt                DateTime                 @updatedAt
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
 }
 
-enum StatusRegistrasiInstansi {
-  BELUM
-  DISETUJUI
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model RegistrasiInstansi {
+  id                         String                   @id @default(cuid())
+  statusRegistrasiInstansi   StatusRegistrasiInstansi @relation(fields: [statusRegistrasiInstansiId], references: [id])
+  statusRegistrasiInstansiId Int                      @default(1)
+  nama                       String
+  email                      String
+  nomorTelepon               String
+  desaKelurahan              String
+  kecamatan                  String
+  kabupatenKota              String
+  password                   String
+  alamat                     String
+  createdAt                  DateTime                 @default(now())
+  updatedAt                  DateTime                 @updatedAt
+  registrasiPicInstansi      RegistrasiPicInstansi?
+
+  @@map("registrasi_instansi")
+}
+
+model StatusRegistrasiInstansi {
+  id                  Int                  @id @default(autoincrement())
+  nama                String               @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  registrasiInstansis RegistrasiInstansi[]
+
+  @@map("status_registrasi_instansi")
+}
+
+model RegistrasiPicInstansi {
+  id                   String             @id @default(cuid())
+  registrasiInstansiId String             @unique
+  registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id], onDelete: Cascade)
+  nama                 String
+  email                String
+  nomorTelepon         String
+  jabatan              String
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("registrasi_pic_instansi")
 }
