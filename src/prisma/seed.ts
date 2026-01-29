@@ -11,11 +11,21 @@ async function main() {
         ]
     })
 
+    await prisma.peran.createMany({
+        data: [
+            { nama: "Admin" },
+            { nama: "Instansi" },
+            { nama: "Peserta" },
+            { nama: "Narasumber" },
+        ]
+    })
+
     await auth.api.signUpEmail({
         body: {
-            name: "Admin",
-            email: "admin@gmail.com",
+            name: "Admin BPMP",
+            email: "gWZbG@example.com",
             password: "password123",
+            peranId: 1
         }
     });
 }

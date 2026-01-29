@@ -10,18 +10,25 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl.pathname;
 
     const guestRoutes = ["/login"];
-    const authRoutes = ["/dashboard"]; // Base route saja
+    const authRoutes = ["/admin", "/instansi", "/peserta", "/narasumber"];
 
-    // Jika sudah login, redirect dari guest routes
     if (session) {
         if (guestRoutes.includes(url)) {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            switch (session.user.peranId) {
+                case 1:
+                    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+                case 2:
+                    return NextResponse.redirect(new URL("/instansi/dashboard", request.url));
+                case 3:
+                    return NextResponse.redirect(new URL("/peserta/dashboard", request.url));
+                case 4:
+                    return NextResponse.redirect(new URL("/narasumber/dashboard", request.url));
+            }
         }
     }
 
-    // Jika belum login, redirect dari auth routes
     if (!session) {
-        // ✅ Pakai startsWith untuk match /dashboard dan semua /dashboard/*
+        console.log(true)
         if (authRoutes.some(route => url.startsWith(route))) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
@@ -33,6 +40,9 @@ export async function proxy(request: NextRequest) {
 export const config = {
     matcher: [
         "/login",
-        "/dashboard/:path*" // Match /dashboard dan semua subpath
+        "/admin/:path*",
+        "/instansi/:path*",
+        "/peserta/:path*",
+        "/narasumber/:path*"
     ],
 };

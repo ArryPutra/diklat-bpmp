@@ -10,7 +10,7 @@ type StatsCardProps = {
 
 export default function StatsCard({ icon, label, value }: StatsCardProps) {
     return (
-        <Card>
+        <Card className='shadow-none!'>
             <CardContent className='flex gap-6 items-center'>
                 <div className='text-2xl text-primary'>
                     {icon}

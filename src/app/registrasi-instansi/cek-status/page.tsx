@@ -1,7 +1,7 @@
 "use client"
 
 import { getRegistrasiInstansiStatus } from '@/actions/registrasi-instansi-action'
-import Layout from '@/components/layouts/layout'
+import Layout from '@/components/layouts/guest-layout'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -118,7 +118,7 @@ export default function CekStatus() {
             className='p-0! flex max-w-full! h-dvh
                     max-md:flex-col-reverse overflow-hidden'>
             <div className={cn(
-                'w-[60%] h-full p-12 overflow-auto max-md:w-full max-md:p-5 max-md:rounded-t-xl max-md:-mt-4 max-md:shadow-xl max-md:bg-white transition-all duration-700',
+                'w-[60%] h-full p-12 overflow-auto max-md:w-full max-md:p-5 max-md:rounded-t-xl max-md:-mt-4 max-md:shadow-xl max-md:bg-white',
                 mounted ? 'animate-fade-in-left opacity-100' : 'opacity-0'
             )}>
                 <Image
@@ -126,7 +126,7 @@ export default function CekStatus() {
                     alt='Logo Kemendikdasmen'
                     width={280}
                     height={45}
-                    className='object-contain hover-scale' />
+                    className='object-contain' />
 
                 <h1 className='mt-12 font-bold text-2xl text-primary'>
                     Cek Status <span className='gradient-text'>Registrasi</span>
@@ -140,7 +140,7 @@ export default function CekStatus() {
                 </Button>
 
                 {/* Form Pencarian */}
-                <Card className="mb-6 hover-lift transition-all duration-300">
+                <Card className="mb-6">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
                             <BiSearch className="w-5 h-5" />
@@ -155,7 +155,7 @@ export default function CekStatus() {
                             <Input
                                 name='kodeRegistrasi'
                                 placeholder='Contoh: cm5abc123xyz'
-                                className='w-full font-mono transition-all duration-300 focus:ring-2 focus:ring-primary/20'
+                                className='font-mono'
                                 defaultValue={state?.data?.id}
                             />
                             <Button type='submit' disabled={pending} className='hover-lift'>
@@ -179,7 +179,7 @@ export default function CekStatus() {
                 {state?.success === true && state.data && (
                     <div className="space-y-4 animate-fade-in-up">
                         {/* Status Card */}
-                        <Card className="hover-lift transition-all duration-300">
+                        <Card>
                             <CardHeader>
                                 <div className="flex items-center justify-between flex-wrap gap-3">
                                     <div>
@@ -213,7 +213,7 @@ export default function CekStatus() {
                         </Card>
 
                         {/* Info Instansi */}
-                        <Card className="hover-lift transition-all duration-300 delay-100">
+                        <Card>
                             <CardHeader>
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <BiBuilding className="w-5 h-5" />
@@ -305,7 +305,7 @@ export default function CekStatus() {
                     alt='Gedung BPMP Kalsel'
                     width={1000}
                     height={1000}
-                    className='h-full object-cover w-full object-center hover:scale-105 transition-transform duration-700' />
+                    className='h-full object-cover w-full object-center' />
             </div>
         </Layout>
     )

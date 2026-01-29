@@ -23,9 +23,21 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  peran         Peran?    @relation(fields: [peranId], references: [id])
+  peranId       Int       @default(1)
 
   @@unique([email])
   @@map("user")
+}
+
+model Peran {
+  id        Int      @id @default(autoincrement())
+  nama      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User[]
+
+  @@map("peran")
 }
 
 model Session {

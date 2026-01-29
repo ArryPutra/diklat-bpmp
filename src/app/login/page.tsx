@@ -1,16 +1,15 @@
 "use client";
 
-import Layout from '@/components/layouts/layout'
+import Layout from '@/components/layouts/guest-layout'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/ui/password-input';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState } from 'react';
 import { loginAction } from '@/actions/auth-action';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
 
 export default function Masuk() {
     const [state, formAction, pending] = useActionState(loginAction, null);
@@ -18,7 +17,7 @@ export default function Masuk() {
     return (
         <Layout
             parentClassName='px-0! overflow-hidden'
-            className='h-screen flex gap-8 py-0! max-w-full! 
+            className='min-h-screen flex gap-8 py-0! max-w-full! 
         max-md:flex-col-reverse max-md:justify-end'>
             <div className='w-[60%] flex items-center justify-center px-5
             max-md:w-full'>
@@ -72,13 +71,13 @@ export default function Masuk() {
                     </div>
                 </div>
             </div>
-            <div className="w-[40%] flex max-md:w-full max-md:h-[20%] overflow-hidden duration-1000">
+            <div className="w-[40%] flex max-md:w-full max-md:h-40">
                 <Image
                     src='/images/gedung-bpmp-kalsel.jpg'
                     alt='Gedung BPMP Kalsel'
                     width={1000}
                     height={1000}
-                    className='object-cover object-center w-full hover:scale-105 transition-transform duration-700' />
+                    className='object-cover object-center w-full' />
             </div>
         </Layout >
     )
