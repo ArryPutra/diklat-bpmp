@@ -1,5 +1,7 @@
+import { ContentCanvas } from '@/components/layouts/auth-layout'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import React from 'react'
 import { BiCheck, BiX } from 'react-icons/bi'
 
@@ -10,11 +12,8 @@ type AdminInstansiViewProps = {
 export default function AdminInstansiView({
     daftarRegistrasiInstansi
 }: AdminInstansiViewProps) {
-
-    console.log(daftarRegistrasiInstansi)
-
     return (
-        <div className='p-6 bg-white border rounded-md'>
+        <ContentCanvas>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -54,6 +53,6 @@ export default function AdminInstansiView({
                     }
                 </TableBody>
             </Table>
-        </div>
+        </ContentCanvas>
     )
 }

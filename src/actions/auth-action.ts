@@ -57,8 +57,6 @@ export async function loginAction(prev: any, formData: FormData) {
         };
     }
 
-    console.log(session.user);
-
     switch (session.user.peranId) {
         case 1:
             redirect("/admin/dashboard");

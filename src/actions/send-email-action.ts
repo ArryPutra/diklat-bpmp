@@ -20,8 +20,6 @@ export async function sendEmailAction({
             subject: subject,
             html: html,
         });
-
-        console.log(result);
     } catch (err) {
         console.error("Gagal mengirim email:", err);
         throw new Error("Email gagal dikirim");

@@ -1,36 +1,27 @@
 import { createRegistrasiInstansi } from "@/actions/registrasi-instansi-action";
 import { createRegistrasiPicInstansi } from "@/actions/registrasi-pic-instansi-action";
 import { sendEmailAction } from "@/actions/send-email-action";
-import RegistrasiInstansi from "@/models/RegistrasiInstansi";
-import RegistrasiPicInstansi from "@/models/RegistrasiPicInstansi";
-import { useState } from "react";
-import { z } from "zod";
-
-const RegistrasiInstansiSchema = z.object({
-    nama: z.string().nonempty("Nama wajib diisi"),
-    email: z.string().email("Email tidak valid"),
-    nomorTelepon: z.string().min(10, "Nomor telepon minimum 10 karakter").max(12, "Nomor telepon maksimum 12 karakter"),
-    desaKelurahan: z.string().nonempty("Desa/Kelurahan wajib diisi"),
-    kecamatan: z.string().nonempty("Kecamatan wajib diisi"),
-    kabupatenKota: z.string().nonempty("Kabupaten/Kota wajib diisi"),
-    password: z.string().min(8, "Password minimal 8 karakter").max(32, "Password maksimal 32 karakter").nonempty("Password wajib diisi"),
-    konfirmasiPassword: z.string().nonempty("Konfirmasi password wajib diisi"),
-    alamat: z.string().nonempty("Alamat wajib diisi"),
-}).refine((data) => data.password === data.konfirmasiPassword, {
-    message: "Password dan konfirmasi password harus sama",
-    path: ["konfirmasiPassword"], // error akan muncul di field konfirmasiPassword
-});
-
-const RegistrasiPicInstansiSchema = z.object({
-    nama: z.string().nonempty("Nama wajib diisi"),
-    email: z.string().email("Email tidak valid"),
-    nomorTelepon: z.string().min(10, "Nomor telepon minimum 10 karakter").max(12, "Nomor telepon maksimum 12 karakter"),
-    jabatan: z.string().nonempty("Jabatan wajib diisi"),
-});
+import { useEffect, useState } from "react";
+import RegistrasiPicInstansi from "../../models/RegistrasiPicInstansi";
+import RegistrasiInstansi from "../../models/RegistrasiInstansi";
+import RegistrasiInstansiSchema from "../../schemas/RegistrasiInstansiSchema";
+import RegistrasiPicInstansiSchema from "../../schemas/RegistrasiPicInstansiSchema";
+import { getDesaKelurahanAction, getKabupatenKotaAction, getKecamatanAction } from "@/actions/data-wilayah-action";
 
 export function useDaftarInstansi() {
     const maxStep = 4;
     const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+
+    const [daftarKabupatenKota, setDaftarKabupatenKota] =
+        useState<Array<{ code: string, name: string }>>([]);
+    const [kabupatenKotaKode, setKabupatenKotaKode] = useState<string>("");
+
+    const [daftarKecamatan, setDaftarKecamatan] =
+        useState<Array<{ code: string, name: string }>>([]);
+    const [kecamatanKode, setKecamatanKode] = useState<string>("");
+
+    const [daftarDesaKelurahan, setDaftarDesaKelurahan] =
+        useState<Array<{ code: string, name: string }>>([]);
 
     function showPicForm() {
         setStep(1);
@@ -38,37 +29,85 @@ export function useDaftarInstansi() {
 
     function showInstansiForm() {
         setStep(2);
+        setKonfirmasiDataErrorMessage("");
     }
 
-    const emptyPicObject: RegistrasiPicInstansi = {
-        nama: "Arry",
-        email: "arry@gmail.com",
+    const emptyRegistrasiPicInstansiObject: RegistrasiPicInstansi = {
+        nama: "Arry Kusuma Putra",
+        email: "arrykusumaputra@gmail.com",
         nomorTelepon: "081350445065",
         jabatan: "Pranata Komputer"
     }
 
-    const emptyInstansiObject: RegistrasiInstansi = {
-        nama: "BPMP Kalsel",
-        email: "bpmp@gmail.com",
+    const emptyRegistrasiInstansiObject: RegistrasiInstansi = {
+        nama: "BPMP Provinsi Kalsel",
+        email: "bpmpkalsel@kemendikdasmen.ac.id",
         nomorTelepon: "08123456789",
-        desaKelurahan: "Landasan Ulin Timur",
-        kecamatan: "Landasan Ulin",
-        kabupatenKota: "Banjarbaru",
+        desaKelurahan: "",
+        kecamatan: "",
+        kabupatenKota: "",
+        desaKelurahanKode: "",
+        kecamatanKode: "",
+        kabupatenKotaKode: "",
         password: "password123",
         konfirmasiPassword: "password123",
-        alamat: "Jl."
+        alamat: "Jl. Gotong Royong"
     }
 
-    const [picInstansi, setPicInstansi] = useState<RegistrasiPicInstansi>(emptyPicObject);
-    const [picInstansiErrorMessages, setPicInstansiErrorMessages] = useState<RegistrasiPicInstansi>(emptyPicObject);
+    const [picInstansi, setPicInstansi] = useState<RegistrasiPicInstansi>(emptyRegistrasiPicInstansiObject);
+    const [picInstansiErrorMessages, setPicInstansiErrorMessages] = useState<RegistrasiPicInstansi>(emptyRegistrasiPicInstansiObject);
 
-    const [instansi, setInstansi] = useState<RegistrasiInstansi>(emptyInstansiObject);
-    const [instansiErrorMessages, setInstansiErrorMessages] = useState<RegistrasiInstansi>(emptyInstansiObject);
+    const [instansi, setInstansi] = useState<RegistrasiInstansi>(emptyRegistrasiInstansiObject);
+    const [instansiErrorMessages, setInstansiErrorMessages] = useState<RegistrasiInstansi>(emptyRegistrasiInstansiObject);
 
-    const [konfirmasiDataLoading, setKonfirmasiDataLoading] = useState(false);
-    const [konfirmasiDataErrorMessage, setKonfirmasiDataErrorMessage] = useState("");
+    const [konfirmasiDataLoading, setKonfirmasiDataLoading] = useState<boolean>(false);
+    const [konfirmasiDataErrorMessage, setKonfirmasiDataErrorMessage] = useState<string>("");
 
-    const [kodeTiketRegistrasi, setKodeTiketRegistrasi] = useState("");
+    const [kodeTiketRegistrasi, setKodeTiketRegistrasi] = useState<string>("");
+
+    useEffect(() => {
+        async function loadKabupatenKota() {
+            const data = await getKabupatenKotaAction();
+            setDaftarKabupatenKota(data)
+        }
+        loadKabupatenKota()
+    }, [])
+
+    useEffect(() => {
+        setInstansi(prev => ({
+            ...prev,
+            kecamatan: "",
+            kecamatanKode: "",
+            desaKelurahan: "",
+            desaKelurahanKode: ""
+        }));
+        setDaftarKecamatan([]);
+        setDaftarDesaKelurahan([]);
+        async function loadKecamatan() {
+            const data = await getKecamatanAction(kabupatenKotaKode!);
+            setDaftarKecamatan(data)
+        }
+        loadKecamatan()
+    }, [kabupatenKotaKode])
+
+    useEffect(() => {
+        setInstansi(prev => ({
+            ...prev,
+            desaKelurahan: "",
+            desaKelurahanKode: ""
+        }));
+        setDaftarDesaKelurahan([]);
+        async function loadDesaKelurahan() {
+            setPicInstansi(prev => ({
+                ...prev,
+                desaKelurahan: "",
+                desaKelurahanKode: ""
+            }));
+            const data = await getDesaKelurahanAction(kecamatanKode!);
+            setDaftarDesaKelurahan(data)
+        }
+        loadDesaKelurahan()
+    }, [kecamatanKode])
 
     function onSubmitPicForm() {
         const resultData = RegistrasiPicInstansiSchema.safeParse(picInstansi);
@@ -86,7 +125,7 @@ export function useDaftarInstansi() {
             return;
         }
 
-        setPicInstansiErrorMessages(emptyPicObject);
+        setPicInstansiErrorMessages(emptyRegistrasiPicInstansiObject);
         setStep(2);
     }
 
@@ -103,6 +142,9 @@ export function useDaftarInstansi() {
                 desaKelurahan: errors.desaKelurahan?.[0] || "",
                 kecamatan: errors.kecamatan?.[0] || "",
                 kabupatenKota: errors.kabupatenKota?.[0] || "",
+                desaKelurahanKode: errors.desaKelurahanKode?.[0] || "",
+                kecamatanKode: errors.kecamatanKode?.[0] || "",
+                kabupatenKotaKode: errors.kabupatenKotaKode?.[0] || "",
                 password: errors.password?.[0] || "",
                 konfirmasiPassword: errors.konfirmasiPassword?.[0] || "",
                 alamat: errors.alamat?.[0] || ""
@@ -111,22 +153,24 @@ export function useDaftarInstansi() {
             return;
         }
 
-        setInstansiErrorMessages(emptyInstansiObject);
+        setInstansiErrorMessages(emptyRegistrasiInstansiObject);
         setStep(3);
     }
 
     async function onSubmitKonfirmasiData() {
-        if (konfirmasiDataLoading) return;
+        if (konfirmasiDataLoading) return; // mencegah double click
 
         setKonfirmasiDataLoading(true);
 
         const registrasiInstansi = await createRegistrasiInstansi(instansi);
-        createRegistrasiPicInstansi(picInstansi, registrasiInstansi.data?.id!);
+        if (registrasiInstansi.success) {
+            createRegistrasiPicInstansi(picInstansi, registrasiInstansi.data?.id!);
+        }
 
         setKonfirmasiDataLoading(false);
 
         if (!registrasiInstansi.success) {
-            setKonfirmasiDataErrorMessage("Terjadi kesalahan saat mendaftar, silahkan hubungi admin.");
+            setKonfirmasiDataErrorMessage(registrasiInstansi.errors?.message ?? "Terjadi kesalahan");
 
             return;
         }
@@ -191,6 +235,12 @@ export function useDaftarInstansi() {
         onSubmitKonfirmasiData,
         konfirmasiDataErrorMessage,
         konfirmasiDataLoading,
-        kodeTiketRegistrasi
+        kodeTiketRegistrasi,
+
+        daftarKabupatenKota,
+        setKabupatenKotaKode,
+        daftarKecamatan,
+        setKecamatanKode,
+        daftarDesaKelurahan,
     }
 } 

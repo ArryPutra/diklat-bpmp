@@ -4,10 +4,9 @@ import prisma from "@/lib/prisma";
 async function main() {
     await prisma.statusRegistrasiInstansi.createMany({
         data: [
-            { nama: "Menunggu" },
-            { nama: "Ditinjau" },
-            { nama: "Diterima" },
-            { nama: "Ditolak" },
+            { nama: "Diajukan", warna: "bg-yellow-500 " },
+            { nama: "Diterima", warna: "bg-blue-500 " },
+            { nama: "Ditolak", warna: "bg-red-500 " },
         ]
     })
 
@@ -23,7 +22,7 @@ async function main() {
     await auth.api.signUpEmail({
         body: {
             name: "Admin BPMP",
-            email: "gWZbG@example.com",
+            email: "admin@gmail.com",
             password: "password123",
             peranId: 1
         }

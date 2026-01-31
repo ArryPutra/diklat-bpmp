@@ -28,7 +28,6 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!session) {
-        console.log(true)
         if (authRoutes.some(route => url.startsWith(route))) {
             return NextResponse.redirect(new URL("/login", request.url));
         }

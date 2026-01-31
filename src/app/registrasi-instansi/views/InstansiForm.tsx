@@ -1,25 +1,39 @@
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet, FieldTitle } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import Instansi, { RegistrasiInstansi } from '@/models/RegistrasiInstansi'
 import { BiLeftArrowAlt } from 'react-icons/bi'
+import RegistrasiInstansi from '../../../models/RegistrasiInstansi'
+import { useState } from 'react'
 
 export default function InstansiForm({
     setData,
     data,
     onSubmit,
     onBackStep,
-    errorMessages
+    errorMessages,
+
+    daftarKabupatenKota,
+    setKabupatenKotaKode,
+    daftarKecamatan,
+    setKecamatanKode,
+    daftarDesaKelurahan,
 }: {
     setData: React.Dispatch<React.SetStateAction<RegistrasiInstansi>>,
     data: RegistrasiInstansi,
     onSubmit: (formData: FormData) => void,
     onBackStep: () => void,
-    errorMessages: Instansi
+    errorMessages: RegistrasiInstansi,
+
+    daftarKabupatenKota: Array<{ code: string, name: string }>,
+    setKabupatenKotaKode: React.Dispatch<React.SetStateAction<string>>,
+    daftarKecamatan: Array<{ code: string, name: string }>,
+    setKecamatanKode: React.Dispatch<React.SetStateAction<string>>,
+    daftarDesaKelurahan: Array<{ code: string, name: string }>,
 }) {
+
     return (
         <>
             <h1 className='text-xl font-semibold mb-6 gradient-text'>Data Instansi</h1>
@@ -68,39 +82,75 @@ export default function InstansiForm({
                             }
                         </Field>
                         <Field>
-                            <FieldLabel>Desa/Kelurahan</FieldLabel>
-                            <Select value={data.desaKelurahan} name='desaKelurahan'
-                                onValueChange={(value) =>
-                                    setData(prev => ({ ...prev, desaKelurahan: value }))
-                                }>
+                            <FieldLabel>Kabupaten/Kota</FieldLabel>
+                            <Select value={data.kabupatenKotaKode} name='kabupatenKota'
+                                onValueChange={(value) => {
+                                    setData(prev => ({
+                                        ...prev,
+                                        kabupatenKotaKode: value,
+                                        kabupatenKota: daftarKabupatenKota!.find(kabupatenKota => kabupatenKota.code === value)!.name,
+                                        kecamatanKode: "",
+                                        desaKelurahanKode: ""
+                                    }))
+                                    setKabupatenKotaKode(value)
+                                }}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Pilih Desa/Kelurahan" />
+                                    <SelectValue placeholder="Pilih Kabupaten/Kota" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Desa/Kelurahan</SelectLabel>
-                                        <SelectItem value="Landasan Ulin Timur">Landasan Ulin Timur</SelectItem>
+                                        <SelectLabel>Kabupaten/Kota</SelectLabel>
+                                        {
+                                            daftarKabupatenKota &&
+                                            daftarKabupatenKota.map((kabupatenKota, index) => (
+                                                <SelectItem
+                                                    key={index}
+                                                    value={kabupatenKota.code}>
+                                                    {kabupatenKota.name}
+                                                </SelectItem>
+                                            ))
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             {
-                                errorMessages.desaKelurahan &&
-                                <FieldError>{errorMessages.desaKelurahan}</FieldError>
+                                errorMessages.kabupatenKota &&
+                                <FieldError>{errorMessages.kabupatenKota}</FieldError>
+
+                            }
+                            {
+                                daftarKabupatenKota.length === 0 &&
+                                <FieldDescription>Sedang memuat data ...</FieldDescription>
                             }
                         </Field>
                         <Field>
                             <FieldLabel>Kecamatan</FieldLabel>
-                            <Select value={data.kecamatan} name='kecamatan'
-                                onValueChange={(value) =>
-                                    setData(prev => ({ ...prev, kecamatan: value }))
-                                }>
+                            <Select value={data.kecamatanKode} name='kecamatan' disabled={daftarKecamatan.length === 0}
+                                onValueChange={(value) => {
+                                    setData(prev => ({
+                                        ...prev,
+                                        kecamatanKode: value,
+                                        kecamatan: daftarKecamatan!.find(kecamatan => kecamatan.code === value)!.name,
+                                        desaKelurahanKode: ""
+                                    }))
+                                    setKecamatanKode(value)
+                                }}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Pilih Kecamatan" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Kecamatan</SelectLabel>
-                                        <SelectItem value="Landasan Ulin">Landasan Ulin</SelectItem>
+                                        {
+                                            daftarKecamatan &&
+                                            daftarKecamatan.map((kecamatan, index) => (
+                                                <SelectItem
+                                                    key={index}
+                                                    value={kecamatan.code}>
+                                                    {kecamatan.name}
+                                                </SelectItem>
+                                            ))
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -110,24 +160,37 @@ export default function InstansiForm({
                             }
                         </Field>
                         <Field>
-                            <FieldLabel>Kabupaten/Kota</FieldLabel>
-                            <Select value={data.kabupatenKota} name='kabupatenKota'
-                                onValueChange={(value) =>
-                                    setData(prev => ({ ...prev, kabupatenKota: value }))
-                                }>
+                            <FieldLabel>Desa/Kelurahan</FieldLabel>
+                            <Select value={data.desaKelurahanKode} name='desaKelurahan' disabled={daftarDesaKelurahan.length === 0}
+                                onValueChange={(value) => {
+                                    setData(prev => ({
+                                        ...prev,
+                                        desaKelurahan: daftarDesaKelurahan!.find(desaKelurahan => desaKelurahan.code === value)!.name,
+                                        desaKelurahanKode: value
+                                    }))
+                                }}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Pilih Kabupaten/Kota" />
+                                    <SelectValue placeholder="Pilih Desa/Kelurahan" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Kabupaten/Kota</SelectLabel>
-                                        <SelectItem value="Banjarbaru">Banjarbaru</SelectItem>
+                                        <SelectLabel>Desa/Kelurahan</SelectLabel>
+                                        {
+                                            daftarDesaKelurahan &&
+                                            daftarDesaKelurahan.map((desaKelurahan, index) => (
+                                                <SelectItem
+                                                    key={index}
+                                                    value={desaKelurahan.code}>
+                                                    {desaKelurahan.name}
+                                                </SelectItem>
+                                            ))
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             {
-                                errorMessages.kabupatenKota &&
-                                <FieldError>{errorMessages.kabupatenKota}</FieldError>
+                                errorMessages.desaKelurahan &&
+                                <FieldError>{errorMessages.desaKelurahan}</FieldError>
                             }
                         </Field>
                         <Field>
@@ -176,7 +239,7 @@ export default function InstansiForm({
                         <Button className='w-fit ml-auto hover-lift' type='submit'>Konfirmasi Data</Button>
                     </div>
                 </FieldGroup>
-            </form>
+            </form >
         </>
     )
 }

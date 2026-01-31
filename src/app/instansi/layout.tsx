@@ -7,11 +7,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AuthLayout
             menuItems={
                 [
-                    { name: 'Dashboard', icon: <BiHome />, url: '/admin/dashboard' },
-                    { name: 'Diklat', icon: <BiBookReader />, url: '/admin/kelola-diklat' },
-                    { name: 'Instansi', icon: <BiBuilding />, url: '/admin/instansi' },
-                    { name: 'Peserta', icon: <BiUser />, url: '/admin/peserta' },
-                    { name: 'Narasumber', icon: <BiUserVoice />, url: '/admin/narasumber' },
+                    { name: 'Dashboard', icon: <BiHome />, url: '/instansi/dashboard' },
                 ]
             }>
             {children}

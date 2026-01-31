@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useActionState, useEffect, useState } from 'react'
-import { BiBuilding, BiCalendar, BiCheckCircle, BiCopy, BiEnvelope, BiLeftArrowAlt, BiMap, BiPhone, BiSearch, BiTime, BiUser } from 'react-icons/bi'
+import { BiBuilding, BiCalendar, BiCheckCircle, BiCopy, BiEnvelope, BiLeftArrowAlt, BiMap, BiPhone, BiSearch, BiTime, BiUser, BiX } from 'react-icons/bi'
 
 // Helper untuk masking email (privasi)
 function maskEmail(email: string): string {
@@ -41,12 +41,12 @@ function formatDate(date: Date | string): string {
 // Status badge dengan warna
 function StatusBadge({ status }: { status: string }) {
     const statusConfig: Record<string, { color: string; bgColor: string; icon: React.ReactNode }> = {
-        'Menunggu Verifikasi': {
+        'Diajukan': {
             color: 'text-amber-700',
             bgColor: 'bg-amber-50 border-amber-200',
             icon: <BiTime className="w-4 h-4" />
         },
-        'Disetujui': {
+        'Diterima': {
             color: 'text-green-700',
             bgColor: 'bg-green-50 border-green-200',
             icon: <BiCheckCircle className="w-4 h-4" />
@@ -54,12 +54,7 @@ function StatusBadge({ status }: { status: string }) {
         'Ditolak': {
             color: 'text-red-700',
             bgColor: 'bg-red-50 border-red-200',
-            icon: <BiTime className="w-4 h-4" />
-        },
-        'Dalam Proses': {
-            color: 'text-blue-700',
-            bgColor: 'bg-blue-50 border-blue-200',
-            icon: <BiTime className="w-4 h-4" />
+            icon: <BiX className="w-4 h-4" />
         }
     }
 
@@ -296,10 +291,7 @@ export default function CekStatus() {
             </div>
 
             {/* Tampilan Kanan */}
-            <div className={cn(
-                'w-[40%] max-md:w-full max-md:h-44 overflow-hidden transition-all duration-1000',
-                mounted ? 'animate-fade-in-right opacity-100' : 'opacity-0'
-            )}>
+            <div className='w-[40%] max-md:w-full max-md:h-44 overflow-hidden transition-all duration-1000'>
                 <Image
                     src='/images/gedung-bpmp-kalsel.jpg'
                     alt='Gedung BPMP Kalsel'

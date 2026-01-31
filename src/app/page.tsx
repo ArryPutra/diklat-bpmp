@@ -5,12 +5,19 @@ import StatsCard from "@/components/shared/stats-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiBuilding, BiCalendar, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
 
 export default function Home() {
+  useEffect(() => {
+    document.documentElement.classList.add("scroll-smooth");
+
+    return () => {
+      document.documentElement.classList.remove("scroll-smooth");
+    };
+  }, []);
+
   return (
     <>
       <Header />
@@ -32,9 +39,9 @@ function Header() {
 
   return (
     <header className="fixed w-full px-5 backdrop-blur-sm">
-      <div className="flex items-center justify-between w-full max-w-6xl mx-auto border mt-6 px-6 h-20 rounded-md bg-white shadow
+      <div className="flex items-center justify-between w-full max-w-6xl mx-auto border mt-6 px-6 h-20 rounded-md bg-white/70 shadow
         max-md:relative">
-        <Image src='/images/logo/logo.png' alt="" width={160} height={160} priority />
+        <Image src="/images/logo/logo.png" alt="Logo Diklat" width={160} height={160} priority />
 
         <div className={`flex items-center
           max-md:absolute max-md:bg-white max-md:left-0 max-md:top-0 max-md:mt-28 max-md:w-full max-md:p-4 max-md:flex-col max-md:items-start max-md:rounded-md max-md:gap-4 max-md:duration-500 max-md:overflow-hidden
@@ -69,7 +76,7 @@ function Beranda() {
 
   return (
     <GuestLayout
-      parentClassName="bg-linear-to-b from-white to-primary/5"
+      parentClassName="bg-linear-to-b to-primary/5"
       className="h-screen flex items-center justify-between gap-16
       max-md:flex-col max-md:justify-start max-md:pt-36"
       id="beranda">
@@ -98,7 +105,7 @@ function Beranda() {
 
 function Statistik() {
   return (
-    <GuestLayout parentClassName="bg-linear-to-b from-primary/5 to-white">
+    <GuestLayout parentClassName="bg-linear-to-b from-primary/5">
       <h1 className="font-bold text-2xl">Data Statistik Terkini</h1>
 
       <div className="grid gap-6 grid-cols-2 mt-6

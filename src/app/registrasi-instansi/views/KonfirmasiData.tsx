@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import Instansi from '@/models/RegistrasiInstansi'
-import PicInstansi from '@/models/RegistrasiPicInstansi'
-import React from 'react'
 import { BiLeftArrowAlt } from 'react-icons/bi'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import RegistrasiPicInstansi from '../../../models/RegistrasiPicInstansi'
+import RegistrasiInstansi from '../../../models/RegistrasiInstansi'
 
 export default function KonfirmasiData({
     dataPic,
@@ -14,8 +13,8 @@ export default function KonfirmasiData({
     message,
     loading
 }: {
-    dataPic: PicInstansi,
-    dataInstansi: Instansi,
+    dataPic: RegistrasiPicInstansi,
+    dataInstansi: RegistrasiInstansi,
     onBackStep: () => void,
     onSubmit: () => void,
     message: string,

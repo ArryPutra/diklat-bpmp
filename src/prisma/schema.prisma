@@ -24,7 +24,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   peran         Peran?    @relation(fields: [peranId], references: [id])
-  peranId       Int       @default(1)
+  peranId       Int
 
   @@unique([email])
   @@map("user")
@@ -98,6 +98,9 @@ model RegistrasiInstansi {
   desaKelurahan              String
   kecamatan                  String
   kabupatenKota              String
+  desaKelurahanKode          String
+  kecamatanKode              String
+  kabupatenKotaKode          String
   password                   String
   alamat                     String
   createdAt                  DateTime                 @default(now())
@@ -108,11 +111,12 @@ model RegistrasiInstansi {
 }
 
 model StatusRegistrasiInstansi {
-  id                  Int                  @id @default(autoincrement())
-  nama                String               @unique
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  registrasiInstansis RegistrasiInstansi[]
+  id                 Int                  @id @default(autoincrement())
+  nama               String               @unique
+  warna              String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  registrasiInstansi RegistrasiInstansi[]
 
   @@map("status_registrasi_instansi")
 }

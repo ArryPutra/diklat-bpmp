@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { RegistrasiPicInstansi } from '@/models/RegistrasiPicInstansi'
 import React from 'react'
 import { BiRightArrowAlt } from 'react-icons/bi'
+import RegistrasiPicInstansi from '../../../models/RegistrasiPicInstansi'
 
 export default function PicForm({
     setData,
@@ -82,7 +82,7 @@ export default function PicForm({
                     </FieldSet>
 
                     <Button className='w-fit ml-auto hover-lift group' type='submit'>
-                        Selanjutnya <BiRightArrowAlt className='group-hover:translate-x-1 transition-transform' />
+                        Selanjutnya <BiRightArrowAlt />
                     </Button>
                 </FieldGroup>
             </form>

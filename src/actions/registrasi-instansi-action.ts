@@ -1,16 +1,18 @@
 "use server"
 
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import RegistrasiInstansi from "@/models/RegistrasiInstansi";
+import RegistrasiInstansiSchema from "@/schemas/RegistrasiInstansiSchema";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-const schemaRegistrasiInstansi = z.object({
+const schemaRegistrasiInstansiStatus = z.object({
     kodeRegistrasi: z.string().nonempty("Kode Registrasi wajib diisi"),
 });
 
-// Fungsi untuk cek status registrasi (tanpa data sensitif seperti password)
 export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData) {
-    const result = schemaRegistrasiInstansi.safeParse(Object.fromEntries(formData));
+    const result = schemaRegistrasiInstansiStatus.safeParse(Object.fromEntries(formData));
 
     if (!result.success) {
         return {
@@ -27,7 +29,6 @@ export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData
                 id: kodeRegistrasi
             },
             select: {
-                // Hanya pilih field yang aman untuk ditampilkan
                 id: true,
                 nama: true,
                 email: true,
@@ -38,7 +39,6 @@ export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData
                 alamat: true,
                 createdAt: true,
                 updatedAt: true,
-                // TIDAK menyertakan password untuk keamanan
                 statusRegistrasiInstansi: {
                     select: {
                         id: true,
@@ -52,7 +52,6 @@ export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData
                         email: true,
                         nomorTelepon: true,
                         jabatan: true
-                        // TIDAK menyertakan data sensitif lainnya
                     }
                 }
             }
@@ -71,7 +70,7 @@ export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData
 
 // Fungsi lama untuk backward compatibility (internal use only)
 export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
-    const result = schemaRegistrasiInstansi.safeParse(Object.fromEntries(formData));
+    const result = schemaRegistrasiInstansiStatus.safeParse(Object.fromEntries(formData));
 
     if (!result.success) {
         return {
@@ -104,34 +103,32 @@ export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
     }
 }
 
-const RegistrasiInstansiSchema = z.object({
-    nama: z.string().nonempty("Nama wajib diisi"),
-    email: z.string().email("Email tidak valid"),
-    nomorTelepon: z.string().min(10, "Nomor telepon minimum 10 karakter").max(12, "Nomor telepon maksimum 12 karakter"),
-    desaKelurahan: z.string().nonempty("Desa/Kelurahan wajib diisi"),
-    kecamatan: z.string().nonempty("Kecamatan wajib diisi"),
-    kabupatenKota: z.string().nonempty("Kabupaten/Kota wajib diisi"),
-    password: z.string().min(8, "Password minimal 8 karakter").max(32, "Password maksimal 32 karakter").nonempty("Password wajib diisi"),
-    konfirmasiPassword: z.string().nonempty("Konfirmasi password wajib diisi"),
-    alamat: z.string().nonempty("Alamat wajib diisi"),
-}).refine((data) => data.password === data.konfirmasiPassword, {
-    message: "Password dan konfirmasi password harus sama",
-    path: ["konfirmasiPassword"], // error akan muncul di field konfirmasiPassword
-});
-
 export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
     const resultData = RegistrasiInstansiSchema.safeParse(instansi);
 
     if (!resultData.success) {
-        const errors = resultData.error.flatten().fieldErrors;
-
         return {
-            success: false,
-            message: errors
+            success: false
         }
     }
 
     try {
+        // melakukan pengecekan apakah email sudah terdaftar atau belum
+        const emailExists = await prisma.user.findUnique({
+            where: {
+                email: resultData.data.email
+            }
+        });
+
+        if (emailExists) {
+            return {
+                success: false,
+                errors: {
+                    message: "Email yang dimasukkan sudah terdaftar sebagai akun, silahkan gunakan email lain."
+                }
+            }
+        }
+
         const data = await prisma.registrasiInstansi.create(
             {
                 data: {
@@ -141,9 +138,11 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
                     desaKelurahan: resultData.data.desaKelurahan,
                     kecamatan: resultData.data.kecamatan,
                     kabupatenKota: resultData.data.kabupatenKota,
+                    desaKelurahanKode: resultData.data.desaKelurahanKode,
+                    kecamatanKode: resultData.data.kecamatanKode,
+                    kabupatenKotaKode: resultData.data.kabupatenKotaKode,
                     password: resultData.data.password,
                     alamat: resultData.data.alamat,
-
                 }
             }
         );
@@ -152,6 +151,65 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
     } catch (error) {
         console.log(error)
 
-        return { success: false, message: "Terjadi kesalahan" }
+        return {
+            success: false,
+            errors: {
+                message: "Terjadi kesalahan"
+            }
+        }
+    }
+}
+
+export async function updateStatusRegistrasiInstansi(
+    prevState: any,
+    formData: FormData
+) {
+    const registrasiInstansiId = formData.get("registrasiInstansiId") as string
+    const statusRegistrasiInstansi = formData.get("statusRegistrasiInstansi") as string
+
+    if (!registrasiInstansiId || !statusRegistrasiInstansi) {
+        return {
+            success: false
+        }
+    }
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            const data = await tx.registrasiInstansi.update({
+                where: {
+                    id: registrasiInstansiId
+                },
+                data: {
+                    statusRegistrasiInstansi: {
+                        connect: {
+                            nama: statusRegistrasiInstansi
+                        }
+                    }
+                },
+                include: {
+                    statusRegistrasiInstansi: true,
+                }
+            })
+
+            if (data.statusRegistrasiInstansi.nama === "Diterima") {
+                await auth.api.signUpEmail({
+                    body: {
+                        name: data.nama,
+                        email: data.email,
+                        password: data.password,
+                        peranId: 2
+                    }
+                })
+            }
+        })
+
+        revalidatePath('/admin/dashboard')
+    } catch (error) {
+        console.log(error);
+
+        return {
+            success: false,
+            message: "Terjadi kesalahan"
+        }
     }
 }

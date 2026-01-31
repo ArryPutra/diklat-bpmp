@@ -13,7 +13,7 @@ import KonfirmasiData from './views/KonfirmasiData'
 import SuksesKirim from './views/SuksesKirim'
 import { useEffect } from 'react'
 
-export default function DaftarInstansi() {
+export default function RegistrasiIntansiView() {
     const daftarInstansi = useDaftarInstansi();
     const router = useRouter();
 
@@ -31,7 +31,7 @@ export default function DaftarInstansi() {
             className='p-0! flex max-w-full! h-dvh
             max-md:flex-col-reverse overflow-hidden'>
             {/* Tampilan Kiri */}
-            <div className="w-[60%] h-full p-12 overflow-auto max-md:w-full max-md:p-5 max-md:rounded-t-xl max-md:-mt-4 max-md:shadow-xl max-md:bg-white">
+            <div className="w-[60%] h-full p-12 overflow-auto max-md:w-full max-md:p-5 max-md:rounded-t-xl max-md:-mt-4 max-md:shadow-xl bg-white">
                 <Image
                     src='/images/logo/kemendikdasmen-bpmp-kalsel.png'
                     alt='Logo Kemendikdasmen'
@@ -78,6 +78,12 @@ export default function DaftarInstansi() {
                             onSubmit={daftarInstansi.onSubmitInstansiForm}
                             onBackStep={daftarInstansi.showPicForm}
                             errorMessages={daftarInstansi.instansiErrorMessages}
+
+                            daftarKabupatenKota={daftarInstansi.daftarKabupatenKota}
+                            setKabupatenKotaKode={daftarInstansi.setKabupatenKotaKode}
+                            daftarKecamatan={daftarInstansi.daftarKecamatan}
+                            setKecamatanKode={daftarInstansi.setKecamatanKode}
+                            daftarDesaKelurahan={daftarInstansi.daftarDesaKelurahan}
                         />
                     }
                 </div>
