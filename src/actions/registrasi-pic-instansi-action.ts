@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import RegistrasiPicInstansi from "@/models/RegistrasiPicInstansi";
-import RegistrasiPicInstansiSchema from "@/schemas/RegistrasiPicInstansiSchema";
+import { RegistrasiPicInstansiSchema } from "@/schemas/registrasi-pic-instansi.schema";
 
 export async function createRegistrasiPicInstansi(
     picInstansi: RegistrasiPicInstansi,
@@ -11,11 +11,8 @@ export async function createRegistrasiPicInstansi(
     const resultData = RegistrasiPicInstansiSchema.safeParse(picInstansi);
 
     if (!resultData.success) {
-        const errors = resultData.error.flatten().fieldErrors;
-
         return {
-            success: false,
-            message: errors
+            success: false
         }
     }
 
@@ -36,6 +33,6 @@ export async function createRegistrasiPicInstansi(
     } catch (error) {
         console.log(error)
 
-        return { success: false, message: "Terjadi kesalahan" }
+        return { success: false }
     }
 }

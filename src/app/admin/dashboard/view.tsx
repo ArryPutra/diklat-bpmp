@@ -3,7 +3,7 @@
 import StatsCard from '@/components/shared/stats-card'
 import { BiBookReader, BiBuilding, BiCheck, BiInfoCircle, BiInfoSquare, BiSearch, BiSolidBookReader, BiUser, BiUserCheck, BiUserVoice, BiX } from 'react-icons/bi'
 import DaftarInstansiTerbaru from './components/daftar-instansi-terbaru'
-import { RegistrasiInstansi } from '@/generated/prisma/client'
+import StatsCards from './components/stats-cards'
 
 type AdminDashboardViewProps = {
     dataStatistik: {
@@ -13,36 +13,27 @@ type AdminDashboardViewProps = {
         totalNarasumber: number;
     }
     daftarRegistrasiInstansi: any[]
+    totalDaftarRegistrasiInstansi: number
 }
 
 export default function AdminDashboardView({
     dataStatistik,
-    daftarRegistrasiInstansi
+    daftarRegistrasiInstansi,
+    totalDaftarRegistrasiInstansi
 }: AdminDashboardViewProps) {
 
     return (
         <>
-            <div className='grid grid-cols-3 gap-3 max-lg:grid-cols-2 max-md:grid-cols-1 mb-6'>
-                <StatsCard
-                    label='Total Diklat'
-                    value={dataStatistik.totalDiklat.toString()}
-                    icon={<BiBookReader />} />
-                <StatsCard
-                    label='Total Instansi'
-                    value={dataStatistik.totalInstansi.toString()}
-                    icon={<BiBuilding />} />
-                <StatsCard
-                    label='Total Peserta'
-                    value={dataStatistik.totalPeserta.toString()}
-                    icon={<BiUser />} />
-                <StatsCard
-                    label='Total Narasumber'
-                    value={dataStatistik.totalNarasumber.toString()}
-                    icon={<BiUserVoice />} />
-            </div>
+            <StatsCards dataStatistik={{
+                totalDiklat: dataStatistik.totalDiklat,
+                totalInstansi: dataStatistik.totalInstansi,
+                totalPeserta: dataStatistik.totalPeserta,
+                totalNarasumber: dataStatistik.totalNarasumber
+            }} />
 
             <DaftarInstansiTerbaru
                 daftarRegistrasiInstansi={daftarRegistrasiInstansi}
+                totalDaftarRegistrasiInstansi={totalDaftarRegistrasiInstansi}
             />
         </>
     )

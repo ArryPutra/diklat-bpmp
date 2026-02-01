@@ -39,7 +39,7 @@ function Header() {
 
   return (
     <header className="fixed w-full px-5 backdrop-blur-sm">
-      <div className="flex items-center justify-between w-full max-w-6xl mx-auto border mt-6 px-6 h-20 rounded-md bg-white/70 shadow
+      <div className="flex items-center justify-between w-full max-w-6xl mx-auto border mt-6 px-6 h-20 rounded-md bg-white shadow
         max-md:relative">
         <Image src="/images/logo/logo.png" alt="Logo Diklat" width={160} height={160} priority />
 

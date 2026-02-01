@@ -1,6 +1,6 @@
 "use client"
 
-import { getRegistrasiInstansiStatus } from '@/actions/registrasi-instansi-action'
+import { getRegistrasiInstansi } from '@/actions/registrasi-instansi-action'
 import Layout from '@/components/layouts/guest-layout'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -91,7 +91,7 @@ function InfoItem({ icon, label, value, masked = false }: {
 }
 
 export default function CekStatus() {
-    const [state, formAction, pending] = useActionState(getRegistrasiInstansiStatus, null);
+    const [state, formAction, pending] = useActionState(getRegistrasiInstansi, null);
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
     const [copied, setCopied] = useState(false);

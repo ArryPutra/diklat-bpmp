@@ -4,9 +4,9 @@ import { sendEmailAction } from "@/actions/send-email-action";
 import { useEffect, useState } from "react";
 import RegistrasiPicInstansi from "../../models/RegistrasiPicInstansi";
 import RegistrasiInstansi from "../../models/RegistrasiInstansi";
-import RegistrasiInstansiSchema from "../../schemas/RegistrasiInstansiSchema";
-import RegistrasiPicInstansiSchema from "../../schemas/RegistrasiPicInstansiSchema";
 import { getDesaKelurahanAction, getKabupatenKotaAction, getKecamatanAction } from "@/actions/data-wilayah-action";
+import { CreateRegistrasiInstansiSchema } from "@/schemas/registrasi-instansi.schema";
+import { RegistrasiPicInstansiSchema } from "@/schemas/registrasi-pic-instansi.schema";
 
 export function useDaftarInstansi() {
     const maxStep = 4;
@@ -130,7 +130,7 @@ export function useDaftarInstansi() {
     }
 
     function onSubmitInstansiForm() {
-        const resultData = RegistrasiInstansiSchema.safeParse(instansi);
+        const resultData = CreateRegistrasiInstansiSchema.safeParse(instansi);
 
         if (!resultData.success) {
             const errors = resultData.error.flatten().fieldErrors;
@@ -170,7 +170,7 @@ export function useDaftarInstansi() {
         setKonfirmasiDataLoading(false);
 
         if (!registrasiInstansi.success) {
-            setKonfirmasiDataErrorMessage(registrasiInstansi.errors?.message ?? "Terjadi kesalahan");
+            setKonfirmasiDataErrorMessage(registrasiInstansi?.message ?? "Terjadi kesalahan");
 
             return;
         }

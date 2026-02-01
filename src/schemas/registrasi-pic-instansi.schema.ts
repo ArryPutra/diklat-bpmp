@@ -6,5 +6,3 @@ export const RegistrasiPicInstansiSchema = z.object({
     nomorTelepon: z.string().min(10, "Nomor telepon minimum 10 karakter").max(12, "Nomor telepon maksimum 12 karakter"),
     jabatan: z.string().nonempty("Jabatan wajib diisi"),
 });
-
-export default RegistrasiPicInstansiSchema;

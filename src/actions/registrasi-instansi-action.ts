@@ -1,18 +1,53 @@
 "use server"
 
+import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import RegistrasiInstansi from "@/models/RegistrasiInstansi";
-import RegistrasiInstansiSchema from "@/schemas/RegistrasiInstansiSchema";
+import { GetRegistrasiInstansiSchema, CreateRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 
-const schemaRegistrasiInstansiStatus = z.object({
-    kodeRegistrasi: z.string().nonempty("Kode Registrasi wajib diisi"),
-});
+export async function getAllRegistrasiInstansi({
+    search = "",
+    page = "1",
+    statusRegistrasiInstansiId = 1
+}) {
+    const _search = search.trim();
 
-export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData) {
-    const result = schemaRegistrasiInstansiStatus.safeParse(Object.fromEntries(formData));
+    const where: Prisma.RegistrasiInstansiWhereInput = {
+        OR: [
+            {
+                nama: {
+                    contains: _search,
+                    mode: "insensitive"
+                },
+            }
+        ],
+        statusRegistrasiInstansi: {
+            id: statusRegistrasiInstansiId
+        }
+    }
+
+    const data = await prisma.registrasiInstansi.findMany({
+        skip: parseInt(page) * 10 - 10,
+        take: 10,
+        where,
+        include: {
+            registrasiPicInstansi: true,
+            statusRegistrasiInstansi: true
+        }
+    });
+
+    const total = await prisma.registrasiInstansi.count({ where });
+
+    return {
+        data: data,
+        total: total,
+    };
+}
+
+export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
+    const result = GetRegistrasiInstansiSchema.safeParse(Object.fromEntries(formData));
 
     if (!result.success) {
         return {
@@ -68,43 +103,8 @@ export async function getRegistrasiInstansiStatus(_prev: any, formData: FormData
     }
 }
 
-// Fungsi lama untuk backward compatibility (internal use only)
-export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
-    const result = schemaRegistrasiInstansiStatus.safeParse(Object.fromEntries(formData));
-
-    if (!result.success) {
-        return {
-            success: false,
-            message: "Kode Registrasi wajib diisi",
-        };
-    }
-
-    const kodeRegistrasi = result.data.kodeRegistrasi;
-
-    try {
-        const data = await prisma.registrasiInstansi.
-            findFirst({
-                where: {
-                    id: kodeRegistrasi
-                },
-                include: {
-                    statusRegistrasiInstansi: true,
-                    registrasiPicInstansi: true
-                }
-            });
-
-        if (!data) {
-            return { success: false, message: "Data tidak ditemukan" };
-        }
-
-        return { success: true, data: data };
-    } catch (error) {
-        return { success: false, message: "Terjadi kesalahan" };
-    }
-}
-
 export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
-    const resultData = RegistrasiInstansiSchema.safeParse(instansi);
+    const resultData = CreateRegistrasiInstansiSchema.safeParse(instansi);
 
     if (!resultData.success) {
         return {
@@ -113,7 +113,7 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
     }
 
     try {
-        // melakukan pengecekan apakah email sudah terdaftar atau belum
+        // melakukan pengecekan apakah email sudah terdaftar pada user autentikasi atau belum
         const emailExists = await prisma.user.findUnique({
             where: {
                 email: resultData.data.email
@@ -123,9 +123,7 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
         if (emailExists) {
             return {
                 success: false,
-                errors: {
-                    message: "Email yang dimasukkan sudah terdaftar sebagai akun, silahkan gunakan email lain."
-                }
+                message: "Email yang dimasukkan sudah terdaftar sebagai akun, silahkan gunakan email lain."
             }
         }
 
@@ -147,15 +145,17 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
             }
         );
 
-        return { success: true, data: data }
+        return {
+            success: true,
+            message: "Registrasi instansi berhasil",
+            data: data
+        }
     } catch (error) {
         console.log(error)
 
         return {
             success: false,
-            errors: {
-                message: "Terjadi kesalahan"
-            }
+            message: "Terjadi kesalahan"
         }
     }
 }
@@ -164,10 +164,9 @@ export async function updateStatusRegistrasiInstansi(
     prevState: any,
     formData: FormData
 ) {
-    const registrasiInstansiId = formData.get("registrasiInstansiId") as string
-    const statusRegistrasiInstansi = formData.get("statusRegistrasiInstansi") as string
+    const resultData = UpdateRegistrasiInstansiStatusSchema.safeParse(Object.fromEntries(formData));
 
-    if (!registrasiInstansiId || !statusRegistrasiInstansi) {
+    if (!resultData.success) {
         return {
             success: false
         }
@@ -177,12 +176,12 @@ export async function updateStatusRegistrasiInstansi(
         await prisma.$transaction(async (tx) => {
             const data = await tx.registrasiInstansi.update({
                 where: {
-                    id: registrasiInstansiId
+                    id: resultData.data.registrasiInstansiId
                 },
                 data: {
                     statusRegistrasiInstansi: {
                         connect: {
-                            nama: statusRegistrasiInstansi
+                            nama: resultData.data.statusRegistrasiInstansi
                         }
                     }
                 },
@@ -204,12 +203,15 @@ export async function updateStatusRegistrasiInstansi(
         })
 
         revalidatePath('/admin/dashboard')
+
+        return {
+            success: true
+        }
     } catch (error) {
         console.log(error);
 
         return {
-            success: false,
-            message: "Terjadi kesalahan"
+            success: false
         }
     }
 }

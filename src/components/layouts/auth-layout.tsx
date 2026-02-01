@@ -43,7 +43,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     return (
         <div className="bg-gray-50 flex">
             {/* SIDEBAR */}
-            <aside className={`min-w-60 bg-white px-5 h-dvh z-10 fixed
+            <aside className={`min-w-60 bg-white px-5 h-dvh z-50 fixed
             max-md:shadow max-md:-left-full max-md:duration-500
                 ${sidebarOpen && 'max-md:left-0'}`}>
                 <div className="border-b h-20 flex items-center justify-center
@@ -82,7 +82,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
             <div className="flex flex-col w-full">
                 {/* HEADER */}
-                <header className="min-h-20 flex items-center px-5 justify-between bg-white w-full border-b fixed pl-65
+                <header className="min-h-20 flex items-center px-5 justify-between bg-white w-full border-b fixed pl-65 z-30
                 max-md:pl-5">
                     <BiMenu size={40} className="md:hidden"
                         onClick={() => { setSidebarOpen(true) }} />
@@ -103,8 +103,8 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                         namaPeran={user.namaPeran} />
                 </header>
 
-                <main className="overflow-auto w-full pl-65 pt-25 h-dvh
-                max-md:p-5 max-md:pt-25">
+                <main className="w-full pl-65 pt-25 min-h-dvh p-5
+                max-md:pl-5 max-md:pt-25">
                     <h1 className="md:hidden text-xl font-bold text-primary mb-6">
                         {getTitle?.name}
                     </h1>
@@ -115,7 +115,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
             </div>
 
             {/* OVERLAY (FOR MOBILE WHEN SIDEBAR IS OPEN) */}
-            <div className={`max-md:w-full max-md:h-screen max-md:duration-300 max-md:fixed
+            <div className={`max-md:w-full max-md:h-screen max-md:duration-300 max-md:fixed max-md:z-40
                 ${sidebarOpen ? 'max-md:bg-black/50 max-md:pointer-events-auto' : 'max-md:bg-transparent max-md:pointer-events-none'}`}
                 onClick={() => { setSidebarOpen(false) }}>
 

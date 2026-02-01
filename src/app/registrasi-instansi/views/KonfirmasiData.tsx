@@ -89,7 +89,7 @@ export default function KonfirmasiData({
                     onClick={onSubmit}
                     variant={loading ? 'secondary' : 'default'}
                     disabled={loading}>
-                    {loading ? 'Sedang Kirim...' : 'Kirim Data'}
+                    {loading ? 'Sedang Kirim...' : 'Registrasi Sekarang'}
                 </Button>
             </div>
         </>

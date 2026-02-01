@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const RegistrasiInstansiSchema = z.object({
+export const CreateRegistrasiInstansiSchema = z.object({
     nama: z.string().nonempty("Nama wajib diisi"),
     email: z.string().email("Email tidak valid"),
     nomorTelepon: z.string().min(10, "Nomor telepon minimum 10 karakter").max(12, "Nomor telepon maksimum 12 karakter"),
@@ -16,6 +16,13 @@ export const RegistrasiInstansiSchema = z.object({
 }).refine((data) => data.password === data.konfirmasiPassword, {
     message: "Password dan konfirmasi password harus sama",
     path: ["konfirmasiPassword"],
-});
+})
 
-export default RegistrasiInstansiSchema;
+export const GetRegistrasiInstansiSchema = z.object({
+    kodeRegistrasi: z.string().nonempty("Kode Registrasi wajib diisi"),
+})
+
+export const UpdateRegistrasiInstansiStatusSchema = z.object({
+    registrasiInstansiId: z.string().nonempty("ID Registrasi Instansi wajib diisi"),
+    statusRegistrasiInstansi: z.string().nonempty("Status Registrasi Instansi wajib diisi"),
+})

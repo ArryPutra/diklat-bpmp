@@ -2,14 +2,9 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { LoginSchema } from "@/schemas/auth.schema";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { z } from "zod";
-
-const LoginSchema = z.object({
-    email: z.string().nonempty("Email wajib diisi").email("Email tidak valid"),
-    password: z.string().nonempty("Password wajib diisi"),
-});
 
 export async function loginAction(prev: any, formData: FormData) {
     const result = LoginSchema.safeParse(Object.fromEntries(formData));
@@ -19,12 +14,11 @@ export async function loginAction(prev: any, formData: FormData) {
 
         return {
             success: false,
-            message: result.error.message,
             errors: {
                 field: {
                     email: fieldErrors.email?.[0],
                     password: fieldErrors.password?.[0],
-                }
+                },
             },
             values: {
                 email: formData.get("email")?.toString(),
@@ -47,9 +41,7 @@ export async function loginAction(prev: any, formData: FormData) {
 
         return {
             success: false,
-            errors: {
-                message: "Email atau password salah",
-            },
+            message: "Email atau password salah",
             values: {
                 email: formData.get("email")?.toString(),
                 password: formData.get("password")?.toString(),
@@ -71,6 +63,7 @@ export async function loginAction(prev: any, formData: FormData) {
     }
 }
 
+// fungsi mendapatkan data login pengguna
 export async function getCurrentSession() {
     const session = await auth.api.getSession({
         headers: await headers()
@@ -79,6 +72,7 @@ export async function getCurrentSession() {
     return session;
 }
 
+// fungsi mendapatkan data login pengguna (user) lebih spesifik
 export async function getCurrentUser() {
     const session = await auth.api.getSession({
         headers: await headers()

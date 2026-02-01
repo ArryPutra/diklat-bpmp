@@ -32,10 +32,10 @@ export default function Masuk() {
                         <p className='text-muted-foreground'>Selamat datang, silahkan login</p>
 
                         {
-                            state?.errors?.message &&
+                            state?.message &&
                             <Alert variant='destructive' className='mt-6'>
                                 <AlertTitle>Pesan Kesalahan:</AlertTitle>
-                                <AlertDescription>{state.errors.message}</AlertDescription>
+                                <AlertDescription>{state.message}</AlertDescription>
                             </Alert>
                         }
 

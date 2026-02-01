@@ -1,3 +1,5 @@
+"use client"
+
 import { ContentCanvas } from '@/components/layouts/auth-layout'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -11,14 +13,42 @@ import { AlertTriangleIcon, CheckCircle2Icon, CircleFadingPlusIcon } from 'lucid
 import { Spinner } from '@/components/ui/spinner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { updateStatusRegistrasiInstansi } from '@/actions/registrasi-instansi-action'
-import { Dialog, DialogHeader } from '@/components/ui/dialog'
-import { DialogContent, DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { PaginationWithLinks } from '@/components/shared/pagination-with-links'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Field, FieldLabel } from '@/components/ui/field'
 
 export default function DaftarInstansiTerbaru({
-    daftarRegistrasiInstansi
+    daftarRegistrasiInstansi,
+    totalDaftarRegistrasiInstansi
 }: {
     daftarRegistrasiInstansi: any[]
+    totalDaftarRegistrasiInstansi: number
 }) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
+
+    const currentPage = parseInt(searchParams.get("page") ?? "1");
+
+    function onSearch(formData: FormData) {
+        const search = formData.get('search')?.toString() ?? "";
+
+        if (search) {
+            params.set("search", search);
+        } else {
+            params.delete("search");
+        }
+
+        router.push(`?${params.toString()}`);
+    }
+
+    function onChangeStatus(value: string) {
+        params.set("status", value);
+
+        router.push(`?${params.toString()}`);
+    }
+
     return (
         <ContentCanvas>
             <div className='flex justify-between flex-wrap mb-4 gap-3'>
@@ -26,21 +56,48 @@ export default function DaftarInstansiTerbaru({
                     <h1 className='font-bold'>Pendaftaran Instansi Terbaru</h1>
                     <p className='text-sm'>Pendaftaran instansi yang perlu ditinjau</p>
                 </div>
-                <div className='flex gap-2'>
-                    <Input placeholder='Cari' />
-                    <Button size='icon'><BiSearch /></Button>
-                </div>
             </div>
 
-            <Table className='max-w-full'>
+            <div className='flex items-end justify-between gap-3 mb-4'>
+                <Field className='w-fit'>
+                    <FieldLabel>
+                        Status
+                    </FieldLabel>
+                    <Select
+                        defaultValue={params.get("status") ?? "1"}
+                        onValueChange={onChangeStatus}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select page size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value='1'>Diajukan</SelectItem>
+                                <SelectItem value='2'>Diterima</SelectItem>
+                                <SelectItem value='3'>Ditolak</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </Field>
+
+                <form className='flex gap-2' action={onSearch}>
+                    <Input
+                        placeholder='Cari'
+                        name='search'
+                        defaultValue={params.get("search") ?? ""} />
+                    <Button size='icon' type='submit'>
+                        <BiSearch />
+                    </Button>
+                </form>
+            </div>
+
+            <Table className='max-w-full mb-6'>
                 <TableHeader>
                     <TableRow>
                         <TableHead>No</TableHead>
                         <TableHead>Instansi</TableHead>
-                        <TableHead>Instansi Kontak</TableHead>
                         <TableHead>PIC</TableHead>
-                        <TableHead>PIC Kontak</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Daerah</TableHead>
                         <TableHead>Waktu Pendaftaran</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
@@ -51,16 +108,18 @@ export default function DaftarInstansiTerbaru({
                             ?
                             daftarRegistrasiInstansi.map((item: any, index: number) => (
                                 <TableRow key={index}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{item.nama}</TableCell>
+                                    <TableCell>{index + 1 + (currentPage - 1) * 10}</TableCell>
                                     <TableCell>
-                                        <span className='font-semibold'>{item.nomorTelepon}</span>
+                                        <span className='font-semibold'>{item.nama}</span>
+                                        <br />
+                                        <span>{item.nomorTelepon}</span>
                                         <br />
                                         <span>{item.email}</span>
                                     </TableCell>
-                                    <TableCell>{item.registrasiPicInstansi.nama}</TableCell>
                                     <TableCell>
-                                        <span className='font-semibold'>{item.registrasiPicInstansi.nomorTelepon}</span>
+                                        <span className='font-semibold'>{item.registrasiPicInstansi.nama}</span>
+                                        <br />
+                                        <span>{item.registrasiPicInstansi.nomorTelepon}</span>
                                         <br />
                                         <span>{item.registrasiPicInstansi.email}</span>
                                     </TableCell>
@@ -68,6 +127,13 @@ export default function DaftarInstansiTerbaru({
                                         <span className={`${item.statusRegistrasiInstansi.warna} px-4 py-2 rounded-full text-white text-xs font-semibold`}>
                                             {item.statusRegistrasiInstansi.nama}
                                         </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className='font-semibold'>{item.kabupatenKota}</span>
+                                        <br />
+                                        <span>{item.kecamatan}</span>
+                                        <br />
+                                        <span>{item.desaKelurahan}</span>
                                     </TableCell>
                                     <TableCell>
                                         {
@@ -96,6 +162,16 @@ export default function DaftarInstansiTerbaru({
                     }
                 </TableBody>
             </Table>
+
+            {
+                totalDaftarRegistrasiInstansi > 0 &&
+                <div className='w-fit ml-auto'>
+                    <PaginationWithLinks
+                        page={currentPage}
+                        pageSize={10}
+                        totalCount={totalDaftarRegistrasiInstansi} />
+                </div>
+            }
         </ContentCanvas>
     )
 }
