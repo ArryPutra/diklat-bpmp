@@ -47,7 +47,7 @@ export default function Masuk() {
                                         placeholder='Masukkan email'
                                         type='email'
                                         name='email'
-                                        defaultValue={state?.values.email} />
+                                        defaultValue={state?.values?.email} />
                                     {
                                         state?.errors?.field?.email &&
                                         <FieldError>{state.errors.field?.email}</FieldError>

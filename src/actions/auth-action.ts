@@ -29,6 +29,22 @@ export async function loginAction(prev: any, formData: FormData) {
 
     let session = null;
 
+    const getUser = await prisma.user.findUnique({
+        where: {
+            email: result.data.email
+        },
+        select: {
+            apakahNonaktif: true
+        }
+    });
+
+    if (getUser?.apakahNonaktif) {
+        return {
+            success: false,
+            message: "Akun anda telah dinonaktifkan",
+        }
+    }
+
     try {
         session = await auth.api.signInEmail({
             body: {

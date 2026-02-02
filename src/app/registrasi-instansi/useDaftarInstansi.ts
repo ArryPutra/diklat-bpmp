@@ -1,12 +1,14 @@
-import { createRegistrasiInstansi } from "@/actions/registrasi-instansi-action";
+"use client"
+
+import { getDesaKelurahanAction, getKabupatenKotaAction, getKecamatanAction } from "@/actions/data-wilayah-action";
+import { createRegistrasiInstansiAction, deleteRegistrasiInstansiAction } from "@/actions/registrasi-instansi-action";
 import { createRegistrasiPicInstansi } from "@/actions/registrasi-pic-instansi-action";
 import { sendEmailAction } from "@/actions/send-email-action";
-import { useEffect, useState } from "react";
-import RegistrasiPicInstansi from "../../models/RegistrasiPicInstansi";
-import RegistrasiInstansi from "../../models/RegistrasiInstansi";
-import { getDesaKelurahanAction, getKabupatenKotaAction, getKecamatanAction } from "@/actions/data-wilayah-action";
 import { CreateRegistrasiInstansiSchema } from "@/schemas/registrasi-instansi.schema";
 import { RegistrasiPicInstansiSchema } from "@/schemas/registrasi-pic-instansi.schema";
+import { useEffect, useState } from "react";
+import RegistrasiInstansi from "../../models/RegistrasiInstansi";
+import RegistrasiPicInstansi from "../../models/RegistrasiPicInstansi";
 
 export function useDaftarInstansi() {
     const maxStep = 4;
@@ -162,22 +164,35 @@ export function useDaftarInstansi() {
 
         setKonfirmasiDataLoading(true);
 
-        const registrasiInstansi = await createRegistrasiInstansi(instansi);
-        if (registrasiInstansi.success) {
-            createRegistrasiPicInstansi(picInstansi, registrasiInstansi.data?.id!);
+        const createRegistrasiInstansi = await createRegistrasiInstansiAction(instansi);
+        // jika registrasi instansi berhasil dibuat
+        if (createRegistrasiInstansi.success) {
+            // buat registrasi pic instansi
+            const createPicInstansi = await createRegistrasiPicInstansi(picInstansi, createRegistrasiInstansi.data?.id!);
+
+            // jika registrasi pic instansi gagal dibuat
+            if (!createPicInstansi.success) {
+                // hapus registrasi instansi tadi
+                await deleteRegistrasiInstansiAction(createRegistrasiInstansi.data?.id!);
+
+                setKonfirmasiDataErrorMessage(createRegistrasiInstansi.message ?? "Terjadi kesalahan");
+                setKonfirmasiDataLoading(false);
+
+                return;
+            }
         }
-
-        setKonfirmasiDataLoading(false);
-
-        if (!registrasiInstansi.success) {
-            setKonfirmasiDataErrorMessage(registrasiInstansi?.message ?? "Terjadi kesalahan");
+        // jika registrasi instansi gagal
+        else {
+            setKonfirmasiDataErrorMessage(createRegistrasiInstansi.message ?? "Terjadi kesalahan");
+            setKonfirmasiDataLoading(false);
 
             return;
         }
 
+
         setStep(4);
 
-        setKodeTiketRegistrasi(registrasiInstansi.data?.id ?? "-");
+        setKodeTiketRegistrasi(createRegistrasiInstansi.data?.id ?? "-");
 
         await sendEmailAction({
             toEmail: picInstansi.email,
@@ -192,7 +207,7 @@ export function useDaftarInstansi() {
     
     <div style="text-align: center; margin: 20px 0;">
       <span style="font-size: 24px; font-weight: bold; color: #1abc9c; padding: 10px 20px; border: 2px dashed #1abc9c; border-radius: 6px;">
-        ${registrasiInstansi.data?.id}
+        ${createRegistrasiInstansi.data?.id}
       </span>
     </div>
     

@@ -1,6 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { BiUser } from 'react-icons/bi'
+import { Card, CardContent, CardDescription, CardTitle } from '../ui/card'
 
 type StatsCardProps = {
     icon: React.ReactNode

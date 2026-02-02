@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import AdminDashboardView from './view'
-import { getAllRegistrasiInstansi } from '@/actions/registrasi-instansi-action';
+import { getAllRegistrasiInstansiAction } from '@/actions/registrasi-instansi-action';
 
 type AdminDashboardViewProps = {
     searchParams: Promise<{
@@ -18,7 +18,7 @@ export default async function AdminDashboardPage({
     const searchQuery = await searchParams;
 
     const daftarRegistrasiInstansi =
-        await getAllRegistrasiInstansi({
+        await getAllRegistrasiInstansiAction({
             page: searchQuery.page,
             search: searchQuery.search,
             statusRegistrasiInstansiId: parseInt(searchQuery.status ?? "1")

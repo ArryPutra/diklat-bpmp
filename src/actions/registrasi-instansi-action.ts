@@ -4,10 +4,10 @@ import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import RegistrasiInstansi from "@/models/RegistrasiInstansi";
-import { GetRegistrasiInstansiSchema, CreateRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
+import { CreateRegistrasiInstansiSchema, GetRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
 import { revalidatePath } from "next/cache";
 
-export async function getAllRegistrasiInstansi({
+export async function getAllRegistrasiInstansiAction({
     search = "",
     page = "1",
     statusRegistrasiInstansiId = 1
@@ -103,7 +103,7 @@ export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
     }
 }
 
-export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
+export async function createRegistrasiInstansiAction(instansi: RegistrasiInstansi) {
     const resultData = CreateRegistrasiInstansiSchema.safeParse(instansi);
 
     if (!resultData.success) {
@@ -160,7 +160,7 @@ export async function createRegistrasiInstansi(instansi: RegistrasiInstansi) {
     }
 }
 
-export async function updateStatusRegistrasiInstansi(
+export async function updateStatusRegistrasiInstansiAction(
     prevState: any,
     formData: FormData
 ) {
@@ -172,9 +172,15 @@ export async function updateStatusRegistrasiInstansi(
         }
     }
 
+    let messageData = {
+        namaInstansi: "",
+        status: ""
+    };
+
     try {
         await prisma.$transaction(async (tx) => {
-            const data = await tx.registrasiInstansi.update({
+            // memperbarui status registrasi instansi
+            const updateRegistrasiInstansi = await tx.registrasiInstansi.update({
                 where: {
                     id: resultData.data.registrasiInstansiId
                 },
@@ -187,25 +193,68 @@ export async function updateStatusRegistrasiInstansi(
                 },
                 include: {
                     statusRegistrasiInstansi: true,
+                    registrasiPicInstansi: true
                 }
             })
 
-            if (data.statusRegistrasiInstansi.nama === "Diterima") {
-                await auth.api.signUpEmail({
+            // jika status registrasi instansi diterima, maka buat akun instansi
+            if (updateRegistrasiInstansi.statusRegistrasiInstansi.nama === "Diterima") {
+                // buat akun instansi
+                const createInstansiUser = await auth.api.signUpEmail({
                     body: {
-                        name: data.nama,
-                        email: data.email,
-                        password: data.password,
+                        name: updateRegistrasiInstansi.nama,
+                        email: updateRegistrasiInstansi.email,
+                        password: updateRegistrasiInstansi.password,
                         peranId: 2
                     }
                 })
+
+                // buat data instansi berelasi dengan akun/user
+                const createInstansi = await tx.instansi.create({
+                    data: {
+                        userId: createInstansiUser.user.id,
+                        nomorTelepon: updateRegistrasiInstansi.nomorTelepon,
+                        registrasiInstansiId: updateRegistrasiInstansi.id,
+                        desaKelurahan: updateRegistrasiInstansi.desaKelurahan,
+                        kecamatan: updateRegistrasiInstansi.kecamatan,
+                        kabupatenKota: updateRegistrasiInstansi.kabupatenKota,
+                        desaKelurahnKode: updateRegistrasiInstansi.desaKelurahanKode,
+                        kecamatanKode: updateRegistrasiInstansi.kecamatanKode,
+                        kabupatenKotaKode: updateRegistrasiInstansi.kabupatenKotaKode,
+                        alamat: updateRegistrasiInstansi.alamat
+                    }
+                })
+
+                // buat data pic instansi berelasi dengan instansi
+                await tx.picInstansi.create({
+                    data: {
+                        instansiId: createInstansi.id,
+                        registrasiPicInstansiId: updateRegistrasiInstansi.registrasiPicInstansi?.id ?? 0,
+                        nama: updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "-",
+                        email: updateRegistrasiInstansi.registrasiPicInstansi?.email ?? "-",
+                        nomorTelepon: updateRegistrasiInstansi.registrasiPicInstansi?.nomorTelepon ?? "-",
+                        jabatan: updateRegistrasiInstansi.registrasiPicInstansi?.jabatan ?? "-"
+                    }
+                })
             }
+
+            messageData.namaInstansi = updateRegistrasiInstansi.nama
+            messageData.status = updateRegistrasiInstansi.statusRegistrasiInstansi.nama
         })
 
         revalidatePath('/admin/dashboard')
 
+        let message = '';
+
+        if (messageData.status === "Diterima") {
+            message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil diterima. Silahkan cek di halaman daftar instansi.`;
+        } else if (messageData.status === "Ditolak") {
+            message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil ditolak.`;
+        }
+
         return {
-            success: true
+            success: true,
+            message: message,
         }
     } catch (error) {
         console.log(error);
@@ -214,4 +263,17 @@ export async function updateStatusRegistrasiInstansi(
             success: false
         }
     }
+}
+
+export async function deleteRegistrasiInstansiAction(id: string) {
+    try {
+        await prisma.registrasiInstansi.delete({ where: { id: id } });
+
+        return { success: true }
+    } catch (error) {
+        console.log(error)
+
+        return { success: false }
+    }
+
 }

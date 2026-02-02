@@ -14,17 +14,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  peran         Peran?    @relation(fields: [peranId], references: [id])
-  peranId       Int
+  id             String    @id
+  name           String
+  email          String
+  emailVerified  Boolean   @default(false)
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  sessions       Session[]
+  accounts       Account[]
+  peran          Peran?    @relation(fields: [peranId], references: [id])
+  peranId        Int
+  apakahNonaktif Boolean   @default(false)
+  instansi       Instansi?
 
   @@unique([email])
   @@map("user")
@@ -106,6 +108,7 @@ model RegistrasiInstansi {
   createdAt                  DateTime                 @default(now())
   updatedAt                  DateTime                 @updatedAt
   registrasiPicInstansi      RegistrasiPicInstansi?
+  instansi                   Instansi?
 
   @@map("registrasi_instansi")
 }
@@ -122,7 +125,7 @@ model StatusRegistrasiInstansi {
 }
 
 model RegistrasiPicInstansi {
-  id                   String             @id @default(cuid())
+  id                   Int                @id @default(autoincrement())
   registrasiInstansiId String             @unique
   registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id], onDelete: Cascade)
   nama                 String
@@ -131,6 +134,44 @@ model RegistrasiPicInstansi {
   jabatan              String
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
+  picInstansi          PicInstansi?
 
   @@map("registrasi_pic_instansi")
+}
+
+model Instansi {
+  id                   Int                @id @default(autoincrement())
+  registrasiInstansiId String             @unique
+  registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id])
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id])
+  nomorTelepon         String
+  desaKelurahan        String
+  kecamatan            String
+  kabupatenKota        String
+  desaKelurahnKode     String
+  kecamatanKode        String
+  kabupatenKotaKode    String
+  alamat               String
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  picInstansi          PicInstansi?
+
+  @@map("instansi")
+}
+
+model PicInstansi {
+  id                      Int                   @id @default(autoincrement())
+  instansiId              Int                   @unique
+  instansi                Instansi              @relation(fields: [instansiId], references: [id])
+  registrasiPicInstansiId Int                   @unique
+  registrasiPicInstansi   RegistrasiPicInstansi @relation(fields: [registrasiPicInstansiId], references: [id])
+  nama                    String
+  email                   String
+  nomorTelepon            String
+  jabatan                 String
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+
+  @@map("pic_instansi")
 }
