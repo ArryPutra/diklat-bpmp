@@ -5,6 +5,7 @@ import StatsCard from "@/components/shared/stats-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BiBuilding, BiCalendar, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
@@ -32,7 +33,11 @@ export default function Home() {
   );
 }
 
-function Header() {
+export function Header({
+  activeMenuLabel
+}: {
+  activeMenuLabel?: string
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const router = useRouter();
@@ -48,9 +53,9 @@ function Header() {
           ${menuOpen ? 'max-md:h-46 max-md:py-4 max-md:shadow max-md:border-primary/15 max-md:border' : 'max-md:h-0 max-md:py-0 max-md:shadow-none max-md:border-transparent max-md:border-0'}`}>
           <ul className={`flex gap-3 font-semibold absolute left-1/2 -translate-x-1/2
             max-md:flex-col max-md:static max-md:translate-0`}>
-            <li className="hover:text-primary"><a href="#beranda">Beranda</a></li>
-            <li className="hover:text-primary"><a href="#diklat">Diklat</a></li>
-            <li className="hover:text-primary"><a href="#faq">FAQ</a></li>
+            <li className="hover:text-primary"><a href="/#beranda">Beranda</a></li>
+            <li className={`hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary"}`}><a href="/#diklat">Diklat</a></li>
+            <li className="hover:text-primary"><a href="/#faq">FAQ</a></li>
           </ul>
           <Button onClick={() => router.push('/login')}>Masuk</Button>
         </div>
@@ -84,9 +89,10 @@ function Beranda() {
         <h1 className="text-2xl font-bold">Sistem Informasi Diklat & Pelatihan Pendidikan</h1>
         <p>Program pendidikan dan pelatihan (diklat) yang dirancang untuk mendukung pengembangan kompetensi.</p>
         <div className="mt-4 flex gap-3 flex-wrap">
-          <a href="#diklat">
+
+          <Link href='/cari-diklat'>
             <Button>Cari Diklat <BiRightArrowAlt /></Button>
-          </a>
+          </Link>
           <Button variant='outline' onClick={() => router.push('/registrasi-instansi')}>
             Daftarkan Instansi
           </Button>

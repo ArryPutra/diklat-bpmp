@@ -41,7 +41,7 @@ export async function loginAction(prev: any, formData: FormData) {
     if (getUser?.apakahNonaktif) {
         return {
             success: false,
-            message: "Akun anda telah dinonaktifkan",
+            message: "Akun Anda telah dinonaktifkan",
         }
     }
 

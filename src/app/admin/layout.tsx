@@ -1,6 +1,6 @@
 
 import AuthLayout from '@/components/layouts/auth-layout'
-import { BiBook, BiBookBookmark, BiBookReader, BiBuilding, BiHome, BiLeaf, BiSolidCaretUpCircle, BiSolidGraduation, BiUser, BiUserPlus, BiUserVoice } from 'react-icons/bi'
+import { BiBookReader, BiBuilding, BiHome, BiUserVoice } from 'react-icons/bi'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -8,9 +8,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             menuItems={
                 [
                     { name: 'Dashboard', icon: <BiHome />, url: '/admin/dashboard' },
-                    { name: 'Diklat', icon: <BiBookReader />, url: '/admin/kelola-diklat' },
-                    { name: 'Instansi', icon: <BiBuilding />, url: '/admin/instansi' },
-                    { name: 'Peserta', icon: <BiUser />, url: '/admin/peserta' },
+                    { name: 'Kelola Diklat', icon: <BiBookReader />, url: '/admin/kelola-diklat' },
+                    { name: 'Kelola Instansi', icon: <BiBuilding />, url: '/admin/kelola-instansi' },
                     { name: 'Narasumber', icon: <BiUserVoice />, url: '/admin/narasumber' },
                 ]
             }>

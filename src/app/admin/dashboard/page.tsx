@@ -1,8 +1,8 @@
 "use server"
 
-import prisma from '@/lib/prisma';
-import AdminDashboardView from './view'
 import { getAllRegistrasiInstansiAction } from '@/actions/registrasi-instansi-action';
+import prisma from '@/lib/prisma';
+import AdminDashboardView from './view';
 
 type AdminDashboardViewProps = {
     searchParams: Promise<{
@@ -21,7 +21,7 @@ export default async function AdminDashboardPage({
         await getAllRegistrasiInstansiAction({
             page: searchQuery.page,
             search: searchQuery.search,
-            statusRegistrasiInstansiId: parseInt(searchQuery.status ?? "1")
+            statusRegistrasiInstansiId: parseInt(searchQuery.status ?? "1"),
         });
 
     const dataStatistik = {

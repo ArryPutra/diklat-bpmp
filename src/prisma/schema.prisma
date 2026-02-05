@@ -116,7 +116,7 @@ model RegistrasiInstansi {
 model StatusRegistrasiInstansi {
   id                 Int                  @id @default(autoincrement())
   nama               String               @unique
-  warna              String
+  backgroundColor    String
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   registrasiInstansi RegistrasiInstansi[]
@@ -161,17 +161,56 @@ model Instansi {
 }
 
 model PicInstansi {
-  id                      Int                   @id @default(autoincrement())
-  instansiId              Int                   @unique
-  instansi                Instansi              @relation(fields: [instansiId], references: [id])
+  id Int @id @default(autoincrement())
+
+  instansiId Int @unique
+
   registrasiPicInstansiId Int                   @unique
   registrasiPicInstansi   RegistrasiPicInstansi @relation(fields: [registrasiPicInstansiId], references: [id])
   nama                    String
   email                   String
   nomorTelepon            String
   jabatan                 String
-  createdAt               DateTime              @default(now())
-  updatedAt               DateTime              @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  instansi Instansi @relation(fields: [instansiId], references: [id])
 
   @@map("pic_instansi")
+}
+
+model Diklat {
+  id String @id @default(cuid())
+
+  metodeDiklatId Int
+
+  judul                   String
+  deskripsi               String?
+  tujuan                  String
+  targetSasaran           String
+  maksimalKuota           Int
+  tanggalBukaPendaftaran  DateTime
+  tanggalTutupPendaftaran DateTime
+  tanggalMulaiAcara       DateTime
+  tanggalSelesaiAcara     DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  metodeDiklat MetodeDiklat @relation(fields: [metodeDiklatId], references: [id])
+
+  @@map("diklat")
+}
+
+model MetodeDiklat {
+  id Int @id @default(autoincrement())
+
+  nama            String  @unique
+  deskripsi       String?
+  backgroundColor String
+
+  diklat Diklat[]
+
+  @@map("metode_diklat")
 }

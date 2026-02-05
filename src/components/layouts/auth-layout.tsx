@@ -1,14 +1,13 @@
 'use client'
 
-import Image from "next/image"
+import { getCurrentUser, logoutAction } from "@/actions/auth-action";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
-import { BiBookContent, BiChevronDown, BiDownArrowCircle, BiHome, BiLogOut, BiMenu, BiMoon, BiSolidGraduation, BiSolidMoon, BiSolidSun, BiSun, BiX } from "react-icons/bi"
+import { useActionState, useEffect, useState } from "react";
+import { BiChevronDown, BiLogOut, BiMenu, BiX } from "react-icons/bi";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { getCurrentSession, getCurrentUser, logoutAction } from "@/actions/auth-action";
 import { Spinner } from "../ui/spinner";
-import { Switch } from "../ui/switch";
 
 type MenuItem = {
     name: string;
@@ -29,7 +28,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     const router = useRouter();
     const pathname = usePathname();
 
-    const getTitle = menuItems.find(item => item.url === pathname);
+    const getTitle = menuItems.find(item => item.url === pathname || pathname.startsWith(item.url + '/'));
 
     useEffect(() => {
         async function fetchCurrentUser() {
@@ -64,9 +63,9 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                     {
                         menuItems.map((item, index) => (
                             <button key={index} className={`h-12 rounded-xl flex items-center gap-3 pl-3 duration-300 transition-[background-color]
-                                ${pathname === item.url ? 'border border-transparent bg-primary text-white shadow' : 'border hover:bg-gray-100'}`}
+                                ${pathname.startsWith(item.url) ? 'border border-transparent bg-primary text-white shadow' : 'border hover:bg-gray-100'}`}
                                 onClick={() => {
-                                    if (pathname == item.url) return;
+                                    if (pathname.startsWith(item.url)) return;
 
                                     router.push(item.url)
                                     setSidebarOpen(false)

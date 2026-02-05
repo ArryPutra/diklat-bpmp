@@ -1,8 +1,8 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertDialogAction } from '@radix-ui/react-alert-dialog'
-import { AlertTriangleIcon } from 'lucide-react'
+"use client"
+
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import React from 'react'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog'
 
 type ActionDialogProps = {
     title: string
@@ -11,7 +11,7 @@ type ActionDialogProps = {
     triggerButton: React.ReactNode
     actionButton: React.ReactNode
     content?: React.ReactNode
-
+    sectionsGrid?: 1 | 2
 }
 
 export default function ActionDialog({
@@ -20,9 +20,11 @@ export default function ActionDialog({
     sections,
     triggerButton,
     actionButton,
-    content
+    content,
+    sectionsGrid = 2
 }: ActionDialogProps) {
     return (
+
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 {triggerButton}
@@ -38,7 +40,7 @@ export default function ActionDialog({
                     {sections.map((section, index) =>
                         <div key={index} className='border rounded-lg p-4'>
                             <h3 className='font-semibold mb-3'>{section.title}</h3>
-                            <div className='grid grid-cols-2 gap-3 text-sm max-md:grid-cols-1'>
+                            <div className={`grid grid-cols-${sectionsGrid} gap-3 text-sm max-md:grid-cols-1`}>
                                 {section.fields.map((field: any) => (
                                     <div key={field.label}>
                                         <p className='text-gray-500 text-xs'>{field.label}</p>
@@ -53,10 +55,10 @@ export default function ActionDialog({
                 {content}
 
                 <AlertDialogFooter className='flex-row justify-end'>
-                    <AlertDialogCancel>Tutup</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                        {actionButton}
-                    </AlertDialogAction>
+                    <AlertDialogCancel asChild>
+                        <Button variant='outline'>Tutup</Button>
+                    </AlertDialogCancel>
+                    {actionButton}
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

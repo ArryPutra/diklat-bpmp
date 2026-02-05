@@ -1,3 +1,6 @@
+"use client"
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 import { Button } from "../ui/button";
@@ -10,17 +13,13 @@ import {
 } from "../ui/input-group";
 
 type SearchProps = {
-    name: string;
-    defaultValue: string;
-    formAction: (formData: FormData) => void;
+    name?: string;
 };
 
 export default function Search({
-    name,
-    defaultValue,
-    formAction,
+    name = "search",
 }: SearchProps) {
-    const [value, setValue] = useState(defaultValue);
+    const [value, setValue] = useState<string>("");
     const formRef = useRef<HTMLFormElement>(null);
 
     const handleClear = () => {
@@ -32,19 +31,35 @@ export default function Search({
         });
     };
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
+
+    function onSearch(formData: FormData) {
+        const search = formData.get(name)?.toString() ?? "";
+
+        if (search) {
+            params.set(name, search);
+        } else {
+            params.delete(name);
+        }
+
+        router.push(`?${params.toString()}`);
+
+        setValue(search)
+    }
+
     return (
         <form
             ref={formRef}
             className="flex gap-3"
-            action={formAction}
-        >
+            action={onSearch}>
             <InputGroup>
                 <InputGroupInput
                     name={name}
-                    value={value}
+                    defaultValue={value}
                     onChange={(e) => setValue(e.target.value)}
-                    placeholder="Cari"
-                />
+                    placeholder="Cari" />
 
                 <InputGroupAddon>
                     <InputGroupText>
@@ -56,8 +71,7 @@ export default function Search({
                     <InputGroupAddon align="inline-end">
                         <InputGroupButton
                             type="button"
-                            onClick={handleClear}
-                        >
+                            onClick={handleClear}>
                             <BiX />
                         </InputGroupButton>
                     </InputGroupAddon>

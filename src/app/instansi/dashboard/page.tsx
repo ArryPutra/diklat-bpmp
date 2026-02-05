@@ -1,8 +1,6 @@
-import { Button } from '@/components/ui/button'
-import React from 'react'
 
-export default function InstansiDashboard() {
+export default function InstansiDashboardPage() {
     return (
-        <Button>Logout</Button>
+        <h1>lol</h1>
     )
 }

@@ -8,6 +8,7 @@ import LoadingScreen from '@/components/shared/loading-screen';
 import { PaginationWithLinks } from '@/components/shared/pagination-with-links';
 import Search from '@/components/shared/search';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -54,10 +55,8 @@ export default function DaftarInstansiTerbaru({
 
     return (
         <ContentCanvas>
-            {
-                pendingUpdateStatusRegistrasiInstansi &&
-                <LoadingScreen />
-            }
+
+            <LoadingScreen isLoading={pendingUpdateStatusRegistrasiInstansi} />
 
             <div className='flex justify-between flex-wrap mb-4 gap-3'>
                 <div>
@@ -138,7 +137,7 @@ export default function DaftarInstansiTerbaru({
                                         <span>{item.registrasiPicInstansi.email}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className={`${item.statusRegistrasiInstansi.warna} px-4 py-2 rounded-full text-white text-xs font-semibold`}>
+                                        <span className={`${item.statusRegistrasiInstansi.backgroundColor} px-4 py-2 rounded-full text-white text-xs font-semibold`}>
                                             {item.statusRegistrasiInstansi.nama}
                                         </span>
                                     </TableCell>
@@ -158,11 +157,6 @@ export default function DaftarInstansiTerbaru({
                                     </TableCell>
                                     <TableCell className='space-x-2'>
                                         <InfoDialog
-                                            triggerButton={
-                                                <Button variant='outline' size='icon-sm'>
-                                                    <BiInfoCircle />
-                                                </Button>
-                                            }
                                             title='Informasi Registrasi Instansi'
                                             description={`Kode Tiket Registerasi: ${item.id}`}
                                             sections={
@@ -216,7 +210,9 @@ export default function DaftarInstansiTerbaru({
                                                         <input type="hidden" name="registrasiInstansiId" value={item.id} />
                                                         <input type="hidden" name="statusRegistrasiInstansi" value="Ditolak" />
 
-                                                        <Button variant='destructive'>Tolak Pendaftaran</Button>
+                                                        <AlertDialogAction type='submit' variant='destructive'>
+                                                            Tolak Pendaftaran
+                                                        </AlertDialogAction>
                                                     </form>
                                                 } />
                                         }
@@ -239,11 +235,13 @@ export default function DaftarInstansiTerbaru({
                                                         <input type="hidden" name="registrasiInstansiId" value={item.id} />
                                                         <input type="hidden" name="statusRegistrasiInstansi" value="Diterima" />
 
-                                                        <Button>Terima Pendaftaran</Button>
+                                                        <AlertDialogAction type='submit'>
+                                                            Terima Pendaftaran
+                                                        </AlertDialogAction>
                                                     </form>
                                                 }
                                                 content={
-                                                    <Alert variant='destructive'>
+                                                    <Alert variant='danger'>
                                                         <AlertTriangleIcon />
                                                         <AlertTitle>Perhatian!</AlertTitle>
                                                         <AlertDescription>

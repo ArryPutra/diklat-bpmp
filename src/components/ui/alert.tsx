@@ -1,3 +1,5 @@
+"use client"
+
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
@@ -8,7 +10,8 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card text-card-foreground",
+        // default: "bg-card text-card-foreground",
+        default: "bg-primary/5 text-primary border-primary/15",
         destructive:
           "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
         danger:

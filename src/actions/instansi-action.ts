@@ -36,6 +36,9 @@ export async function getAllInstansiAction({
             user: true,
             picInstansi: true,
             registrasiInstansi: true
+        },
+        orderBy: {
+            createdAt: "desc"
         }
     });
 
@@ -45,4 +48,18 @@ export async function getAllInstansiAction({
         data: data,
         total: total,
     };
+}
+
+export async function getInstansiById(id: number) {
+    const instansi = await prisma.instansi.findUnique({
+        where: { id: id },
+        include: {
+            user: true,
+            picInstansi: true,
+            registrasiInstansi: true
+        }
+    })
+
+    return instansi
+
 }

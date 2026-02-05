@@ -1,6 +1,15 @@
-import React from 'react'
+"use client"
 
-export default function LoadingScreen() {
+export default function LoadingScreen({
+    isLoading
+}: {
+    isLoading: boolean
+}) {
+
+    if (!isLoading) {
+        return null;
+    }
+
     return (
         <div className="fixed w-full h-screen left-0 top-0 flex items-center justify-center bg-black/50 z-100">
             <svg className='size-20' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">

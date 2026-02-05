@@ -1,20 +1,20 @@
 "use client"
 
-import { aktifkanUserAction, nonaktifkanUserAction } from '@/actions/user-action'
+import { updateStatusApakahNonaktifAction } from '@/actions/user-action'
 import { ContentCanvas } from '@/components/layouts/auth-layout'
 import ActionDialog from '@/components/shared/dialog/action-dialog'
-import InfoDialog from '@/components/shared/dialog/info-dialog'
+import LoadingScreen from '@/components/shared/loading-screen'
 import { PaginationWithLinks } from '@/components/shared/pagination-with-links'
 import Search from '@/components/shared/search'
+import SelectDropdown from '@/components/shared/select-dropdown'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertDialogAction } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { getRowNumber } from '@/utils/getRowNumber'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useActionState } from 'react'
 import { BiBlock, BiCheck, BiInfoCircle } from 'react-icons/bi'
 
@@ -28,65 +28,39 @@ export default function AdminInstansiView({
     totalDaftarInstansi
 }: AdminInstansiViewProps) {
 
-    const [stateNonaktifkanUserAction, nonaktifkanUserFormAction, pendingNonaktifkanUserFormAction] =
-        useActionState(nonaktifkanUserAction, null);
-    const [stateAktifkanUserAction, aktifkanUserFormAction, pendingAktifkanUserFormAction] =
-        useActionState(aktifkanUserAction, null);
+    const [stateUpdateStatusUserAction, formActionUpdateStatusUser, pendingUpdateStatusUser] =
+        useActionState(updateStatusApakahNonaktifAction, null);
 
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const params = new URLSearchParams(searchParams.toString());
-
-    function onChangeApakahNonaktifUser(value: "false" | "true") {
-        params.set("apakahNonaktif", value)
-
-        router.push(`?${params}`)
-    }
-
-    function onSearch(formData: FormData) {
-        const search = formData.get('search')?.toString() ?? "";
-
-        if (search) {
-            params.set("search", search);
-        } else {
-            params.delete("search");
-        }
-
-        router.push(`?${params.toString()}`);
-    }
+    const params = new URLSearchParams(useSearchParams().toString());
 
     const currentPage = parseInt(params.get("page") ?? "1");
-    const newMessage =
-        stateNonaktifkanUserAction?.message ?? stateAktifkanUserAction?.message;
+    const newMessage = stateUpdateStatusUserAction?.message;
 
     return (
         <ContentCanvas>
+
+            <LoadingScreen isLoading={pendingUpdateStatusUser} />
+
             <div className='flex gap-3 flex-wrap items-end justify-between mb-6'>
                 {/* Select Status Akun */}
-                <Field className='w-fit'>
-                    <FieldLabel>Status Akun</FieldLabel>
-                    <Select defaultValue={searchParams.get("apakahNonaktif") ?? "false"} onValueChange={onChangeApakahNonaktifUser}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Pilih Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value="false">Aktif</SelectItem>
-                                <SelectItem value="true">Tidak Aktif</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </Field>
+                <SelectDropdown
+                    label='Status Akun'
+                    query={{
+                        name: "apakahNonaktif",
+                        values: [
+                            { label: "Aktif", value: "false" },
+                            { label: "Nonaktif", value: "true" }
+                        ],
+                        defaultValue: "false"
+                    }} />
                 {/* Search */}
                 <Search
-                    name='search'
-                    defaultValue={params.get("search") ?? ""}
-                    formAction={onSearch} />
+                    name='search' />
             </div>
 
             {
                 newMessage &&
-                <Alert variant='danger' className='mb-4'>
+                <Alert className='mb-4'>
                     <BiInfoCircle />
                     <AlertTitle>Pesan:</AlertTitle>
                     <AlertDescription>
@@ -101,7 +75,6 @@ export default function AdminInstansiView({
                         <TableHead>No</TableHead>
                         <TableHead>Instansi</TableHead>
                         <TableHead>PIC</TableHead>
-                        <TableHead>Alamat</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -110,7 +83,7 @@ export default function AdminInstansiView({
                         daftarInstansi.length !== 0 ? (
                             daftarInstansi.map((instansi: any, index: number) => (
                                 <TableRow key={index}>
-                                    <TableCell>{index + 1 + (currentPage - 1) * 10}</TableCell>
+                                    <TableCell>{getRowNumber(index, currentPage, 10)}</TableCell>
                                     <TableCell>
                                         <span className='font-semibold'>{instansi.user.name}</span>
                                         <br />
@@ -125,48 +98,19 @@ export default function AdminInstansiView({
                                         <br />
                                         <span className='text-gray-500'>{instansi.picInstansi.nomorTelepon}</span>
                                     </TableCell>
-                                    <TableCell>{instansi.alamat}</TableCell>
                                     <TableCell>
                                         <div className='flex gap-2'>
                                             {/* Info Action */}
-                                            <InfoDialog
-                                                triggerButton={
-                                                    <Button variant='outline' size='icon-sm'>
-                                                        <BiInfoCircle />
-                                                    </Button>
-                                                }
-                                                title='Informasi Instansi'
-                                                description={`Kode Tiket Registrasi: ${instansi.registrasiInstansiId}`}
-                                                sections={[
-                                                    {
-                                                        title: "Instansi",
-                                                        fields: [
-                                                            { label: 'Nama Instansi', value: instansi.user.name },
-                                                            { label: 'Email', value: instansi.user.email },
-                                                            { label: 'Nomor Telepon', value: instansi.nomorTelepon },
-                                                            { label: 'Desa/Kelurahan', value: instansi.desaKelurahan },
-                                                            { label: 'Kecamatan', value: instansi.kecamatan },
-                                                            { label: 'Kabupaten/Kota', value: instansi.kabupatenKota },
-                                                            { label: 'Alamat', value: instansi.alamat }
-                                                        ],
-                                                    },
-                                                    {
-                                                        title: "Penanggung Jawab (PIC)",
-                                                        fields: [
-                                                            { label: 'Nama PIC', value: instansi.picInstansi.nama },
-                                                            { label: 'Email PIC', value: instansi.picInstansi.email },
-                                                            { label: 'Nomor Telepon', value: instansi.picInstansi.nomorTelepon },
-                                                            { label: 'Jabatan', value: instansi.picInstansi.jabatan }
-                                                        ]
-                                                    }
-                                                ]} />
+                                            <Link href={`/admin/kelola-instansi/${instansi.id}`}>
+                                                <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
+                                            </Link>
                                             {/* Nonaktifkan/Aktifkan User Action */}
                                             {
                                                 instansi.user.apakahNonaktif
                                                     ? <ActionDialog
                                                         triggerButton={
                                                             <Button size='icon-sm'>
-                                                                {pendingAktifkanUserFormAction ? <Spinner /> : <BiCheck />}
+                                                                <BiCheck />
                                                             </Button>
                                                         }
                                                         title='Aktifkan Instansi'
@@ -180,13 +124,12 @@ export default function AdminInstansiView({
                                                             }
                                                         ]}
                                                         actionButton={
-                                                            <form action={aktifkanUserFormAction}>
+                                                            <form action={formActionUpdateStatusUser}>
                                                                 <Input type='hidden' name='userId' value={instansi.user.id} />
+                                                                <Input type='hidden' name='apakahNonaktif' value="false" />
                                                                 <Input type='hidden' name='currentPath' value={"/admin/instansi"} />
 
-                                                                <AlertDialogAction
-                                                                    type='submit'
-                                                                    disabled={pendingNonaktifkanUserFormAction}>
+                                                                <AlertDialogAction type='submit'>
                                                                     Aktifkan
                                                                 </AlertDialogAction>
                                                             </form>
@@ -194,7 +137,7 @@ export default function AdminInstansiView({
                                                     : <ActionDialog
                                                         triggerButton={
                                                             <Button variant='destructive' size='icon-sm'>
-                                                                {pendingNonaktifkanUserFormAction ? <Spinner /> : <BiBlock />}
+                                                                <BiBlock />
                                                             </Button>
                                                         }
                                                         title='Nonaktifkan Instansi'
@@ -208,14 +151,14 @@ export default function AdminInstansiView({
                                                             }
                                                         ]}
                                                         actionButton={
-                                                            <form action={nonaktifkanUserFormAction}>
+                                                            <form action={formActionUpdateStatusUser}>
                                                                 <Input type='hidden' name='userId' value={instansi.user.id} />
+                                                                <Input type='hidden' name='apakahNonaktif' value="true" />
                                                                 <Input type='hidden' name='currentPath' value={"/admin/instansi"} />
 
                                                                 <AlertDialogAction
                                                                     variant='destructive'
-                                                                    type='submit'
-                                                                    disabled={pendingNonaktifkanUserFormAction}>
+                                                                    type='submit'>
                                                                     Nonaktifkan
                                                                 </AlertDialogAction>
                                                             </form>
@@ -238,7 +181,7 @@ export default function AdminInstansiView({
 
             {
                 totalDaftarInstansi > 0 &&
-                <div className='w-fit ml-auto'>
+                <div className='mt-6'>
                     <PaginationWithLinks
                         page={currentPage}
                         pageSize={10}

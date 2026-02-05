@@ -1,8 +1,7 @@
 "use server"
 
-import prisma from '@/lib/prisma'
-import AdminInstansiView from './view'
 import { getAllInstansiAction } from '@/actions/instansi-action'
+import AdminInstansiView from './view'
 
 type AdminInstansiPageProps = {
     searchParams: Promise<{
@@ -12,7 +11,16 @@ type AdminInstansiPageProps = {
     }>
 }
 
-export default async function AdminInstansiPage({ searchParams }: AdminInstansiPageProps) {
+export default async function AdminInstansiPage({
+    searchParams
+}: {
+    searchParams: Promise<{
+        apakahNonaktif?: "false" | "true"
+        search?: string
+        page?: string
+    }>
+}) {
+
     const daftarInstansi = await getAllInstansiAction({
         search: (await searchParams).search,
         apakahNonaktif: (await searchParams).apakahNonaktif,

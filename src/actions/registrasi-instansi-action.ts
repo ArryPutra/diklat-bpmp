@@ -10,7 +10,13 @@ import { revalidatePath } from "next/cache";
 export async function getAllRegistrasiInstansiAction({
     search = "",
     page = "1",
-    statusRegistrasiInstansiId = 1
+    statusRegistrasiInstansiId = 1,
+    orderBy = "asc"
+}: {
+    search?: string,
+    page?: string,
+    statusRegistrasiInstansiId?: number,
+    orderBy?: "asc" | "desc"
 }) {
     const _search = search.trim();
 
@@ -35,6 +41,9 @@ export async function getAllRegistrasiInstansiAction({
         include: {
             registrasiPicInstansi: true,
             statusRegistrasiInstansi: true
+        },
+        orderBy: {
+            createdAt: orderBy
         }
     });
 
@@ -178,71 +187,68 @@ export async function updateStatusRegistrasiInstansiAction(
     };
 
     try {
-        await prisma.$transaction(async (tx) => {
-            // memperbarui status registrasi instansi
-            const updateRegistrasiInstansi = await tx.registrasiInstansi.update({
-                where: {
-                    id: resultData.data.registrasiInstansiId
-                },
-                data: {
-                    statusRegistrasiInstansi: {
-                        connect: {
-                            nama: resultData.data.statusRegistrasiInstansi
-                        }
+        // memperbarui status registrasi instansi
+        const updateRegistrasiInstansi = await prisma.registrasiInstansi.update({
+            where: {
+                id: resultData.data.registrasiInstansiId
+            },
+            data: {
+                statusRegistrasiInstansi: {
+                    connect: {
+                        nama: resultData.data.statusRegistrasiInstansi
                     }
-                },
-                include: {
-                    statusRegistrasiInstansi: true,
-                    registrasiPicInstansi: true
+                }
+            },
+            include: {
+                statusRegistrasiInstansi: true,
+                registrasiPicInstansi: true
+            }
+        })
+
+
+        // jika status registrasi instansi diterima, maka buat akun instansi
+        if (updateRegistrasiInstansi.statusRegistrasiInstansi.nama === "Diterima") {
+            // buat akun instansi
+            const createInstansiUser = await auth.api.signUpEmail({
+                body: {
+                    name: updateRegistrasiInstansi.nama,
+                    email: updateRegistrasiInstansi.email,
+                    password: updateRegistrasiInstansi.password,
+                    peranId: 2
                 }
             })
 
-            // jika status registrasi instansi diterima, maka buat akun instansi
-            if (updateRegistrasiInstansi.statusRegistrasiInstansi.nama === "Diterima") {
-                // buat akun instansi
-                const createInstansiUser = await auth.api.signUpEmail({
-                    body: {
-                        name: updateRegistrasiInstansi.nama,
-                        email: updateRegistrasiInstansi.email,
-                        password: updateRegistrasiInstansi.password,
-                        peranId: 2
-                    }
-                })
+            // buat data instansi berelasi dengan akun/user
+            const createInstansi = await prisma.instansi.create({
+                data: {
+                    userId: createInstansiUser.user.id,
+                    nomorTelepon: updateRegistrasiInstansi.nomorTelepon,
+                    registrasiInstansiId: updateRegistrasiInstansi.id,
+                    desaKelurahan: updateRegistrasiInstansi.desaKelurahan,
+                    kecamatan: updateRegistrasiInstansi.kecamatan,
+                    kabupatenKota: updateRegistrasiInstansi.kabupatenKota,
+                    desaKelurahnKode: updateRegistrasiInstansi.desaKelurahanKode,
+                    kecamatanKode: updateRegistrasiInstansi.kecamatanKode,
+                    kabupatenKotaKode: updateRegistrasiInstansi.kabupatenKotaKode,
+                    alamat: updateRegistrasiInstansi.alamat
+                }
+            })
 
-                // buat data instansi berelasi dengan akun/user
-                const createInstansi = await tx.instansi.create({
-                    data: {
-                        userId: createInstansiUser.user.id,
-                        nomorTelepon: updateRegistrasiInstansi.nomorTelepon,
-                        registrasiInstansiId: updateRegistrasiInstansi.id,
-                        desaKelurahan: updateRegistrasiInstansi.desaKelurahan,
-                        kecamatan: updateRegistrasiInstansi.kecamatan,
-                        kabupatenKota: updateRegistrasiInstansi.kabupatenKota,
-                        desaKelurahnKode: updateRegistrasiInstansi.desaKelurahanKode,
-                        kecamatanKode: updateRegistrasiInstansi.kecamatanKode,
-                        kabupatenKotaKode: updateRegistrasiInstansi.kabupatenKotaKode,
-                        alamat: updateRegistrasiInstansi.alamat
-                    }
-                })
+            // buat data pic instansi berelasi dengan instansi
+            await prisma.picInstansi.create({
+                data: {
+                    instansiId: createInstansi.id,
+                    registrasiPicInstansiId: updateRegistrasiInstansi.registrasiPicInstansi?.id ?? 0,
+                    nama: updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "-",
+                    email: updateRegistrasiInstansi.registrasiPicInstansi?.email ?? "-",
+                    nomorTelepon: updateRegistrasiInstansi.registrasiPicInstansi?.nomorTelepon ?? "-",
+                    jabatan: updateRegistrasiInstansi.registrasiPicInstansi?.jabatan ?? "-"
+                }
+            })
+        }
 
-                // buat data pic instansi berelasi dengan instansi
-                await tx.picInstansi.create({
-                    data: {
-                        instansiId: createInstansi.id,
-                        registrasiPicInstansiId: updateRegistrasiInstansi.registrasiPicInstansi?.id ?? 0,
-                        nama: updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "-",
-                        email: updateRegistrasiInstansi.registrasiPicInstansi?.email ?? "-",
-                        nomorTelepon: updateRegistrasiInstansi.registrasiPicInstansi?.nomorTelepon ?? "-",
-                        jabatan: updateRegistrasiInstansi.registrasiPicInstansi?.jabatan ?? "-"
-                    }
-                })
-            }
-
-            messageData.namaInstansi = updateRegistrasiInstansi.nama
-            messageData.status = updateRegistrasiInstansi.statusRegistrasiInstansi.nama
-        })
-
-        revalidatePath('/admin/dashboard')
+        messageData.namaInstansi = updateRegistrasiInstansi.nama
+        messageData.status = updateRegistrasiInstansi.statusRegistrasiInstansi.nama
 
         let message = '';
 
@@ -251,6 +257,8 @@ export async function updateStatusRegistrasiInstansiAction(
         } else if (messageData.status === "Ditolak") {
             message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil ditolak.`;
         }
+
+        revalidatePath('/admin/dashboard')
 
         return {
             success: true,
