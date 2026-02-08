@@ -10,16 +10,23 @@ import { redirect } from "next/navigation"
 export async function getAllDiklatAction({
     search = "",
     page = "1",
-    metodeDiklatId
+    metodeDiklatId,
+    statusPendaftaranDiklatId = [1, 2, 3],
+    take = 10
 }: {
     search?: string
     page?: string
-    metodeDiklatId?: number | undefined
+    metodeDiklatId?: number
+    statusPendaftaranDiklatId?: number[]
+    take?: number
 }) {
     const _search = search.trim();
 
     const where: Prisma.DiklatWhereInput = {
         metodeDiklatId: metodeDiklatId,
+        statusPendaftaranDiklatId: {
+            in: statusPendaftaranDiklatId
+        },
         OR: [
             {
                 judul: {
@@ -32,15 +39,17 @@ export async function getAllDiklatAction({
 
     const data = await prisma.diklat.findMany({
         skip: parseInt(page) * 10 - 10,
-        take: 10,
+        take: take,
         where,
         include: {
-            metodeDiklat: true
+            metodeDiklat: true,
+            statusPendaftaranDiklat: true
         },
         orderBy: {
-            createdAt: "desc"
-        }
+            createdAt: "desc",
+        },
     });
+
 
     const total = await prisma.diklat.count({ where });
 
@@ -54,7 +63,8 @@ export async function getDiklatByIdAction(id: string) {
     const diklat = await prisma.diklat.findUnique({
         where: { id: id },
         include: {
-            metodeDiklat: true
+            metodeDiklat: true,
+            statusPendaftaranDiklat: true
         }
     })
 
@@ -78,6 +88,7 @@ export async function createDiklatAction(
                 targetSasaran: formData.get("targetSasaran")?.toString(),
                 metodeDiklatId: formData.get("metodeDiklatId")?.toString(),
                 maksimalKuota: formData.get("maksimalKuota")?.toString(),
+                lokasi: formData.get("lokasi")?.toString(),
                 tanggalMulaiAcara: formData.get("tanggalMulaiAcara")?.toString(),
                 tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
                 tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
@@ -86,15 +97,34 @@ export async function createDiklatAction(
         }
     }
 
-
     try {
+        let statusPendaftaranDiklatId: number
+
+        const tanggalSekarang = new Date()
+
+        const buka = new Date(resultData.data.tanggalBukaPendaftaran)
+        const tutup = new Date(resultData.data.tanggalTutupPendaftaran)
+
+        // set ke 23:59:59.999
+        tutup.setHours(23, 59, 59, 999)
+
+        if (tanggalSekarang < buka) {
+            statusPendaftaranDiklatId = 1
+        } else if (tanggalSekarang <= tutup) {
+            statusPendaftaranDiklatId = 2
+        } else {
+            statusPendaftaranDiklatId = 3
+        }
+
         await prisma.diklat.create({
             data: {
+                metodeDiklatId: resultData.data.metodeDiklatId,
+                statusPendaftaranDiklatId: statusPendaftaranDiklatId,
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 tujuan: resultData.data.tujuan,
-                metodeDiklatId: resultData.data.metodeDiklatId,
                 maksimalKuota: resultData.data.maksimalKuota,
+                lokasi: resultData.data.lokasi,
                 tanggalBukaPendaftaran: resultData.data.tanggalBukaPendaftaran,
                 tanggalTutupPendaftaran: resultData.data.tanggalTutupPendaftaran,
                 tanggalMulaiAcara: resultData.data.tanggalMulaiAcara,
@@ -145,15 +175,34 @@ export async function updateDiklatAction(
     }
 
     try {
+        let statusPendaftaranDiklatId: number
+
+        const tanggalSekarang = new Date()
+
+        const buka = new Date(resultData.data.tanggalBukaPendaftaran)
+        const tutup = new Date(resultData.data.tanggalTutupPendaftaran)
+
+        // set ke 23:59:59.999
+        tutup.setHours(23, 59, 59, 999)
+
+        if (tanggalSekarang < buka) {
+            statusPendaftaranDiklatId = 1
+        } else if (tanggalSekarang <= tutup) {
+            statusPendaftaranDiklatId = 2
+        } else {
+            statusPendaftaranDiklatId = 3
+        }
+
         await prisma.diklat.update({
             where: {
                 id: id
             },
             data: {
+                metodeDiklatId: resultData.data.metodeDiklatId,
+                statusPendaftaranDiklatId: statusPendaftaranDiklatId,
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 tujuan: resultData.data.tujuan,
-                metodeDiklatId: resultData.data.metodeDiklatId,
                 maksimalKuota: resultData.data.maksimalKuota,
                 tanggalBukaPendaftaran: resultData.data.tanggalBukaPendaftaran,
                 tanggalTutupPendaftaran: resultData.data.tanggalTutupPendaftaran,

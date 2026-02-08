@@ -13,6 +13,7 @@ type SelectDropdownProps = {
       value: string
     }[],
     defaultValue?: string
+    deleteValue?: string
   }
 }
 
@@ -25,6 +26,10 @@ export default function SelectDropdown({
 
   function onChange(value: string) {
     params.set(query.name, value)
+
+    if (query.defaultValue === value) {
+      params.delete(query.name)
+    }
 
     router.push(`?${params}`)
   }

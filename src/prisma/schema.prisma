@@ -183,12 +183,15 @@ model PicInstansi {
 model Diklat {
   id String @id @default(cuid())
 
-  metodeDiklatId Int
+  metodeDiklatId            Int
+  statusPendaftaranDiklatId Int
 
   judul                   String
   deskripsi               String?
+  gambar                  String?
   tujuan                  String
   targetSasaran           String
+  lokasi                  String
   maksimalKuota           Int
   tanggalBukaPendaftaran  DateTime
   tanggalTutupPendaftaran DateTime
@@ -198,16 +201,27 @@ model Diklat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  metodeDiklat MetodeDiklat @relation(fields: [metodeDiklatId], references: [id])
+  metodeDiklat            MetodeDiklat?            @relation(fields: [metodeDiklatId], references: [id])
+  statusPendaftaranDiklat StatusPendaftaranDiklat? @relation(fields: [statusPendaftaranDiklatId], references: [id])
 
   @@map("diklat")
+}
+
+model StatusPendaftaranDiklat {
+  id Int @id @default(autoincrement())
+
+  nama            String @unique
+  backgroundColor String
+
+  diklat Diklat[]
+
+  @@map("status_pendaftaran_diklat")
 }
 
 model MetodeDiklat {
   id Int @id @default(autoincrement())
 
-  nama            String  @unique
-  deskripsi       String?
+  nama            String @unique
   backgroundColor String
 
   diklat Diklat[]

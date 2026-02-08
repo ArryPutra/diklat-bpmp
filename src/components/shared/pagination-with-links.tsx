@@ -1,5 +1,8 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useCallback, useTransition } from "react";
 import {
     Pagination,
@@ -17,9 +20,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
 
 export interface PaginationWithLinksProps {
     pageSizeSelectOptions?: {
@@ -187,7 +187,7 @@ export function PaginationWithLinks({
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-center gap-3 w-full">
+        <div className={`flex flex-col md:flex-row items-center gap-3 w-full`}>
             {pageSizeSelectOptions && (
                 <div className="flex flex-col gap-4 flex-1">
                     <SelectRowsPerPage

@@ -1,6 +1,6 @@
 "use client"
 
-import StatsCard from '@/components/shared/stats-card'
+import StatsCard from '@/components/shared/cards/stats-card'
 import { BiBookReader, BiBuilding, BiUser, BiUserVoice } from 'react-icons/bi'
 
 type StatsCardsProps = {

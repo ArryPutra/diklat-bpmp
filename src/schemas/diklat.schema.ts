@@ -15,6 +15,7 @@ export const DiklatSchema = z
         tujuan: z.string().min(1, "Tujuan wajib diisi"),
 
         targetSasaran: z.string().min(1, "Target Sasaran wajib diisi"),
+        lokasi: z.string().min(1, "Lokasi wajib diisi"),
 
         maksimalKuota: z.coerce
             .number()

@@ -27,11 +27,13 @@ export default function AdminDiklatView({
             <Link href='/admin/kelola-diklat/create'>
                 <Button>Tambah Diklat <BiPlus /></Button>
             </Link>
-            <div className="my-6 flex justify-between items-end flex-wrap gap-3">
+            <div className="my-6 flex items-end flex-wrap gap-3">
                 <SelectDropdown
                     label='Metode Diklat'
                     query={{
                         name: "metodeDiklatId",
+                        defaultValue: "0",
+                        deleteValue: "0",
                         values: [
                             { label: "Semua", value: "0" },
                             { label: "Offline/Luar Jaringan", value: "1" },
@@ -39,7 +41,22 @@ export default function AdminDiklatView({
                             { label: "Hybrid", value: "3" }
                         ],
                     }} />
-                <Search />
+                <SelectDropdown
+                    label='Status Pendaftaran'
+                    query={{
+                        name: "statusPendaftaranDiklatId",
+                        defaultValue: "0",
+                        deleteValue: "0",
+                        values: [
+                            { label: "Semua", value: "0" },
+                            { label: "Dijadwalkan", value: "1" },
+                            { label: "Dibuka", value: "2" },
+                            { label: "Ditutup", value: "3" }
+                        ],
+                    }} />
+                <div className="ml-auto">
+                    <Search />
+                </div>
             </div>
 
             {
@@ -53,12 +70,15 @@ export default function AdminDiklatView({
             <KelolaDiklatTable
                 daftarDiklat={daftarDiklat} />
 
-            <div className="mt-6">
-                <PaginationWithLinks
-                    page={parseInt(params.get("page") ?? "1")}
-                    pageSize={10}
-                    totalCount={totalDaftarDiklat} />
-            </div>
+            {
+                totalDaftarDiklat !== 0 &&
+                <div className="mt-6">
+                    <PaginationWithLinks
+                        page={parseInt(params.get("page") ?? "1")}
+                        pageSize={10}
+                        totalCount={totalDaftarDiklat} />
+                </div>
+            }
         </ContentCanvas>
     )
 }

@@ -7,7 +7,7 @@ import { AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import dateFormatted from "@/utils/dateFormatted";
+import { formatDateId } from "@/utils/dateFormatted";
 import { getRowNumber } from "@/utils/getRowNumber";
 import Link from "next/link";
 import { useActionState } from "react";
@@ -32,6 +32,7 @@ export default function KelolaDiklatTable({
                         <TableHead>No.</TableHead>
                         <TableHead>Judul</TableHead>
                         <TableHead>Metode</TableHead>
+                        <TableHead>Status Pendaftaran</TableHead>
                         <TableHead>Maksimal Kuota</TableHead>
                         <TableHead>Tanggal Buka Pendaftaran</TableHead>
                         <TableHead>Aksi</TableHead>
@@ -51,10 +52,15 @@ export default function KelolaDiklatTable({
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
+                                    <Badge className={`${diklat.statusPendaftaranDiklat.backgroundColor}`}>
+                                        {diklat.statusPendaftaranDiklat.nama}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>
                                     {diklat.maksimalKuota} Peserta
                                 </TableCell>
                                 <TableCell>
-                                    {dateFormatted(diklat.tanggalBukaPendaftaran)}
+                                    {formatDateId(diklat.tanggalBukaPendaftaran)}
                                 </TableCell>
                                 <TableCell className="space-x-2">
                                     {/* Info aksi */}

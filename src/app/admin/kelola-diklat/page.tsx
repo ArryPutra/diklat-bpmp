@@ -11,17 +11,21 @@ export default async function AdminDiklatPage({
         search?: string
         page?: string
         metodeDiklatId?: string
+        statusPendaftaranDiklatId?: string
     }>
 }) {
 
     const _searchParams = await searchParams
 
-    const metodeDiklatId = parseInt(_searchParams.metodeDiklatId ?? "0")
+    const metodeDiklatId = parseInt(_searchParams.metodeDiklatId ?? "0");
+    const statusPendaftaranDiklatId = parseInt(_searchParams.statusPendaftaranDiklatId ?? "0");
+
 
     const daftarDiklat = await getAllDiklatAction({
         search: _searchParams.search,
         page: _searchParams.page,
-        metodeDiklatId: metodeDiklatId === 0 ? undefined : metodeDiklatId
+        metodeDiklatId: metodeDiklatId === 0 ? undefined : metodeDiklatId,
+        statusPendaftaranDiklatId: statusPendaftaranDiklatId === 0 ? undefined : statusPendaftaranDiklatId
     });
 
     return (

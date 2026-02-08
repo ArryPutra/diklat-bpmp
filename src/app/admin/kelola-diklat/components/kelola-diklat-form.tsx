@@ -78,6 +78,18 @@ export default function KelolaDiklatForm({
                     </Field>
 
                     <Field>
+                        <FieldLabel>Lokasi</FieldLabel>
+                        <Input
+                            placeholder="Masukkan lokasi"
+                            name="lokasi"
+                            defaultValue={actionState.state?.values?.lokasi ?? diklat?.lokasi} />
+                        {
+                            actionState.state?.errors?.lokasi &&
+                            <FieldError>{actionState.state?.errors?.lokasi}</FieldError>
+                        }
+                    </Field>
+
+                    <Field>
                         <FieldLabel>Metode Diklat</FieldLabel>
                         <Select name="metodeDiklatId" defaultValue={actionState.state?.values?.metodeDiklatId ?? diklat?.metodeDiklat.id.toString()}>
                             <SelectTrigger>

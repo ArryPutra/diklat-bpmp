@@ -1,7 +1,5 @@
 "use client"
 
-import StatsCard from '@/components/shared/stats-card'
-import { BiBookReader, BiBuilding, BiCheck, BiInfoCircle, BiInfoSquare, BiSearch, BiSolidBookReader, BiUser, BiUserCheck, BiUserVoice, BiX } from 'react-icons/bi'
 import DaftarInstansiTerbaru from './components/daftar-instansi-terbaru'
 import StatsCards from './components/stats-cards'
 

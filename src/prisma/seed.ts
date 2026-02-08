@@ -1,7 +1,5 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import diklatSeed from "./seeds/diklat.seed";
-import registrasiInstansiSeed from "./seeds/registrasi-instansi.seed";
 
 async function main() {
     await prisma.statusRegistrasiInstansi.createMany({
@@ -17,6 +15,14 @@ async function main() {
             { nama: "Offline/Luar Jaringan", backgroundColor: "bg-blue-500 " },
             { nama: "Online/Dalam Jaringan", backgroundColor: "bg-green-500 " },
             { nama: "Hybrid", backgroundColor: "bg-purple-500 " },
+        ]
+    })
+
+    await prisma.statusPendaftaranDiklat.createMany({
+        data: [
+            { nama: "Dijadwalkan", backgroundColor: "bg-blue-500 " },
+            { nama: "Dibuka", backgroundColor: "bg-green-500 " },
+            { nama: "Ditutup", backgroundColor: "bg-red-500 " },
         ]
     })
 
@@ -38,8 +44,8 @@ async function main() {
         }
     });
 
-    await registrasiInstansiSeed()
-    await diklatSeed()
+    // await registrasiInstansiSeed()
+    // await diklatSeed()
 }
 
 main()
