@@ -129,7 +129,9 @@ export async function createDiklatAction(
                 tanggalTutupPendaftaran: resultData.data.tanggalTutupPendaftaran,
                 tanggalMulaiAcara: resultData.data.tanggalMulaiAcara,
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
-                targetSasaran: resultData.data.targetSasaran
+                targetSasaran: resultData.data.targetSasaran,
+                materiPelatihan: resultData.data.materiPelatihan,
+                persyaratanPeserta: resultData.data.persyaratanPeserta,
             }
         })
     } catch (error) {

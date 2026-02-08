@@ -95,7 +95,7 @@ function Beranda() {
                 <p>Program pendidikan dan pelatihan (diklat) yang dirancang untuk mendukung pengembangan kompetensi.</p>
                 <div className="mt-4 flex gap-3 flex-wrap">
 
-                    <Link href='/cari-diklat'>
+                    <Link href='/diklat'>
                         <Button>Cari Diklat <BiRightArrowAlt /></Button>
                     </Link>
                     <Button variant='outline' onClick={() => router.push('/registrasi-instansi')}>
@@ -160,7 +160,7 @@ function Diklat({
                 }
             </div>
             <div className="flex justify-end">
-                <Link href='/cari-diklat'>
+                <Link href='/diklat'>
                     <Button variant='outline'>
                         Lihat Lainnya <BiRightArrowAlt />
                     </Button>

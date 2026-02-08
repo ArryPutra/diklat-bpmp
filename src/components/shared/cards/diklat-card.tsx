@@ -36,10 +36,10 @@ export function DiklatCard({
                 </div>
                 <div className="space-y-2 border p-4 rounded-xl mb-4">
                     <div className="flex items-center gap-2 text-xs font-semibold">
-                        <BiCalendar /> <span>{dateRangeFormatted(diklat.tanggalMulaiAcara, diklat.tanggalSelesaiAcara)}</span>
+                        <BiCalendar /> <span>Kegiatan: {dateRangeFormatted(diklat.tanggalMulaiAcara, diklat.tanggalSelesaiAcara)}</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs font-semibold">
-                        <BiLocationPlus /> <span>{diklat.lokasi}</span>
+                        <BiLocationPlus /> <span>Lokasi: {diklat.lokasi}</span>
                     </div>
                 </div>
                 {

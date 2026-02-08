@@ -175,6 +175,30 @@ export default function KelolaDiklatForm({
                             <FieldError>{actionState.state?.errors?.tanggalSelesaiAcara}</FieldError>
                         }
                     </Field>
+
+                    <Field>
+                        <FieldLabel>Materi Pelatihan</FieldLabel>
+                        <Textarea
+                            placeholder="Masukkan materi pelatihan"
+                            name="materiPelatihan"
+                            defaultValue={actionState.state?.values?.materiPelatihan ?? diklat?.materiPelatihan} />
+                        {
+                            actionState.state?.errors?.materiPelatihan &&
+                            <FieldError>{actionState.state?.errors?.materiPelatihan}</FieldError>
+                        }
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Persyaratan Peserta</FieldLabel>
+                        <Textarea
+                            placeholder="Masukkan persyaratan peserta"
+                            name="persyaratanPeserta"
+                            defaultValue={actionState.state?.values?.persyaratanPeserta ?? diklat?.persyaratanPeserta} />
+                        {
+                            actionState.state?.errors?.persyaratanPeserta &&
+                            <FieldError>{actionState.state?.errors?.persyaratanPeserta}</FieldError>
+                        }
+                    </Field>
                 </FieldSet>
 
                 <div className="w-full flex">

@@ -4,7 +4,7 @@ import StatsCard from "@/components/shared/cards/stats-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { dateRangeFormatted, formatDateId } from "@/utils/dateFormatted";
 import { BiBuilding, BiCalendar, BiTargetLock } from "react-icons/bi";
 
@@ -15,17 +15,17 @@ export default function DiklatView({
 }) {
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col">
             <Header activeMenuLabel="Diklat" />
-            <GuestLayout className="pt-40 max-md:pt-36 min-h-screen">
+            <GuestLayout className="pt-40 max-md:pt-36">
                 <Badge className={`mb-2 ${diklat.statusPendaftaranDiklat.backgroundColor}`}>
-                    {diklat.apakahDiklatDibuka ? "Dibuka" : "Ditutup"}
+                    {diklat.statusPendaftaranDiklat.nama}
                 </Badge>
                 <h1 className="text-2xl font-bold text-primary mb-2">{diklat.judul}</h1>
                 <p className="text-sm mb-4">{diklat.deskripsi}</p>
                 <div className="flex gap-3 flex-wrap mb-8">
-                    <Badge>Metode: {diklat.metodeDiklat.nama}</Badge>
-                    <Badge>Target: {diklat.targetSasaran}</Badge>
+                    <Badge variant='outline'>Metode: {diklat.metodeDiklat.nama}</Badge>
+                    <Badge variant='outline'>Target: {diklat.targetSasaran}</Badge>
                 </div>
                 <div className="border text-sm p-4 rounded-lg mb-6">
                     <h1 className="flex items-center gap-2 font-semibold text-lg mb-1 text-primary"><BiTargetLock /> Tujuan</h1>
@@ -50,20 +50,14 @@ export default function DiklatView({
                         <Card className="mb-8">
                             <CardHeader>
                                 <CardTitle >
-                                    Daftar Materi Pelatihan
+                                    Materi Pelatihan
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                <CardDescription className="flex items-center gap-3">
-                                    <Badge className="w-6 h-6">1</Badge> Mengenalkan Platform Pembelajaran Digital
-                                </CardDescription>
-                                <CardDescription className="flex items-center gap-3">
-                                    <Badge className="w-6 h-6">2</Badge> Mengenalkan Platform Pembelajaran Digital
+                                <CardDescription className="flex items-center gap-3 whitespace-pre-line">
+                                    {diklat.materiPelatihan}
                                 </CardDescription>
                             </CardContent>
-                            <CardFooter className="border-t">
-                                <CardDescription>Total Materi: 2 Materi</CardDescription>
-                            </CardFooter>
                         </Card>
 
                         <Card>
@@ -73,16 +67,10 @@ export default function DiklatView({
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                <CardDescription className="flex items-center gap-3">
-                                    <Badge className="w-6 h-6" variant='destructive'>1</Badge> Guru Aktif di Satuan Pendidikan
-                                </CardDescription>
-                                <CardDescription className="flex items-center gap-3">
-                                    <Badge className="w-6 h-6" variant='destructive'>2</Badge> Bersedia Mengikuti Segala Rangkaian dari Awal hingga Akhir
+                                <CardDescription className="flex items-center gap-3 whitespace-pre-line">
+                                    {diklat.persyaratanPeserta}
                                 </CardDescription>
                             </CardContent>
-                            <CardFooter className="border-t">
-                                <CardDescription>Total Persyaratan: 2 Persyaratan</CardDescription>
-                            </CardFooter>
                         </Card>
                     </section>
 
@@ -106,12 +94,23 @@ export default function DiklatView({
                                 <AlertDescription> 2 Hari Lagi</AlertDescription>
                             </Alert>
 
-                            <Button className="w-full mb-2">Daftar Sekarang</Button>
+                            <Button
+                                className="w-full mb-2"
+                                variant={diklat.statusPendaftaranDiklat.id === 2 ? 'default' : 'secondary'}
+                                disabled={diklat.statusPendaftaranDiklat.id !== 2}>
+                                {
+                                    diklat.statusPendaftaranDiklat.id === 2
+                                        ? 'Daftar Sekarang'
+                                        : 'Pendaftaran Ditutup'
+                                }
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>
             </GuestLayout>
-            <Footer />
-        </>
+            <div className="mt-auto">
+                <Footer />
+            </div>
+        </div>
     )
 }

@@ -86,10 +86,7 @@ export default function DaftarInstansiTerbaru({
                     </Select>
                 </Field>
 
-                <Search
-                    name="search"
-                    defaultValue={params.get('search') ?? ''}
-                    formAction={onSearch} />
+                <Search />
             </div>
 
             {
