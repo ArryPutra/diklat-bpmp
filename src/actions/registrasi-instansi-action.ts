@@ -209,42 +209,51 @@ export async function updateStatusRegistrasiInstansiAction(
         // jika status registrasi instansi diterima, maka buat akun instansi
         if (updateRegistrasiInstansi.statusRegistrasiInstansi.nama === "Diterima") {
             // buat akun instansi
-            const createInstansiUser = await auth.api.signUpEmail({
+            const createUser = await auth.api.createUser({
                 body: {
                     name: updateRegistrasiInstansi.nama,
                     email: updateRegistrasiInstansi.email,
                     password: updateRegistrasiInstansi.password,
-                    peranId: 2
+                    data: {
+                        peranId: 2
+                    }
                 }
             })
 
-            // buat data instansi berelasi dengan akun/user
-            const createInstansi = await prisma.instansi.create({
-                data: {
-                    userId: createInstansiUser.user.id,
-                    nomorTelepon: updateRegistrasiInstansi.nomorTelepon,
-                    registrasiInstansiId: updateRegistrasiInstansi.id,
-                    desaKelurahan: updateRegistrasiInstansi.desaKelurahan,
-                    kecamatan: updateRegistrasiInstansi.kecamatan,
-                    kabupatenKota: updateRegistrasiInstansi.kabupatenKota,
-                    desaKelurahnKode: updateRegistrasiInstansi.desaKelurahanKode,
-                    kecamatanKode: updateRegistrasiInstansi.kecamatanKode,
-                    kabupatenKotaKode: updateRegistrasiInstansi.kabupatenKotaKode,
-                    alamat: updateRegistrasiInstansi.alamat
-                }
-            })
+            try {
+                // buat data instansi berelasi dengan akun/user
+                const createInstansi = await prisma.instansi.create({
+                    data: {
+                        userId: createUser.user.id,
+                        nomorTelepon: updateRegistrasiInstansi.nomorTelepon,
+                        registrasiInstansiId: updateRegistrasiInstansi.id,
+                        desaKelurahan: updateRegistrasiInstansi.desaKelurahan,
+                        kecamatan: updateRegistrasiInstansi.kecamatan,
+                        kabupatenKota: updateRegistrasiInstansi.kabupatenKota,
+                        desaKelurahnKode: updateRegistrasiInstansi.desaKelurahanKode,
+                        kecamatanKode: updateRegistrasiInstansi.kecamatanKode,
+                        kabupatenKotaKode: updateRegistrasiInstansi.kabupatenKotaKode,
+                        alamat: updateRegistrasiInstansi.alamat
+                    }
+                })
 
-            // buat data pic instansi berelasi dengan instansi
-            await prisma.picInstansi.create({
-                data: {
-                    instansiId: createInstansi.id,
-                    registrasiPicInstansiId: updateRegistrasiInstansi.registrasiPicInstansi?.id ?? 0,
-                    nama: updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "-",
-                    email: updateRegistrasiInstansi.registrasiPicInstansi?.email ?? "-",
-                    nomorTelepon: updateRegistrasiInstansi.registrasiPicInstansi?.nomorTelepon ?? "-",
-                    jabatan: updateRegistrasiInstansi.registrasiPicInstansi?.jabatan ?? "-"
-                }
-            })
+                // buat data pic instansi berelasi dengan instansi
+                await prisma.picInstansi.create({
+                    data: {
+                        instansiId: createInstansi.id,
+                        registrasiPicInstansiId: updateRegistrasiInstansi.registrasiPicInstansi?.id ?? 0,
+                        nama: updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "-",
+                        email: updateRegistrasiInstansi.registrasiPicInstansi?.email ?? "-",
+                        nomorTelepon: updateRegistrasiInstansi.registrasiPicInstansi?.nomorTelepon ?? "-",
+                        jabatan: updateRegistrasiInstansi.registrasiPicInstansi?.jabatan ?? "-"
+                    }
+                })
+            } catch (error) {
+                console.log(error)
+
+                // Hapus akun instansi (karena data instansi gagal dibuat)
+                await auth.api.deleteUser({ body: { password: updateRegistrasiInstansi.password } })
+            }
         }
 
         messageData.namaInstansi = updateRegistrasiInstansi.nama

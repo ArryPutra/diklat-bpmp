@@ -35,14 +35,17 @@ async function main() {
         ]
     })
 
-    await auth.api.signUpEmail({
+    await auth.api.createUser({
         body: {
             name: "Admin BPMP",
             email: "admin@gmail.com",
             password: "password123",
-            peranId: 1
+            role: "admin",
+            data: {
+                peranId: 1,
+            }
         }
-    });
+    })
 
     // await registrasiInstansiSeed()
     // await diklatSeed()

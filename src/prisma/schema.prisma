@@ -14,19 +14,21 @@ datasource db {
 }
 
 model User {
-  id             String    @id
-  name           String
-  email          String
-  emailVerified  Boolean   @default(false)
-  image          String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  sessions       Session[]
-  accounts       Account[]
-  peran          Peran?    @relation(fields: [peranId], references: [id])
-  peranId        Int
-  apakahNonaktif Boolean   @default(false)
-  instansi       Instansi?
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  role          String    @default("user")
+  banned        Boolean   @default(false)
+  instansi      Instansi?
+  peserta       Peserta?
+  peran         Peran?    @relation(fields: [peranId], references: [id])
+  peranId       Int
 
   @@unique([email])
   @@map("user")
@@ -156,6 +158,7 @@ model Instansi {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   picInstansi          PicInstansi?
+  peserta              Peserta[]
 
   @@map("instansi")
 }
@@ -205,6 +208,7 @@ model Diklat {
 
   metodeDiklat            MetodeDiklat?            @relation(fields: [metodeDiklatId], references: [id])
   statusPendaftaranDiklat StatusPendaftaranDiklat? @relation(fields: [statusPendaftaranDiklatId], references: [id])
+  pendaftarPesertaDiklat  PendaftarPesertaDiklat[]
 
   @@map("diklat")
 }
@@ -214,6 +218,9 @@ model StatusPendaftaranDiklat {
 
   nama            String @unique
   backgroundColor String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   diklat Diklat[]
 
@@ -226,7 +233,66 @@ model MetodeDiklat {
   nama            String @unique
   backgroundColor String
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   diklat Diklat[]
 
   @@map("metode_diklat")
+}
+
+model Peserta {
+  id Int @id @default(autoincrement())
+
+  userId       String       @unique
+  instansiId   Int
+  nik          String       @unique
+  jabatan      String
+  nomorTelepon String       @unique
+  jenisKelamin JenisKelamin
+  tanggalLahir DateTime
+  tempatLahir  String
+  alamat       String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user                   User                     @relation(fields: [userId], references: [id])
+  instansi               Instansi                 @relation(fields: [instansiId], references: [id])
+  pendaftarPesertaDiklat PendaftarPesertaDiklat[]
+
+  @@map("peserta")
+}
+
+enum JenisKelamin {
+  Pria
+  Wanita
+}
+
+model PendaftarPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  diklatId                       String
+  pesertaId                      Int
+  statusPendaftarPesertaDiklatId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  diklat                       Diklat                       @relation(fields: [diklatId], references: [id])
+  peserta                      Peserta                      @relation(fields: [pesertaId], references: [id])
+  statusPendaftarPesertaDiklat StatusPendaftarPesertaDiklat @relation(fields: [statusPendaftarPesertaDiklatId], references: [id])
+
+  @@unique([diklatId, pesertaId])
+}
+
+model StatusPendaftarPesertaDiklat {
+  id Int @id
+
+  nama String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pendaftarPesertaDiklat PendaftarPesertaDiklat[]
 }

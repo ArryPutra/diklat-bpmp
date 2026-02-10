@@ -1,21 +1,14 @@
 "use server"
 
 import { getAllInstansiAction } from '@/actions/instansi-action'
+import { cookies } from 'next/headers'
 import AdminInstansiView from './view'
-
-type AdminInstansiPageProps = {
-    searchParams: Promise<{
-        apakahNonaktif?: "false" | "true"
-        search?: string
-        page?: string
-    }>
-}
 
 export default async function AdminInstansiPage({
     searchParams
 }: {
     searchParams: Promise<{
-        apakahNonaktif?: "false" | "true"
+        banned?: "false" | "true"
         search?: string
         page?: string
     }>
@@ -23,13 +16,14 @@ export default async function AdminInstansiPage({
 
     const daftarInstansi = await getAllInstansiAction({
         search: (await searchParams).search,
-        apakahNonaktif: (await searchParams).apakahNonaktif,
+        banned: (await searchParams).banned,
         page: (await searchParams).page
     })
 
     return (
         <AdminInstansiView
             daftarInstansi={daftarInstansi.data}
-            totalDaftarInstansi={daftarInstansi.total} />
+            totalDaftarInstansi={daftarInstansi.total}
+            newMessage={(await cookies()).get("flash")?.value} />
     )
 }

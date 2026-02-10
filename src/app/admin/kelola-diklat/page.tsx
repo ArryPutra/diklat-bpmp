@@ -25,7 +25,7 @@ export default async function AdminDiklatPage({
         search: _searchParams.search,
         page: _searchParams.page,
         metodeDiklatId: metodeDiklatId === 0 ? undefined : metodeDiklatId,
-        statusPendaftaranDiklatId: statusPendaftaranDiklatId === 0 ? undefined : statusPendaftaranDiklatId
+        statusPendaftaranDiklatId: statusPendaftaranDiklatId === 0 ? [1, 2, 3] : [statusPendaftaranDiklatId]
     });
 
     return (

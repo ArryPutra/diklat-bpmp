@@ -8,8 +8,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             menuItems={
                 [
                     { name: 'Dashboard', icon: <BiHome />, url: '/instansi/dashboard' },
-                    { name: 'Diklat', icon: <BiBookReader />, url: '/instansi/diklat' },
-                    { name: 'Peserta', icon: <BiUser />, url: '/instansi/peserta' },
+                    { name: 'Cari Diklat', icon: <BiBookReader />, url: '/diklat' },
+                    { name: 'Kelola Peserta', icon: <BiUser />, url: '/instansi/kelola-peserta' },
                 ]
             }>
             {children}

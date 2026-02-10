@@ -1,6 +1,10 @@
+"use client"
+
+import { updateStatusBannedAction } from "@/actions/user-action";
 import GuestLayout from "@/components/layouts/guest-layout";
 import { DiklatCard } from "@/components/shared/cards/diklat-card";
 import Search from "@/components/shared/search";
+import { useActionState } from "react";
 import { Footer, Header } from "../view";
 
 export default function CariDiklatView({
@@ -8,6 +12,9 @@ export default function CariDiklatView({
 }: {
     daftarDiklat: any[]
 }) {
+    const [stateUpdateStatusUserAction, formActionUpdateStatusUser, pendingUpdateStatusUser] =
+        useActionState(updateStatusBannedAction, null);
+
     return (
         <>
             <Header activeMenuLabel="Diklat" />

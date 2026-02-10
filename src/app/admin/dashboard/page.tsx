@@ -26,7 +26,7 @@ export default async function AdminDashboardPage({
 
     const dataStatistik = {
         totalDiklat: 0,
-        totalInstansi: await prisma.user.count({ where: { peranId: 2 } }),
+        totalInstansi: await prisma.user.count({ where: { role: "instansi" } }),
         totalPeserta: 0,
         totalNarasumber: 0
     }

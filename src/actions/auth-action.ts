@@ -29,22 +29,6 @@ export async function loginAction(prev: any, formData: FormData) {
 
     let session = null;
 
-    const getUser = await prisma.user.findUnique({
-        where: {
-            email: result.data.email
-        },
-        select: {
-            apakahNonaktif: true
-        }
-    });
-
-    if (getUser?.apakahNonaktif) {
-        return {
-            success: false,
-            message: "Akun Anda telah dinonaktifkan",
-        }
-    }
-
     try {
         session = await auth.api.signInEmail({
             body: {
@@ -52,12 +36,18 @@ export async function loginAction(prev: any, formData: FormData) {
                 password: result.data.password,
             },
         });
-    } catch (error) {
+    } catch (error: any) {
         console.log(error);
+
+        let message: string = "Email atau password salah"
+
+        if (error.statusCode === 403) {
+            message = "Akun anda telah diblokir"
+        }
 
         return {
             success: false,
-            message: "Email atau password salah",
+            message: message,
             values: {
                 email: formData.get("email")?.toString(),
                 password: formData.get("password")?.toString(),
@@ -89,19 +79,29 @@ export async function getCurrentSession() {
 }
 
 // fungsi mendapatkan data login pengguna (user) lebih spesifik
-export async function getCurrentUser() {
+export async function getCurrentUser(select?: any) {
     const session = await auth.api.getSession({
         headers: await headers()
     });
 
-    const user = await prisma.user.findUnique({
+    if (!session?.user?.id) {
+        return null;
+    }
+
+    const query: any = {
         where: {
-            id: session?.user.id,
+            id: session.user.id,
         },
         include: {
             peran: true
         }
-    });
+    };
+
+    if (select) {
+        query.select = select;
+    }
+
+    const user = await prisma.user.findUnique(query);
 
     return user;
 }

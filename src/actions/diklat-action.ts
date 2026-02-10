@@ -98,23 +98,10 @@ export async function createDiklatAction(
     }
 
     try {
-        let statusPendaftaranDiklatId: number
-
-        const tanggalSekarang = new Date()
-
-        const buka = new Date(resultData.data.tanggalBukaPendaftaran)
-        const tutup = new Date(resultData.data.tanggalTutupPendaftaran)
-
-        // set ke 23:59:59.999
-        tutup.setHours(23, 59, 59, 999)
-
-        if (tanggalSekarang < buka) {
-            statusPendaftaranDiklatId = 1
-        } else if (tanggalSekarang <= tutup) {
-            statusPendaftaranDiklatId = 2
-        } else {
-            statusPendaftaranDiklatId = 3
-        }
+        const statusPendaftaranDiklatId = getStatusPendaftaranDiklatId(
+            resultData.data.tanggalBukaPendaftaran,
+            resultData.data.tanggalTutupPendaftaran
+        )
 
         await prisma.diklat.create({
             data: {
@@ -177,23 +164,10 @@ export async function updateDiklatAction(
     }
 
     try {
-        let statusPendaftaranDiklatId: number
-
-        const tanggalSekarang = new Date()
-
-        const buka = new Date(resultData.data.tanggalBukaPendaftaran)
-        const tutup = new Date(resultData.data.tanggalTutupPendaftaran)
-
-        // set ke 23:59:59.999
-        tutup.setHours(23, 59, 59, 999)
-
-        if (tanggalSekarang < buka) {
-            statusPendaftaranDiklatId = 1
-        } else if (tanggalSekarang <= tutup) {
-            statusPendaftaranDiklatId = 2
-        } else {
-            statusPendaftaranDiklatId = 3
-        }
+        const statusPendaftaranDiklatId = getStatusPendaftaranDiklatId(
+            resultData.data.tanggalBukaPendaftaran,
+            resultData.data.tanggalTutupPendaftaran
+        )
 
         await prisma.diklat.update({
             where: {
@@ -210,7 +184,9 @@ export async function updateDiklatAction(
                 tanggalTutupPendaftaran: resultData.data.tanggalTutupPendaftaran,
                 tanggalMulaiAcara: resultData.data.tanggalMulaiAcara,
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
-                targetSasaran: resultData.data.targetSasaran
+                targetSasaran: resultData.data.targetSasaran,
+                materiPelatihan: resultData.data.materiPelatihan,
+                persyaratanPeserta: resultData.data.persyaratanPeserta,
             }
         })
     } catch (error) {
@@ -220,6 +196,11 @@ export async function updateDiklatAction(
             success: false
         }
     }
+
+    (await cookies()).set("flash", `Diklat dengan judul "${resultData.data.judul}" berhasil diperbarui.`, {
+        path: "/admin/kelola-diklat",
+        maxAge: 10
+    })
 
     redirect("/admin/kelola-diklat")
 }
@@ -253,4 +234,24 @@ export async function deleteDiklatAction(
     }
 
 
+}
+
+function getStatusPendaftaranDiklatId(
+    tanggalBukaPendaftaran: Date,
+    tanggalTutupPendaftaran: Date
+): number {
+    const tanggalSekarang = new Date()
+    const buka = new Date(tanggalBukaPendaftaran)
+    const tutup = new Date(tanggalTutupPendaftaran)
+
+    // set ke 23:59:59.999
+    tutup.setHours(23, 59, 59, 999)
+
+    if (tanggalSekarang < buka) {
+        return 1 // Belum buka
+    } else if (tanggalSekarang <= tutup) {
+        return 2 // Sedang buka
+    } else {
+        return 3 // Sudah tutup
+    }
 }

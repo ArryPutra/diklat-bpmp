@@ -17,6 +17,8 @@ export default async function diklatSeed() {
                 tujuan: `Tujuan diklat ${i + 1}`,
                 targetSasaran: `Target Sasaran diklat ${i + 1}`,
                 lokasi: "Zoom Meeting",
+                materiPelatihan: `Materi Pelatihan diklat ${i + 1}`,
+                persyaratanPeserta: `Persyaratan Peserta diklat ${i + 1}`
             }
         })
     }

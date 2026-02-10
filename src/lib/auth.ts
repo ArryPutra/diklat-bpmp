@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from 'better-auth/plugins';
 import prisma from "./prisma";
 
 export const auth = betterAuth({
@@ -8,19 +9,18 @@ export const auth = betterAuth({
         enabled: true,
         autoSignIn: false
     },
-    database: prismaAdapter(prisma, {
-        provider: "postgresql",
-    }),
     user: {
         additionalFields: {
             peranId: {
                 type: "number",
+                required: true,
+                input: true
             }
-        },
-        deleteUser: {
-            enabled: true
         }
     },
+    database: prismaAdapter(prisma, {
+        provider: "postgresql",
+    }),
 
-    plugins: [nextCookies()]
+    plugins: [nextCookies(), admin()]
 })

@@ -118,8 +118,8 @@ export default function KelolaDiklatForm({
                         <FieldLabel>Maksimal Kuota</FieldLabel>
                         <Input
                             placeholder="Masukkan kuota peserta"
-                            type="number"
                             name="maksimalKuota"
+                            inputMode="numeric"
                             defaultValue={actionState.state?.values?.maksimalKuota ?? diklat?.maksimalKuota}
                             min={1} />
                         {

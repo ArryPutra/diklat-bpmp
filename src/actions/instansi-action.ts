@@ -1,16 +1,22 @@
+"use server"
+
 import { Prisma } from "@/generated/prisma/client";
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { UpdateInstansiSchema } from "@/schemas/instansi.schema";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function getAllInstansiAction({
     search = "",
     page = "1",
-    apakahNonaktif = "false"
+    banned = "false"
 }) {
     const _search = search.trim();
 
     const where: Prisma.InstansiWhereInput = {
         user: {
-            apakahNonaktif: apakahNonaktif === "true",
+            banned: banned === "true",
             OR: [
                 {
                     name: {
@@ -50,7 +56,7 @@ export async function getAllInstansiAction({
     };
 }
 
-export async function getInstansiById(id: number) {
+export async function getInstansiAction(id: number) {
     const instansi = await prisma.instansi.findUnique({
         where: { id: id },
         include: {
@@ -62,4 +68,48 @@ export async function getInstansiById(id: number) {
 
     return instansi
 
+}
+
+export async function updateInstansiAction(
+    instansiId: number,
+    prevState: any,
+    formData: FormData
+) {
+    const resultData = UpdateInstansiSchema.safeParse(Object.fromEntries(formData));
+
+    if (!resultData.success) {
+        return {
+            success: false,
+            errors: resultData.error.flatten().fieldErrors,
+            values: Object.fromEntries(formData)
+        }
+    }
+
+    const instansi = await getInstansiAction(instansiId)
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: instansi?.userId } })
+
+    try {
+        const result = await auth.api.setUserPassword({
+            body: {
+                userId: user.id,
+                newPassword: resultData.data.password!,
+            },
+            headers: await headers()
+        })
+        console.log(result)
+    } catch (error) {
+        console.log(error)
+
+        return {
+            success: false,
+            values: Object.fromEntries(formData)
+        }
+    }
+
+    (await cookies()).set("flash", `Data instansi ${instansi?.user.name} berhasil diperbarui.`, {
+        path: "/admin/kelola-instansi",
+        maxAge: 10
+    })
+
+    redirect("/admin/kelola-instansi")
 }

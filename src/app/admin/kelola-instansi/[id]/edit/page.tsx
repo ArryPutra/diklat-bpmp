@@ -1,9 +1,9 @@
 "use server"
 
 import { getInstansiAction } from "@/actions/instansi-action";
-import KelolaInstansiView from "./view";
+import KelolaInstansiEditView from "./view";
 
-export default async function KelolaInstansiPage({
+export default async function KelolaDiklatEditPage({
     params
 }: {
     params: Promise<{ id: string }>
@@ -11,7 +11,7 @@ export default async function KelolaInstansiPage({
     const _params = await params
 
     return (
-        <KelolaInstansiView
+        <KelolaInstansiEditView
             instansi={await getInstansiAction(parseInt(_params.id))} />
     )
 }
