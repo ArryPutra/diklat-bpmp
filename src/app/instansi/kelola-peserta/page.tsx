@@ -1,6 +1,8 @@
 "use server"
 
+import { getCurrentUser } from "@/actions/auth-action";
 import { getAllPesertaAction } from "@/actions/peserta-action";
+import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import KelolaPesertaView from "./view";
 
@@ -14,10 +16,15 @@ export default async function InstansiPesertaPage({
     }>
 }) {
 
+    const currentUser = await getCurrentUser({
+        id: true,
+    });
+
     const daftarPeserta = await getAllPesertaAction({
         search: (await searchParams).search,
         page: (await searchParams).page,
-        banned: (await searchParams).banned
+        banned: (await searchParams).banned,
+        instansiId: await prisma.instansi.findUniqueOrThrow({ where: { userId: currentUser?.id } }).then(res => res.id)
     });
 
     return (

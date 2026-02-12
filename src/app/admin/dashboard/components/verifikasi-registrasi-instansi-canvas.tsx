@@ -20,7 +20,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { BiCheck, BiInfoCircle, BiX } from 'react-icons/bi';
 
-export default function DaftarInstansiTerbaru({
+export default function VerifikasiRegistrasiInstansiCanvas({
     daftarRegistrasiInstansi,
     totalDaftarRegistrasiInstansi
 }: {

@@ -66,7 +66,6 @@ export function DiklatCard({
                         <AlertTitle>{formatDateId(diklat.tanggalTutupPendaftaran)}</AlertTitle>
                     </Alert>
                 }
-                <h1 className="text-xs"><span>Kuota Terisi:</span> <strong>0/{diklat.maksimalKuota}</strong></h1>
             </CardContent>
             <CardFooter className="flex justify-between mt-auto">
                 <Link href={`/diklat/${diklat.id}`}>

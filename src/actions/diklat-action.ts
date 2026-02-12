@@ -59,12 +59,13 @@ export async function getAllDiklatAction({
     };
 }
 
-export async function getDiklatByIdAction(id: string) {
+export async function getDiklatAction(diklatId: string) {
     const diklat = await prisma.diklat.findUnique({
-        where: { id: id },
+        where: { id: diklatId },
         include: {
             metodeDiklat: true,
-            statusPendaftaranDiklat: true
+            statusPendaftaranDiklat: true,
+            pendaftarPesertaDiklat: true
         }
     })
 

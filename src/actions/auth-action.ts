@@ -92,19 +92,21 @@ export async function getCurrentUser(select?: any) {
         where: {
             id: session.user.id,
         },
-        include: {
-            peran: true
-        }
     };
 
     if (select) {
         query.select = select;
+    } else {
+        query.include = {
+            peran: true,
+        };
     }
 
     const user = await prisma.user.findUnique(query);
 
     return user;
 }
+
 
 export async function logoutAction() {
     await auth.api.signOut({

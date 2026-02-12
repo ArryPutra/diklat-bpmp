@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { CreatePesertaSchema, UpdatePesertaSchema } from "@/schemas/peserta.schema";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "./auth-action";
 
@@ -13,12 +13,14 @@ export async function getAllPesertaAction({
     search = "",
     page = "1",
     take = 10,
-    banned = "false"
+    banned = "false",
+    instansiId
 }: {
     search?: string
     page?: string
     take?: number
     banned?: "false" | "true"
+    instansiId?: number
 }) {
     const _search = search.trim();
 
@@ -33,7 +35,8 @@ export async function getAllPesertaAction({
                 }
             ],
             banned: banned === "true"
-        }
+        },
+        instansiId: instansiId
     }
 
     const data = await prisma.peserta.findMany({
@@ -77,18 +80,32 @@ export async function createPesertaAction(
     try {
         const currentUser = await getCurrentUser()
 
+        if (!currentUser) {
+            return {
+                success: false,
+                message: "Unauthorized"
+            }
+        }
+
         const instansi = await prisma.instansi.findUniqueOrThrow({
-            where: { userId: currentUser?.id },
+            where: { userId: currentUser.id },
             select: { id: true }
         })
 
-        // cek duplikasi sekaligus
+        // =========================
+        // PRE-CHECK DUPLIKASI (UX)
+        // =========================
         const duplicate = await prisma.peserta.findFirst({
             where: {
+                instansiId: instansi.id,
                 OR: [
                     { nik: data.nik },
                     { nomorTelepon: data.nomorTelepon }
                 ]
+            },
+            select: {
+                nik: true,
+                nomorTelepon: true
             }
         })
 
@@ -105,7 +122,9 @@ export async function createPesertaAction(
 
         let userPeserta: any
 
-        // transaction supaya konsisten
+        // =========================
+        // TRANSACTION
+        // =========================
         await prisma.$transaction(async (tx) => {
             userPeserta = await auth.api.createUser({
                 body: {
@@ -136,7 +155,30 @@ export async function createPesertaAction(
     } catch (error: any) {
         console.error(error)
 
-        // handle auth error 400
+        // =========================
+        // HANDLE UNIQUE DB ERROR
+        // =========================
+        if (error?.code === "P2002") {
+            const target = error?.meta?.target as string[]
+
+            if (target?.includes("nik")) {
+                return {
+                    success: false,
+                    values,
+                    message: "NIK peserta sudah terdaftar."
+                }
+            }
+
+            if (target?.includes("nomorTelepon")) {
+                return {
+                    success: false,
+                    values,
+                    message: "Nomor telepon peserta sudah terdaftar."
+                }
+            }
+        }
+
+        // auth error
         if (error?.statusCode === 400) {
             return {
                 success: false,
@@ -164,6 +206,7 @@ export async function createPesertaAction(
 
     redirect("/instansi/kelola-peserta")
 }
+
 
 
 export async function getPesertaAction(id: number) {
@@ -199,8 +242,15 @@ export async function updatePesertaAction(
     try {
         const currentUser = await getCurrentUser()
 
+        if (!currentUser) {
+            return {
+                success: false,
+                message: "Unauthorized"
+            }
+        }
+
         const instansi = await prisma.instansi.findUniqueOrThrow({
-            where: { userId: currentUser?.id },
+            where: { userId: currentUser.id },
             select: { id: true }
         })
 
@@ -217,14 +267,21 @@ export async function updatePesertaAction(
             }
         }
 
-        // cek duplikasi nik / nomor (kecuali diri sendiri)
+        // =========================
+        // PRECHECK DUPLIKASI (PER INSTANSI)
+        // =========================
         const duplicate = await prisma.peserta.findFirst({
             where: {
                 id: { not: pesertaId },
+                instansiId: instansi.id,
                 OR: [
                     { nik: data.nik },
                     { nomorTelepon: data.nomorTelepon }
                 ]
+            },
+            select: {
+                nik: true,
+                nomorTelepon: true
             }
         })
 
@@ -239,15 +296,21 @@ export async function updatePesertaAction(
             }
         }
 
-        // transaction update
+        // =========================
+        // TRANSACTION
+        // =========================
         await prisma.$transaction(async (tx) => {
-            await tx.user.update({
-                where: { id: peserta.userId },
-                data: {
-                    name: data.nama,
-                    email: data.email
-                }
-            })
+            if (data.email !== peserta.user.email) {
+                await auth.api.adminUpdateUser({
+                    body: {
+                        userId: peserta.user.id,
+                        data: {
+                            email: data.email
+                        }
+                    },
+                    headers: await headers()
+                })
+            }
 
             await tx.peserta.update({
                 where: { id: pesertaId },
@@ -262,19 +325,50 @@ export async function updatePesertaAction(
                 }
             })
 
-            // update password jika ada
             if (data.password && data.password.length > 0) {
                 await auth.api.setUserPassword({
                     body: {
                         userId: peserta.userId,
-                        newPassword: data.password,
+                        newPassword: data.password
                     },
+                    headers: await headers()
                 })
             }
         })
 
     } catch (error: any) {
         console.error(error)
+
+        // =========================
+        // HANDLE UNIQUE DB ERROR
+        // =========================
+        if (error?.code === "P2002") {
+            const target = error?.meta?.target as string[]
+
+            if (target?.includes("nik")) {
+                return {
+                    success: false,
+                    values,
+                    message: "NIK peserta sudah digunakan."
+                }
+            }
+
+            if (target?.includes("nomorTelepon")) {
+                return {
+                    success: false,
+                    values,
+                    message: "Nomor telepon peserta sudah digunakan."
+                }
+            }
+
+            if (target?.includes("email")) {
+                return {
+                    success: false,
+                    values,
+                    message: "Email sudah digunakan."
+                }
+            }
+        }
 
         return {
             success: false,
@@ -283,7 +377,7 @@ export async function updatePesertaAction(
         }
     }
 
-    ; (await cookies()).set(
+    (await cookies()).set(
         "flash",
         `Data peserta ${data.nama} berhasil diperbarui.`,
         {
@@ -294,6 +388,7 @@ export async function updatePesertaAction(
 
     redirect("/instansi/kelola-peserta")
 }
+
 
 export async function getPesertaByInstansi(instansiId: number) {
     const daftarPeserta = await prisma.peserta.findMany({

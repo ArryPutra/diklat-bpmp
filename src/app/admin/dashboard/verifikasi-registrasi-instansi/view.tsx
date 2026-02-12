@@ -1,9 +1,10 @@
 "use client"
 
-import DaftarInstansiTerbaru from './components/daftar-instansi-terbaru'
-import StatsCards from './components/stats-cards'
+import ButtonNav from '../components/button-nav'
+import StatsCards from '../components/stats-cards'
+import VerifikasiRegistrasiInstansiCanvas from '../components/verifikasi-registrasi-instansi-canvas'
 
-type AdminDashboardViewProps = {
+type AdminDashboardVerifikasiRegistrasiInstansiViewProps = {
     dataStatistik: {
         totalDiklat: number;
         totalInstansi: number;
@@ -14,11 +15,11 @@ type AdminDashboardViewProps = {
     totalDaftarRegistrasiInstansi: number
 }
 
-export default function AdminDashboardView({
+export default function AdminDashboardVerifikasiRegistrasiInstansiView({
     dataStatistik,
     daftarRegistrasiInstansi,
     totalDaftarRegistrasiInstansi
-}: AdminDashboardViewProps) {
+}: AdminDashboardVerifikasiRegistrasiInstansiViewProps) {
 
     return (
         <>
@@ -29,7 +30,9 @@ export default function AdminDashboardView({
                 totalNarasumber: dataStatistik.totalNarasumber
             }} />
 
-            <DaftarInstansiTerbaru
+            <ButtonNav />
+
+            <VerifikasiRegistrasiInstansiCanvas
                 daftarRegistrasiInstansi={daftarRegistrasiInstansi}
                 totalDaftarRegistrasiInstansi={totalDaftarRegistrasiInstansi}
             />

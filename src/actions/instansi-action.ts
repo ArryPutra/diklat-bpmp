@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 import { UpdateInstansiSchema } from "@/schemas/instansi.schema";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "./auth-action";
 
 export async function getAllInstansiAction({
     search = "",
@@ -56,9 +57,9 @@ export async function getAllInstansiAction({
     };
 }
 
-export async function getInstansiAction(id: number) {
+export async function getInstansiAction(instansiId: number) {
     const instansi = await prisma.instansi.findUnique({
-        where: { id: id },
+        where: { id: instansiId },
         include: {
             user: true,
             picInstansi: true,
@@ -67,7 +68,6 @@ export async function getInstansiAction(id: number) {
     })
 
     return instansi
-
 }
 
 export async function updateInstansiAction(
@@ -96,9 +96,8 @@ export async function updateInstansiAction(
             },
             headers: await headers()
         })
-        console.log(result)
     } catch (error) {
-        console.log(error)
+        console.error(error)
 
         return {
             success: false,
@@ -112,4 +111,16 @@ export async function updateInstansiAction(
     })
 
     redirect("/admin/kelola-instansi")
+}
+
+export async function getCurrentInstansi() {
+    const currentUser = await getCurrentUser()
+
+    const currentInstansi = await prisma.instansi.findFirstOrThrow({
+        where: {
+            userId: currentUser?.id
+        }
+    })
+
+    return currentInstansi
 }

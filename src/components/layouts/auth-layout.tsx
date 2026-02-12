@@ -3,8 +3,9 @@
 import { getCurrentUser, logoutAction } from "@/actions/auth-action";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { BiChevronDown, BiLogOut, BiMenu, BiX } from "react-icons/bi";
+import LoadingScreen from "../shared/loading-screen";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
@@ -32,15 +33,19 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
     useEffect(() => {
         async function fetchCurrentUser() {
-            const user = await getCurrentUser();
-            setUser({ name: user?.name!, namaPeran: user?.peran?.nama! });
+            const user: any = await getCurrentUser();
+            console.log(user)
+            setUser({ name: user?.name!, namaPeran: user?.peran.nama });
         }
 
         fetchCurrentUser();
     }, []);
 
+    const [isPending, startTransition] = useTransition();
+
     return (
         <div className="bg-gray-50 flex">
+            <LoadingScreen isLoading={isPending} />
             {/* SIDEBAR */}
             <aside className={`min-w-60 bg-white px-5 h-dvh z-50 fixed
             max-md:shadow max-md:-left-full max-md:duration-500
@@ -62,13 +67,16 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                 <nav className="flex w-full flex-col pt-6 space-y-3">
                     {
                         menuItems.map((item, index) => (
-                            <button key={index} className={`h-12 rounded-xl flex items-center gap-3 pl-3 duration-300 transition-[background-color]
+                            <button key={index} className={`h-12 rounded-xl flex items-center gap-3 px-3 duration-300 transition-[background-color] w-full
                                 ${pathname.startsWith(item.url) ? 'border border-transparent bg-primary text-white shadow' : 'border hover:bg-gray-100'}`}
                                 onClick={() => {
                                     if (pathname.startsWith(item.url)) return;
+                                    if (!item.url) return;
 
-                                    router.push(item.url)
-                                    setSidebarOpen(false)
+                                    startTransition(() => {
+                                        router.push(item.url!)
+                                        setSidebarOpen(false)
+                                    })
                                 }
                                 }>
                                 {item.icon}

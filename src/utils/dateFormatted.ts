@@ -34,3 +34,7 @@ export function dateRangeFormatted(startDate: string, endDate: string) {
         { locale: id }
     )}`
 }
+
+export function formatDateTimeId(date: string) {
+    return format(new Date(date), "EEEE, d MMMM yyyy HH:mm:ss", { locale: id });
+}

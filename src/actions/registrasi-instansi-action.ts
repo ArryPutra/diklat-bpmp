@@ -214,6 +214,7 @@ export async function updateStatusRegistrasiInstansiAction(
                     name: updateRegistrasiInstansi.nama,
                     email: updateRegistrasiInstansi.email,
                     password: updateRegistrasiInstansi.password,
+                    role: "admin",
                     data: {
                         peranId: 2
                     }
@@ -267,7 +268,7 @@ export async function updateStatusRegistrasiInstansiAction(
             message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil ditolak.`;
         }
 
-        revalidatePath('/admin/dashboard')
+        revalidatePath('/admin/dashboard/verifikasi-registrasi-instansi')
 
         return {
             success: true,

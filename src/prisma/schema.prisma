@@ -14,7 +14,8 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id String @id
+
   name          String
   email         String
   emailVerified Boolean   @default(false)
@@ -25,10 +26,11 @@ model User {
   accounts      Account[]
   role          String    @default("user")
   banned        Boolean   @default(false)
-  instansi      Instansi?
-  peserta       Peserta?
-  peran         Peran?    @relation(fields: [peranId], references: [id])
-  peranId       Int
+
+  instansi Instansi?
+  peserta  Peserta?
+  peran    Peran?    @relation(fields: [peranId], references: [id])
+  peranId  Int
 
   @@unique([email])
   @@map("user")
@@ -246,9 +248,9 @@ model Peserta {
 
   userId       String       @unique
   instansiId   Int
-  nik          String       @unique
+  nik          String
   jabatan      String
-  nomorTelepon String       @unique
+  nomorTelepon String
   jenisKelamin JenisKelamin
   tanggalLahir DateTime
   tempatLahir  String
@@ -261,6 +263,8 @@ model Peserta {
   instansi               Instansi                 @relation(fields: [instansiId], references: [id])
   pendaftarPesertaDiklat PendaftarPesertaDiklat[]
 
+  @@unique([instansiId, nik])
+  @@unique([instansiId, nomorTelepon])
   @@map("peserta")
 }
 
@@ -274,7 +278,7 @@ model PendaftarPesertaDiklat {
 
   diklatId                       String
   pesertaId                      Int
-  statusPendaftarPesertaDiklatId Int
+  statusPendaftarPesertaDiklatId Int    @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -284,10 +288,11 @@ model PendaftarPesertaDiklat {
   statusPendaftarPesertaDiklat StatusPendaftarPesertaDiklat @relation(fields: [statusPendaftarPesertaDiklatId], references: [id])
 
   @@unique([diklatId, pesertaId])
+  @@map("pendaftar_peserta_diklat")
 }
 
 model StatusPendaftarPesertaDiklat {
-  id Int @id
+  id Int @id @default(autoincrement())
 
   nama String @unique
 
@@ -295,4 +300,6 @@ model StatusPendaftarPesertaDiklat {
   updatedAt DateTime @updatedAt
 
   pendaftarPesertaDiklat PendaftarPesertaDiklat[]
+
+  @@map("status_pendaftar_peserta_diklat")
 }

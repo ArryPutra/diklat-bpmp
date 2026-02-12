@@ -311,7 +311,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
             onValueChange,
             variant,
             defaultValue = [],
-            placeholder = "Select options",
+            placeholder = "Cari opsi",
             animation = 0,
             animationConfig,
             maxCount = 3,
@@ -1015,7 +1015,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                         <Command>
                             {searchable && (
                                 <CommandInput
-                                    placeholder="Search options..."
+                                    placeholder="Cari opsi..."
                                     onKeyDown={handleInputKeyDown}
                                     value={searchValue}
                                     onValueChange={setSearchValue}
@@ -1063,7 +1063,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                                                 <CheckIcon className="h-4 w-4" />
                                             </div>
                                             <span>
-                                                (Select All
+                                                (Pilih Semua
                                                 {getAllOptions().length > 20
                                                     ? ` - ${getAllOptions().length} options`
                                                     : ""}
@@ -1174,7 +1174,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                                         <CommandItem
                                             onSelect={() => setIsPopoverOpen(false)}
                                             className="flex-1 justify-center cursor-pointer max-w-full">
-                                            Close
+                                            Tutup
                                         </CommandItem>
                                     </div>
                                 </CommandGroup>
@@ -1198,3 +1198,4 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 
 MultiSelect.displayName = "MultiSelect";
 export type { MultiSelectGroup, MultiSelectOption, MultiSelectProps };
+

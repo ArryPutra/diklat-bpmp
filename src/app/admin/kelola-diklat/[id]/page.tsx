@@ -1,6 +1,6 @@
 "use server"
 
-import { getDiklatByIdAction } from "@/actions/diklat-action";
+import { getDiklatAction } from "@/actions/diklat-action";
 import KelolaDiklatDetailView from "./view";
 
 export default async function KelolaDiklatDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -8,6 +8,6 @@ export default async function KelolaDiklatDetailPage({ params }: { params: Promi
 
     return (
         <KelolaDiklatDetailView
-            diklat={await getDiklatByIdAction(_params.id)} />
+            diklat={await getDiklatAction(_params.id)} />
     )
 }
