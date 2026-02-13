@@ -26,7 +26,7 @@ export default async function DiklatPage({
         daftarPesertaDariInstansi = await prisma.peserta.findMany({
             where: {
                 instansiId: instansi.id,
-                pendaftarPesertaDiklat: {
+                pesertaDiklat: {
                     none: {
                         diklatId: diklat?.id
                     }
@@ -44,11 +44,11 @@ export default async function DiklatPage({
         })
     }
 
-    daftarPesertaDiklat = await prisma.pendaftarPesertaDiklat.findMany({
+    daftarPesertaDiklat = await prisma.pesertaDiklat.findMany({
         where: { diklatId: diklat?.id },
         select: {
             createdAt: true,
-            statusPendaftarPesertaDiklat: {
+            statusDaftarPesertaDiklat: {
                 select: {
                     nama: true
                 }
@@ -73,8 +73,6 @@ export default async function DiklatPage({
             }
         }
     });
-
-    console.log(daftarPesertaDiklat)
 
     return (
         <DiklatView

@@ -7,7 +7,7 @@ import React from 'react'
 type ActionDialogProps = {
     title: string
     description: string
-    sections: { title: string, fields: { label: string, value: string }[] }[]
+    sections?: { title: string, fields: { label: string, value: string }[] }[]
     triggerButton: React.ReactNode
     actionButton: React.ReactNode
     content?: React.ReactNode
@@ -36,21 +36,24 @@ export default function ActionDialog({
                     <AlertDialogDescription>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <div className='space-y-4 max-h-96 overflow-y-auto'>
-                    {sections.map((section, index) =>
-                        <div key={index} className='border rounded-lg p-4'>
-                            <h3 className='font-semibold mb-3'>{section.title}</h3>
-                            <div className={`grid grid-cols-${sectionsGrid} gap-3 text-sm max-md:grid-cols-1`}>
-                                {section.fields.map((field: any) => (
-                                    <div key={field.label}>
-                                        <p className='text-gray-500 text-xs'>{field.label}</p>
-                                        <p className='font-medium'>{field.value || '-'}</p>
-                                    </div>
-                                ))}
+                {
+                    sections &&
+                    <div className='space-y-4 max-h-96 overflow-y-auto'>
+                        {sections.map((section, index) =>
+                            <div key={index} className='border rounded-lg p-4'>
+                                <h3 className='font-semibold mb-3'>{section.title}</h3>
+                                <div className={`grid grid-cols-${sectionsGrid} gap-3 text-sm max-md:grid-cols-1`}>
+                                    {section.fields.map((field: any) => (
+                                        <div key={field.label}>
+                                            <p className='text-gray-500 text-xs'>{field.label}</p>
+                                            <p className='font-medium'>{field.value || '-'}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                }
 
                 {content}
 

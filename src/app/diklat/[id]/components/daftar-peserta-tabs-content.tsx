@@ -30,7 +30,7 @@ export default function DaftarPesertaTabsContent({
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell className="font-semibold">{dataPeserta.peserta.user.name}</TableCell>
                                     <TableCell>{dataPeserta.peserta.instansi.user.name}</TableCell>
-                                    <TableCell>{dataPeserta.statusPendaftarPesertaDiklat.nama}</TableCell>
+                                    <TableCell>{dataPeserta.statusDaftarPesertaDiklat.nama}</TableCell>
                                     <TableCell>{formatDateTimeId(dataPeserta.createdAt)}</TableCell>
                                 </TableRow>
                             ))

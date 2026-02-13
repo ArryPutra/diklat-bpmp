@@ -5,10 +5,11 @@ import { DiklatCard } from "@/components/shared/cards/diklat-card";
 import StatsCard from "@/components/shared/cards/stats-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { BiBuilding, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
 
 export default function View({
@@ -47,6 +48,8 @@ export function Header({
 
     const router = useRouter();
 
+    const [isPending, startTransition] = useTransition();
+
     return (
         <header className="fixed w-full px-5 backdrop-blur-sm z-50">
             <div className="flex items-center justify-between w-full max-w-6xl mx-auto border mt-6 px-6 h-20 rounded-md bg-white shadow
@@ -62,7 +65,13 @@ export function Header({
                         <li className={`hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary"}`}><a href="/#diklat">Diklat</a></li>
                         <li className="hover:text-primary"><a href="/#faq">FAQ</a></li>
                     </ul>
-                    <Button onClick={() => router.push('/login')}>Masuk</Button>
+                    <Button onClick={() => {
+                        startTransition(() => {
+                            router.push('/login')
+                        })
+                    }}>
+                        Masuk {isPending && <Spinner />}
+                    </Button>
                 </div>
 
                 <div className="hidden 

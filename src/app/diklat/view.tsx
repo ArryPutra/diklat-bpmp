@@ -3,17 +3,25 @@
 import { updateStatusBannedAction } from "@/actions/user-action";
 import GuestLayout from "@/components/layouts/guest-layout";
 import { DiklatCard } from "@/components/shared/cards/diklat-card";
+import { PaginationWithLinks } from "@/components/shared/pagination-with-links";
 import Search from "@/components/shared/search";
+import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 import { Footer, Header } from "../view";
 
 export default function CariDiklatView({
-    daftarDiklat
+    daftarDiklat,
+    totalDaftarDiklat
 }: {
     daftarDiklat: any[]
+    totalDaftarDiklat: number
 }) {
     const [stateUpdateStatusUserAction, formActionUpdateStatusUser, pendingUpdateStatusUser] =
         useActionState(updateStatusBannedAction, null);
+
+    const params = new URLSearchParams(useSearchParams().toString());
+
+    const currentPage = parseInt(params.get("page") ?? "1");
 
     return (
         <>
@@ -40,6 +48,11 @@ export default function CariDiklatView({
                             <p className="text-gray-500 col-span-3 text-center">Belum ada diklat</p>
                     }
                 </div>
+
+                <PaginationWithLinks
+                    page={currentPage}
+                    pageSize={10}
+                    totalCount={totalDaftarDiklat} />
             </GuestLayout>
 
             <Footer />

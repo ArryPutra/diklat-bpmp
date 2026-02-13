@@ -12,52 +12,67 @@ export async function getAllDiklatAction({
     page = "1",
     metodeDiklatId,
     statusPendaftaranDiklatId = [1, 2, 3],
-    take = 10
+    take = 10,
+    where: customWhere = {}
 }: {
     search?: string
     page?: string
     metodeDiklatId?: number
     statusPendaftaranDiklatId?: number[]
     take?: number
+    where?: Prisma.DiklatWhereInput
 }) {
     const _search = search.trim();
 
-    const where: Prisma.DiklatWhereInput = {
-        metodeDiklatId: metodeDiklatId,
-        statusPendaftaranDiklatId: {
-            in: statusPendaftaranDiklatId
-        },
-        OR: [
-            {
-                judul: {
-                    contains: _search,
-                    mode: "insensitive"
+    const defaultWhere: Prisma.DiklatWhereInput = {
+        ...(metodeDiklatId && { metodeDiklatId }),
+        ...(statusPendaftaranDiklatId && {
+            statusPendaftaranDiklatId: {
+                in: statusPendaftaranDiklatId
+            }
+        }),
+        ...(_search && {
+            OR: [
+                {
+                    judul: {
+                        contains: _search,
+                        mode: "insensitive"
+                    },
                 },
-            },
+            ]
+        })
+    };
+
+    const where: Prisma.DiklatWhereInput = {
+        AND: [
+            defaultWhere,
+            customWhere
         ]
-    }
+    };
+
 
     const data = await prisma.diklat.findMany({
-        skip: parseInt(page) * 10 - 10,
-        take: take,
+        skip: (parseInt(page) - 1) * take,
+        take,
         where,
         include: {
             metodeDiklat: true,
-            statusPendaftaranDiklat: true
+            statusPendaftaranDiklat: true,
+            pesertaDiklat: true
         },
         orderBy: {
             createdAt: "desc",
         },
     });
 
-
     const total = await prisma.diklat.count({ where });
 
     return {
-        data: data,
-        total: total,
+        data,
+        total,
     };
 }
+
 
 export async function getDiklatAction(diklatId: string) {
     const diklat = await prisma.diklat.findUnique({
@@ -65,7 +80,7 @@ export async function getDiklatAction(diklatId: string) {
         include: {
             metodeDiklat: true,
             statusPendaftaranDiklat: true,
-            pendaftarPesertaDiklat: true
+            pesertaDiklat: true
         }
     })
 

@@ -11,8 +11,6 @@ export default async function KelolaPesertaDetailPage({
 }) {
     const _params = await params
 
-    console.log(await getPesertaAction(parseInt(_params.id)))
-
     return (
         <KelolaPesertaDetailView
             peserta={await getPesertaAction(parseInt(_params.id))} />

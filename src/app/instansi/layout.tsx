@@ -2,7 +2,7 @@
 import AuthLayout from '@/components/layouts/auth-layout'
 import { BiBookReader, BiHome, BiUser } from 'react-icons/bi'
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function InstansiLayout({ children }: { children: React.ReactNode }) {
     return (
         <AuthLayout
             menuItems={

@@ -20,7 +20,7 @@ export default function DetailDiklatTabsContent({
     daftarPesertaDariInstansi: any[]
 }) {
     const totalPesertaDariPersentase =
-        (diklat.pendaftarPesertaDiklat.length / diklat.maksimalKuota) * 100;
+        (diklat.pesertaDiklat.length / diklat.maksimalKuota) * 100;
 
     return (
         <TabsContent value="detail">
@@ -78,13 +78,13 @@ export default function DetailDiklatTabsContent({
 
                         <div className="text-sm flex justify-between mb-2">
                             <h1>Kuota Terisi</h1>
-                            <h1>{diklat.pendaftarPesertaDiklat.length}/{diklat.maksimalKuota}</h1>
+                            <h1>{diklat.pesertaDiklat.length}/{diklat.maksimalKuota}</h1>
                         </div>
                         <div className="border w-full h-4 rounded-full overflow-hidden mb-2">
                             <ProgressBar filledPercentage={totalPesertaDariPersentase} />
                         </div>
                         <p className="text-xs text-gray-500 mb-4">
-                            Tersisa <b>{diklat.maksimalKuota - diklat.pendaftarPesertaDiklat.length}</b> kuota dari {diklat.maksimalKuota} Peserta
+                            Tersisa <b>{diklat.maksimalKuota - diklat.pesertaDiklat.length}</b> kuota dari {diklat.maksimalKuota} Peserta
                         </p>
 
                         <Alert variant='danger' className="mb-8">

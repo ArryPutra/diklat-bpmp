@@ -1,6 +1,6 @@
 "use server"
 
-import { getDiklatByIdAction } from "@/actions/diklat-action";
+import { getDiklatAction } from "@/actions/diklat-action";
 import { getAllMetodeDiklatAction } from "@/actions/metode-diklat";
 import KelolaDiklatEditView from "./view";
 
@@ -14,6 +14,6 @@ export default async function KelolaDiklatEditPage({
     return (
         <KelolaDiklatEditView
             daftarMetodeDiklat={await getAllMetodeDiklatAction()}
-            diklat={await getDiklatByIdAction(_params.id)} />
+            diklat={await getDiklatAction(_params.id)} />
     )
 }

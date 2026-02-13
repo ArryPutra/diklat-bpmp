@@ -210,7 +210,7 @@ model Diklat {
 
   metodeDiklat            MetodeDiklat?            @relation(fields: [metodeDiklatId], references: [id])
   statusPendaftaranDiklat StatusPendaftaranDiklat? @relation(fields: [statusPendaftaranDiklatId], references: [id])
-  pendaftarPesertaDiklat  PendaftarPesertaDiklat[]
+  pesertaDiklat           PesertaDiklat[]
 
   @@map("diklat")
 }
@@ -259,9 +259,9 @@ model Peserta {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user                   User                     @relation(fields: [userId], references: [id])
-  instansi               Instansi                 @relation(fields: [instansiId], references: [id])
-  pendaftarPesertaDiklat PendaftarPesertaDiklat[]
+  user          User            @relation(fields: [userId], references: [id])
+  instansi      Instansi        @relation(fields: [instansiId], references: [id])
+  pesertaDiklat PesertaDiklat[]
 
   @@unique([instansiId, nik])
   @@unique([instansiId, nomorTelepon])
@@ -273,25 +273,29 @@ enum JenisKelamin {
   Wanita
 }
 
-model PendaftarPesertaDiklat {
+model PesertaDiklat {
   id Int @id @default(autoincrement())
 
-  diklatId                       String
-  pesertaId                      Int
-  statusPendaftarPesertaDiklatId Int    @default(1)
+  diklatId                         String
+  pesertaId                        Int
+  statusDaftarPesertaDiklatId      Int    @default(1)
+  statusPelaksanaanPesertaDiklatId Int?
+  statusKelulusanPesertaDiklatId   Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  diklat                       Diklat                       @relation(fields: [diklatId], references: [id])
-  peserta                      Peserta                      @relation(fields: [pesertaId], references: [id])
-  statusPendaftarPesertaDiklat StatusPendaftarPesertaDiklat @relation(fields: [statusPendaftarPesertaDiklatId], references: [id])
+  diklat                         Diklat                          @relation(fields: [diklatId], references: [id])
+  peserta                        Peserta                         @relation(fields: [pesertaId], references: [id])
+  statusDaftarPesertaDiklat      StatusDaftarPesertaDiklat       @relation(fields: [statusDaftarPesertaDiklatId], references: [id])
+  statusPelaksanaanPesertaDiklat StatusPelaksanaanPesertaDiklat? @relation(fields: [statusPelaksanaanPesertaDiklatId], references: [id])
+  statusKelulusanPesertaDiklat   StatusKelulusanPesertaDiklat?   @relation(fields: [statusKelulusanPesertaDiklatId], references: [id])
 
   @@unique([diklatId, pesertaId])
-  @@map("pendaftar_peserta_diklat")
+  @@map("peserta_diklat")
 }
 
-model StatusPendaftarPesertaDiklat {
+model StatusDaftarPesertaDiklat {
   id Int @id @default(autoincrement())
 
   nama String @unique
@@ -299,7 +303,33 @@ model StatusPendaftarPesertaDiklat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  pendaftarPesertaDiklat PendaftarPesertaDiklat[]
+  PesertaDiklat PesertaDiklat[]
 
-  @@map("status_pendaftar_peserta_diklat")
+  @@map("status_daftar_peserta_diklat")
+}
+
+model StatusPelaksanaanPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  nama String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  PesertaDiklat PesertaDiklat[]
+
+  @@map("status_pelaksanaan_peserta_diklat")
+}
+
+model StatusKelulusanPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  nama String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  PesertaDiklat PesertaDiklat[]
+
+  @@map("status_kelulusan_peserta_diklat")
 }

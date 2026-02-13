@@ -37,16 +37,28 @@ async function main() {
         ]
     })
 
-    await prisma.statusPendaftarPesertaDiklat.createMany({
+    await prisma.statusDaftarPesertaDiklat.createMany({
         data: [
             { nama: "Menunggu Persetujuan" }, // menunggu persetujuan dari admin
-            { nama: "Terdaftar" }, // peserta sudah terdaftar di diklat
-            { nama: "Dalam Pelatihan" }, // peserta sedang dalam pelatihan
-            { nama: "Selesai" }, // peserta sudah selesai pelatihan
-            { nama: "Lulus" }, // peserta sudah lulus pelatihan
-            { nama: "Tidak Lulus" }, // peserta tidak lulus pelatihan
-            { nama: "Ditolak" }, // peserta ditolak oleh admin
-            { nama: "Batal" }, // peserta batal mendaftar diklat
+            { nama: "Diterima" }, // peserta sudah terdaftar di diklat
+            { nama: "Ditolak" }, // peserta ditolak oleh admin\
+            { nama: "Mengundurkan Diri" },
+        ]
+    })
+
+    await prisma.statusPelaksanaanPesertaDiklat.createMany({
+        data: [
+            { nama: "Sedang Berlangsung" },
+            { nama: "Mengundurkan Diri" },
+            { nama: "Diskualifikasi" }
+        ]
+    })
+
+    await prisma.statusKelulusanPesertaDiklat.createMany({
+        data: [
+            { nama: "Belum Dinilai" },
+            { nama: "Lulus" },
+            { nama: "Tidak Lulus" },
         ]
     })
 

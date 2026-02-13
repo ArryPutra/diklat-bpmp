@@ -116,7 +116,7 @@ export async function updateInstansiAction(
 export async function getCurrentInstansi() {
     const currentUser = await getCurrentUser()
 
-    const currentInstansi = await prisma.instansi.findFirstOrThrow({
+    const currentInstansi = await prisma.instansi.findUnique({
         where: {
             userId: currentUser?.id
         }

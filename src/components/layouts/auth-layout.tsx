@@ -34,7 +34,6 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     useEffect(() => {
         async function fetchCurrentUser() {
             const user: any = await getCurrentUser();
-            console.log(user)
             setUser({ name: user?.name!, namaPeran: user?.peran.nama });
         }
 
@@ -117,7 +116,9 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                     </h1>
 
                     {/* CONTENT VIEW */}
-                    {children}
+                    <div className="space-y-6">
+                        {children}
+                    </div>
                 </main>
             </div>
 
@@ -165,7 +166,7 @@ function PopupProfileMenu({
 
 export function ContentCanvas({ children }: { children: React.ReactNode }) {
     return (
-        <div className='p-6 bg-white border rounded-md w-full'>
+        <div className='p-6 bg-white border rounded-md w-full space-y-6'>
             {children}
         </div>
     )

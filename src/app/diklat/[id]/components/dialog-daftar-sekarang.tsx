@@ -1,13 +1,15 @@
 "use client"
 
-import { createPendaftarPesertaDiklatAction } from "@/actions/pendaftar-peserta-diklat-action";
+import { createPendaftarPesertaDiklatAction } from "@/actions/peserta-diklat-action";
 import { MultiSelect } from "@/components/shared/multi-select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Field, FieldLabel, FieldSet } from "@/components/ui/field";
+import { Field, FieldDescription, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
+import { BiRightArrowAlt } from "react-icons/bi";
 
 export default function DialogDaftarSekarang({
     diklat,
@@ -89,6 +91,7 @@ function DialogForInstansi({
                                 onValueChange={setSelectedValues}
                                 defaultValue={selectedValues}
                             />
+                            <FieldDescription>Hanya menampilkan daftar peserta yang belum terdaftar</FieldDescription>
                         </Field>
                     </FieldSet>
                 }
@@ -98,6 +101,14 @@ function DialogForInstansi({
                         <AlertTitle>Pesan:</AlertTitle>
                         <AlertDescription>
                             {state.message}
+                            {
+                                state?.success &&
+                                <Link href='/instansi/dashboard'>
+                                    <Button size='sm' variant='outline' className="mt-2">
+                                        Kunjungi Dashboard <BiRightArrowAlt />
+                                    </Button>
+                                </Link>
+                            }
                         </AlertDescription>
                     </Alert>
                 }
