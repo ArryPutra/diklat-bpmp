@@ -2,15 +2,17 @@ import Link from "next/link";
 
 export default function TextLink({
     url,
-    value
+    targetBlank,
+    children
 }: {
     url: string
-    value: string
+    targetBlank?: boolean
+    children: React.ReactNode
 }) {
     return (
-        <Link href={url}
+        <Link href={url} target={targetBlank ? "_blank" : undefined}
             className="hover:text-blue-500 hover:underline">
-            {value}
+            {children}
         </Link>
     )
 }

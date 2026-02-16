@@ -4,7 +4,7 @@ import { getAllInstansiAction } from '@/actions/instansi-action'
 import { cookies } from 'next/headers'
 import AdminInstansiView from './view'
 
-export default async function AdminInstansiPage({
+export default async function AdminDaftarInstansiPage({
     searchParams
 }: {
     searchParams: Promise<{

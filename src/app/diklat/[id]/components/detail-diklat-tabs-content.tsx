@@ -2,12 +2,13 @@
 
 import StatsCard from "@/components/shared/cards/stats-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
-import { dateRangeFormatted, formatDateId } from "@/utils/dateFormatted";
+import { dateRangeFormatted, formatDateId, formatDateTimeId } from "@/utils/dateFormatted";
 import { differenceInDays } from "date-fns";
 import { useEffect, useState } from "react";
-import { BiBook, BiBuilding, BiCalendar, BiInfoCircle, BiTargetLock } from "react-icons/bi";
+import { BiBook, BiBuilding, BiCalendar, BiInfoCircle, BiTargetLock, BiUser } from "react-icons/bi";
 import DialogDaftarSekarang from "./dialog-daftar-sekarang";
 
 export default function DetailDiklatTabsContent({
@@ -21,6 +22,8 @@ export default function DetailDiklatTabsContent({
 }) {
     const totalPesertaDariPersentase =
         (diklat.pesertaDiklat.length / diklat.maksimalKuota) * 100;
+
+    console.log(diklat.materiDiklat)
 
     return (
         <TabsContent value="detail">
@@ -51,9 +54,48 @@ export default function DetailDiklatTabsContent({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <CardDescription className="flex items-center gap-3 whitespace-pre-line text-black">
-                                {diklat.materiPelatihan}
-                            </CardDescription>
+                            {
+                                diklat.materiDiklat.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {diklat.materiDiklat.map((materi: any, index: number) => (
+                                            <div
+                                                key={index}
+                                                className="relative border border-l-4 border-l-blue-400 border-slate-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-sm transition-all duration-200 bg-white">
+                                                {/* Nomor Urut Floating */}
+                                                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold shadow-md">
+                                                    {index + 1}
+                                                </div>
+                                                {/* Konten */}
+                                                <div className="flex items-start justify-between gap-4 max-md:flex-col">
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-semibold text-slate-900 mb-1 text-sm">
+                                                            {materi.judul}
+                                                        </h3>
+                                                        <p className="text-xs text-slate-600 mb-3 line-clamp-2">
+                                                            {materi.deskripsi}
+                                                        </p>
+                                                        <div className="flex flex-col gap-1 text-xs">
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Mulai: <b>{formatDateTimeId(materi.waktuMulai)}</b></span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Selesai: <b>{formatDateTimeId(materi.waktuSelesai)}</b></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <Badge variant="secondary" className="flex-shrink-0 whitespace-nowrap text-xs">
+                                                        <BiUser /> {materi.narasumber.user.name}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                        <p className="text-gray-400 text-sm">📚 Belum ada materi yang ditambahkan</p>
+                                    </div>
+                                )
+                            }
                         </CardContent>
                     </Card>
 

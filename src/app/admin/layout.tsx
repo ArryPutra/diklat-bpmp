@@ -1,5 +1,5 @@
 import AuthLayout from '@/components/layouts/auth-layout'
-import { BiBookReader, BiBuilding, BiHome, BiUserVoice } from 'react-icons/bi'
+import { BiBookReader, BiBuilding, BiCheckDouble, BiHome, BiTable, BiUserVoice } from 'react-icons/bi'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -14,10 +14,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {
                         name: 'Kelola Diklat',
                         icon: <BiBookReader />,
-                        url: '/admin/kelola-diklat'
+                        url: '/admin/kelola-diklat',
+                        submenu: [
+                            { name: "Daftar Diklat", icon: <BiTable />, url: "/admin/kelola-diklat/daftar-diklat" },
+                            { name: "Verif Peserta", icon: <BiCheckDouble />, url: "/admin/kelola-diklat/daftar-diklat/verifikasi-peserta-diklat" },
+                        ]
                     },
-                    { name: 'Kelola Instansi', icon: <BiBuilding />, url: '/admin/kelola-instansi' },
-                    { name: 'Narasumber', icon: <BiUserVoice />, url: '/admin/narasumber' },
+                    {
+                        name: 'Kelola Instansi',
+                        icon: <BiBuilding />,
+                        url: '/admin/kelola-instansi',
+                        submenu: [
+                            { name: "Daftar Instansi", icon: <BiTable />, url: "/admin/kelola-instansi/daftar-instansi" },
+                            { name: "Verifikasi", icon: <BiCheckDouble />, url: "/admin/kelola-instansi/verifikasi-instansi" }
+                        ]
+                    },
+                    {
+                        name: 'Narasumber',
+                        icon: <BiUserVoice />,
+                        url: '/admin/kelola-narasumber'
+                    },
                 ]
             }>
             {children}

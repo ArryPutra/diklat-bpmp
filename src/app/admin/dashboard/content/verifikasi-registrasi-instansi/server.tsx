@@ -3,7 +3,6 @@
 import { getAllRegistrasiInstansiAction } from "@/actions/registrasi-instansi-action";
 import VerifikasiRegistrasiInstansiCanvas from "./view";
 
-
 export default async function VerifikasiRegistrasiInstansiServer({
   searchQuery
 }: {

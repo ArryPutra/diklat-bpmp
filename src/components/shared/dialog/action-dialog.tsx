@@ -21,7 +21,7 @@ export default function ActionDialog({
     triggerButton,
     actionButton,
     content,
-    sectionsGrid = 2
+    sectionsGrid = 1
 }: ActionDialogProps) {
     return (
 

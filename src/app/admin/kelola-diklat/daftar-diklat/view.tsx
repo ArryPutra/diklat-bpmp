@@ -24,10 +24,10 @@ export default function AdminDiklatView({
 
     return (
         <ContentCanvas>
-            <Link href='/admin/kelola-diklat/create'>
+            <Link href='/admin/kelola-diklat/daftar-diklat/create' className="block">
                 <Button>Tambah Diklat <BiPlus /></Button>
             </Link>
-            <div className="my-6 flex items-end flex-wrap gap-3">
+            <div className="flex items-end flex-wrap gap-3">
                 <SelectDropdown
                     label='Metode Diklat'
                     query={{
@@ -61,18 +61,19 @@ export default function AdminDiklatView({
 
             {
                 newMessage &&
-                <Alert className="mb-6">
+                <Alert>
                     <AlertTitle>Pesan:</AlertTitle>
                     <AlertDescription>{newMessage}</AlertDescription>
                 </Alert>
             }
 
             <KelolaDiklatTable
-                daftarDiklat={daftarDiklat} />
+                daftarDiklat={daftarDiklat}
+                currentPage={Number(params.get("page") ?? 1)} />
 
             {
                 totalDaftarDiklat !== 0 &&
-                <div className="mt-6">
+                <div>
                     <PaginationWithLinks
                         page={parseInt(params.get("page") ?? "1")}
                         pageSize={10}

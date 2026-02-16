@@ -14,6 +14,7 @@ type MenuItem = {
     name: string;
     icon: React.ReactNode;
     url: string;
+    submenu?: MenuItem[];
 }
 
 type AuthLayoutProps = {
@@ -24,6 +25,7 @@ type AuthLayoutProps = {
 export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenu, setProfileMenu] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
     const [user, setUser] = useState({ name: '...', namaPeran: '...' });
 
     const router = useRouter();
@@ -40,7 +42,31 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
         fetchCurrentUser();
     }, []);
 
+    // Auto-expand menu if current path matches submenu
+    useEffect(() => {
+        const newExpandedMenus: string[] = [];
+        menuItems.forEach(item => {
+            if (item.submenu && item.submenu.length > 0) {
+                const hasActiveSubmenu = item.submenu.some(subitem =>
+                    pathname.startsWith(subitem.url)
+                );
+                if (hasActiveSubmenu) {
+                    newExpandedMenus.push(item.name);
+                }
+            }
+        });
+        setExpandedMenus(newExpandedMenus);
+    }, [pathname, menuItems]);
+
     const [isPending, startTransition] = useTransition();
+
+    const toggleMenu = (menuName: string) => {
+        setExpandedMenus(prev =>
+            prev.includes(menuName)
+                ? prev.filter(m => m !== menuName)
+                : [...prev, menuName]
+        );
+    };
 
     return (
         <div className="bg-gray-50 flex">
@@ -63,24 +89,62 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                 </div>
 
                 {/* MENU ITEMS */}
-                <nav className="flex w-full flex-col pt-6 space-y-3">
+                <nav className="flex w-full flex-col pt-6 space-y-3 overflow-y-auto max-h-[calc(100dvh-120px)]">
                     {
                         menuItems.map((item, index) => (
-                            <button key={index} className={`h-12 rounded-xl flex items-center gap-3 px-3 duration-300 transition-[background-color] w-full
-                                ${pathname.startsWith(item.url) ? 'border border-transparent bg-primary text-white shadow' : 'border hover:bg-gray-100'}`}
-                                onClick={() => {
-                                    if (pathname.startsWith(item.url)) return;
-                                    if (!item.url) return;
+                            <div key={index}>
+                                <button
+                                    className={`h-12 rounded-xl flex items-center gap-3 px-3 duration-300 transition-[background-color] w-full justify-between
+                                        ${pathname.startsWith(item.url) ? 'border border-transparent bg-primary text-white shadow' : 'border hover:bg-gray-100'}`}
+                                    onClick={() => {
+                                        if (item.submenu && item.submenu.length > 0) {
+                                            toggleMenu(item.name);
+                                        } else if (pathname.startsWith(item.url)) {
+                                            return;
+                                        } else if (!item.url) {
+                                            return;
+                                        } else {
+                                            startTransition(() => {
+                                                router.push(item.url!)
+                                                setSidebarOpen(false)
+                                            })
+                                        }
+                                    }}>
+                                    <div className="flex items-center gap-3">
+                                        {item.icon}
+                                        <span className="font-semibold">{item.name}</span>
+                                    </div>
+                                    {item.submenu && item.submenu.length > 0 && (
+                                        <BiChevronDown
+                                            size={20}
+                                            className={`duration-300 transition-transform ${expandedMenus.includes(item.name) ? 'rotate-180' : ''
+                                                }`}
+                                        />
+                                    )}
+                                </button>
 
-                                    startTransition(() => {
-                                        router.push(item.url!)
-                                        setSidebarOpen(false)
-                                    })
-                                }
-                                }>
-                                {item.icon}
-                                <span className="font-semibold">{item.name}</span>
-                            </button>
+                                {/* SUBMENU */}
+                                {item.submenu && item.submenu.length > 0 && expandedMenus.includes(item.name) && (
+                                    <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-3">
+                                        {item.submenu.map((subitem, subindex) => (
+                                            <button
+                                                key={subindex}
+                                                className={`min-h-10 rounded-lg flex items-center gap-3 px-3 duration-300 transition-[background-color] w-full text-sm border
+                                                    ${pathname.startsWith(subitem.url) ? 'bg-primary text-white shadow' : 'hover:bg-gray-100'}`}
+                                                onClick={() => {
+                                                    if (pathname.startsWith(subitem.url)) return;
+                                                    startTransition(() => {
+                                                        router.push(subitem.url!)
+                                                        setSidebarOpen(false)
+                                                    })
+                                                }}>
+                                                {subitem.icon}
+                                                <span className="font-medium">{subitem.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         ))
                     }
                 </nav>

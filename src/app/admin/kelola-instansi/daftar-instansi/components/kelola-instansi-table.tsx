@@ -125,7 +125,7 @@ export default function KelolaInstansiTable({
                     ) : (
                         <TableRow>
                             <TableCell colSpan={4} className='text-center'>
-                                Tidak ada data registrasi instansi.
+                                Tidak ada data instansi.
                             </TableCell>
                         </TableRow>
                     )

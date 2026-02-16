@@ -22,7 +22,7 @@ export default async function AdminDashboardPage({
         totalDiklat: await prisma.diklat.count(),
         totalInstansi: await prisma.instansi.count(),
         totalPeserta: await prisma.peserta.count(),
-        totalNarasumber: 0
+        totalNarasumber: await prisma.narasumber.count(),
     }
 
     return (

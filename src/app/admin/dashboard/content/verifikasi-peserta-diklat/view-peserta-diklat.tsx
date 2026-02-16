@@ -86,7 +86,7 @@ export default function VerifikasiPesertaDiklatView_PesertaDiklat({
                                     <TableCell className="space-x-2">
                                         {
                                             pesertaDiklat.statusDaftarPesertaDiklat.id === 1 ||
-                                                pesertaDiklat.statusDaftarPesertaDiklat.id === 4 ?
+                                                pesertaDiklat.statusDaftarPesertaDiklat.id === 3 ?
                                                 <DialogTerimaStatusPeserta
                                                     item={pesertaDiklat}
                                                     formAction={formActionUpdateStatusPendaftarPesertaDiklatAction} />
@@ -147,7 +147,7 @@ function DialogTerimaStatusPeserta({
                     ]
                 }
             ]}
-            triggerButton={<Button size='icon-sm'><BiCheck /></Button>}
+            triggerButton={<Button size='sm'><BiCheck /> Terima</Button>}
             actionButton={
                 <form action={formAction}>
                     <input type="hidden" name="pesertaDiklatId" value={item.id} />
@@ -186,7 +186,7 @@ function DialogTolakStatusPeserta({
                     ]
                 }
             ]}
-            triggerButton={<Button size='icon-sm' variant='destructive'><BiX /></Button>}
+            triggerButton={<Button size='sm' variant='destructive'><BiX /> Tolak</Button>}
             actionButton={
                 <form action={formAction}>
                     <input type="hidden" name="pesertaDiklatId" value={item.id} />

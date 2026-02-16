@@ -20,12 +20,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { BiCheck, BiInfoCircle, BiX } from 'react-icons/bi';
 
-export default function VerifikasiRegistrasiInstansiCanvas({
+export default function Admin_VerifikasiInstansi_View({
     daftarRegistrasiInstansi,
-    totalDaftarRegistrasiInstansi
+    totalRegistrasiInstansi
 }: {
-    daftarRegistrasiInstansi: any[]
-    totalDaftarRegistrasiInstansi: number
+    daftarRegistrasiInstansi: any[],
+    totalRegistrasiInstansi: number
 }) {
     const [stateUpdateStatusRegistrasiInstansi, formActionUpdateStatusRegistrasiInstansi, pendingUpdateStatusRegistrasiInstansi] =
         useActionState(updateStatusRegistrasiInstansiAction, null);
@@ -34,18 +34,6 @@ export default function VerifikasiRegistrasiInstansiCanvas({
     const params = new URLSearchParams(useSearchParams().toString());
 
     const currentPage = parseInt(params.get("page") ?? "1");
-
-    function onSearch(formData: FormData) {
-        const search = formData.get('search')?.toString() ?? "";
-
-        if (search) {
-            params.set("search", search);
-        } else {
-            params.delete("search");
-        }
-
-        router.push(`?${params.toString()}`);
-    }
 
     function onChangeStatus(value: string) {
         params.set("status", value);
@@ -259,11 +247,11 @@ export default function VerifikasiRegistrasiInstansiCanvas({
             </Table>
 
             {
-                totalDaftarRegistrasiInstansi > 0 &&
+                totalRegistrasiInstansi > 0 &&
                 <PaginationWithLinks
                     page={currentPage}
                     pageSize={10}
-                    totalCount={totalDaftarRegistrasiInstansi} />
+                    totalCount={totalRegistrasiInstansi} />
             }
         </ContentCanvas>
     )

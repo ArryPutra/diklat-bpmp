@@ -36,7 +36,7 @@ export default function DaftarPesertaTabsContent({
                             ))
                             :
                             <TableRow>
-                                <TableHead colSpan={3} className="text-center">Tidak Ada Peserta</TableHead>
+                                <TableHead colSpan={99} className="text-center py-6">Tidak Ada Peserta</TableHead>
                             </TableRow>
                     }
                 </TableBody>

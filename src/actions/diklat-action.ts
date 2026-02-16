@@ -50,7 +50,6 @@ export async function getAllDiklatAction({
         ]
     };
 
-
     const data = await prisma.diklat.findMany({
         skip: (parseInt(page) - 1) * take,
         take,
@@ -58,7 +57,8 @@ export async function getAllDiklatAction({
         include: {
             metodeDiklat: true,
             statusPendaftaranDiklat: true,
-            pesertaDiklat: true
+            pesertaDiklat: true,
+            materiDiklat: true
         },
         orderBy: {
             createdAt: "desc",
@@ -80,7 +80,20 @@ export async function getDiklatAction(diklatId: string) {
         include: {
             metodeDiklat: true,
             statusPendaftaranDiklat: true,
-            pesertaDiklat: true
+            pesertaDiklat: true,
+            materiDiklat: {
+                include: {
+                    narasumber: {
+                        select: {
+                            user: {
+                                select: {
+                                    name: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     })
 
@@ -133,7 +146,6 @@ export async function createDiklatAction(
                 tanggalMulaiAcara: resultData.data.tanggalMulaiAcara,
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
                 targetSasaran: resultData.data.targetSasaran,
-                materiPelatihan: resultData.data.materiPelatihan,
                 persyaratanPeserta: resultData.data.persyaratanPeserta,
             }
         })
@@ -201,7 +213,6 @@ export async function updateDiklatAction(
                 tanggalMulaiAcara: resultData.data.tanggalMulaiAcara,
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
                 targetSasaran: resultData.data.targetSasaran,
-                materiPelatihan: resultData.data.materiPelatihan,
                 persyaratanPeserta: resultData.data.persyaratanPeserta,
             }
         })
@@ -214,11 +225,11 @@ export async function updateDiklatAction(
     }
 
     (await cookies()).set("flash", `Diklat dengan judul "${resultData.data.judul}" berhasil diperbarui.`, {
-        path: "/admin/kelola-diklat",
+        path: "/admin/kelola-diklat/daftar-diklat",
         maxAge: 10
     })
 
-    redirect("/admin/kelola-diklat")
+    redirect("/admin/kelola-diklat/daftar-diklat")
 }
 
 export async function deleteDiklatAction(
@@ -227,20 +238,14 @@ export async function deleteDiklatAction(
 ) {
     const diklatId = formData.get("diklatId") as string
 
-    console.log(diklatId)
+    let diklatDihapus
 
     try {
-        await prisma.diklat.delete({
+        diklatDihapus = await prisma.diklat.delete({
             where: {
                 id: diklatId
             }
         })
-
-        revalidatePath("/admin/kelola-diklat")
-
-        return {
-            success: true
-        }
     } catch (error) {
         console.log(error)
 
@@ -249,7 +254,12 @@ export async function deleteDiklatAction(
         }
     }
 
+    (await cookies()).set("flash", `Diklat dengan judul "${diklatDihapus.judul}" berhasil dihapus.`, {
+        path: "/admin/kelola-diklat/daftar-diklat",
+        maxAge: 10
+    })
 
+    revalidatePath("/admin/kelola-diklat")
 }
 
 function getStatusPendaftaranDiklatId(

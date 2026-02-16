@@ -6,7 +6,8 @@ import { FieldDescription, FieldGroup, FieldSet, FieldTitle } from "../../ui/fie
 import BackButton from "../back-button";
 
 export default function DetailDataPage({
-    listData
+    listData,
+    backUrl
 }: {
     listData: {
         title: string
@@ -14,17 +15,17 @@ export default function DetailDataPage({
             label: string,
             value: string | React.ReactNode
         }[]
-    }[]
+    }[],
+    backUrl?: string
 }) {
     return (
-
         <FieldGroup>
             {
                 listData.map((data: any, index: number) => (
                     <ContentCanvas key={index}>
                         {
                             index == 0 &&
-                            <BackButton />
+                            <BackButton url={backUrl} />
                         }
                         <FieldGroup>
                             <h1 className="font-semibold mb-2 text-xl">{data.title}</h1>

@@ -24,7 +24,9 @@ export default function KelolaDiklatForm({
 
     return (
         <ContentCanvas>
-            <BackButton />
+            <div>
+                <BackButton url="/admin/kelola-diklat/daftar-diklat" />
+            </div>
 
             <form action={actionState.formAction}>
                 <FieldSet>
@@ -173,18 +175,6 @@ export default function KelolaDiklatForm({
                         {
                             actionState.state?.errors?.tanggalSelesaiAcara &&
                             <FieldError>{actionState.state?.errors?.tanggalSelesaiAcara}</FieldError>
-                        }
-                    </Field>
-
-                    <Field>
-                        <FieldLabel>Materi Pelatihan</FieldLabel>
-                        <Textarea
-                            placeholder="Masukkan materi pelatihan"
-                            name="materiPelatihan"
-                            defaultValue={actionState.state?.values?.materiPelatihan ?? diklat?.materiPelatihan} />
-                        {
-                            actionState.state?.errors?.materiPelatihan &&
-                            <FieldError>{actionState.state?.errors?.materiPelatihan}</FieldError>
                         }
                     </Field>
 

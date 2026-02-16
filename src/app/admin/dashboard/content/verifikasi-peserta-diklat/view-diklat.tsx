@@ -24,7 +24,7 @@ export default function VerifikasiPesertaDiklatView_Diklat({
 
     return (
         <ContentCanvas>
-            <div className='flex justify-between flex-wrapgap-3'>
+            <div className='flex justify-between flex-wrap gap-3'>
                 <div>
                     <h1 className='font-bold'>Registrasi Peserta Diklat</h1>
                     <p className='text-sm'>Daftar registrasi peserta diklat yang perlu ditinjau</p>
@@ -35,7 +35,7 @@ export default function VerifikasiPesertaDiklatView_Diklat({
                 <Search />
             </div>
 
-            <Table className="">
+            <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>No</TableHead>

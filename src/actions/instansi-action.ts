@@ -11,7 +11,13 @@ import { getCurrentUser } from "./auth-action";
 export async function getAllInstansiAction({
     search = "",
     page = "1",
-    banned = "false"
+    banned = "false",
+    extraWhere = {}
+}: {
+    search?: string
+    page?: string
+    banned?: string
+    extraWhere?: Prisma.InstansiWhereInput
 }) {
     const _search = search.trim();
 
@@ -32,7 +38,8 @@ export async function getAllInstansiAction({
                     },
                 }
             ]
-        }
+        },
+        ...extraWhere
     }
 
     const data = await prisma.instansi.findMany({

@@ -16,8 +16,8 @@ export default function BackButton({ url }: { url?: string }) {
     }
 
     return (
-        <Button variant='secondary' className="mb-8"
-            onClick={handleBack}>
+        <Button variant='secondary'
+            onClick={handleBack} className="w-fit">
             <BiLeftArrowAlt /> Kembali
         </Button>
     )

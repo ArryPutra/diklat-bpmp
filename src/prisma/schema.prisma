@@ -16,6 +16,8 @@ datasource db {
 model User {
   id String @id
 
+  peranId Int
+
   name          String
   email         String
   emailVerified Boolean   @default(false)
@@ -27,10 +29,10 @@ model User {
   role          String    @default("user")
   banned        Boolean   @default(false)
 
-  instansi Instansi?
-  peserta  Peserta?
-  peran    Peran?    @relation(fields: [peranId], references: [id])
-  peranId  Int
+  instansi   Instansi?
+  peserta    Peserta?
+  peran      Peran?      @relation(fields: [peranId], references: [id])
+  narasumber Narasumber?
 
   @@unique([email])
   @@map("user")
@@ -202,7 +204,6 @@ model Diklat {
   tanggalTutupPendaftaran DateTime
   tanggalMulaiAcara       DateTime
   tanggalSelesaiAcara     DateTime
-  materiPelatihan         String
   persyaratanPeserta      String
 
   createdAt DateTime @default(now())
@@ -211,6 +212,7 @@ model Diklat {
   metodeDiklat            MetodeDiklat?            @relation(fields: [metodeDiklatId], references: [id])
   statusPendaftaranDiklat StatusPendaftaranDiklat? @relation(fields: [statusPendaftaranDiklatId], references: [id])
   pesertaDiklat           PesertaDiklat[]
+  materiDiklat            MateriDiklat[]
 
   @@map("diklat")
 }
@@ -332,4 +334,43 @@ model StatusKelulusanPesertaDiklat {
   PesertaDiklat PesertaDiklat[]
 
   @@map("status_kelulusan_peserta_diklat")
+}
+
+model Narasumber {
+  id Int @id @default(autoincrement())
+
+  userId String @unique
+
+  nomorTelepon String
+  jenisKelamin JenisKelamin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id])
+  materiDiklat MateriDiklat[]
+
+  @@map("narasumber")
+}
+
+model MateriDiklat {
+  id Int @id @default(autoincrement())
+
+  diklatId     String
+  narasumberId Int
+
+  judul        String
+  deskripsi    String
+  fileMateri   String?
+  lokasi       String?
+  waktuMulai   DateTime
+  waktuSelesai DateTime
+
+  diklat     Diklat     @relation(fields: [diklatId], references: [id])
+  narasumber Narasumber @relation(fields: [narasumberId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("materi_diklat")
 }

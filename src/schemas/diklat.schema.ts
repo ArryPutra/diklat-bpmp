@@ -35,7 +35,6 @@ export const DiklatSchema = z
             invalid_type_error: "Tanggal Selesai tidak valid",
         }),
 
-        materiPelatihan: z.string().min(1, "Materi pelatihan wajib diisi"),
         persyaratanPeserta: z.string().min(1, "Persyaratan wajib diisi"),
     })
     .superRefine((data, ctx) => {

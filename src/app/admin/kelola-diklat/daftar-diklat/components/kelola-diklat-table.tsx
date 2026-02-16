@@ -3,6 +3,7 @@
 import { deleteDiklatAction } from "@/actions/diklat-action";
 import ActionDialog from "@/components/shared/dialog/action-dialog";
 import LoadingScreen from "@/components/shared/loading-screen";
+import TextLink from "@/components/shared/text-link";
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,11 @@ import { useActionState } from "react";
 import { BiEdit, BiInfoCircle, BiTrash } from "react-icons/bi";
 
 export default function KelolaDiklatTable({
-    daftarDiklat
+    daftarDiklat,
+    currentPage
 }: {
     daftarDiklat: any[]
+    currentPage: number
 }) {
 
     const [stateDeleteDiklat, formActionDeleteDiklat, pendingDeleteDiklat] =
@@ -33,6 +36,7 @@ export default function KelolaDiklatTable({
                         <TableHead>Judul</TableHead>
                         <TableHead>Metode</TableHead>
                         <TableHead>Status Pendaftaran</TableHead>
+                        <TableHead>Jumlah Materi</TableHead>
                         <TableHead>Maksimal Kuota</TableHead>
                         <TableHead>Tanggal Buka Pendaftaran</TableHead>
                         <TableHead>Aksi</TableHead>
@@ -42,9 +46,13 @@ export default function KelolaDiklatTable({
                     {daftarDiklat.length > 0 ?
                         daftarDiklat.map((diklat: any, index: number) =>
                             <TableRow key={index}>
-                                <TableCell>{getRowNumber(index, 1, 10)}</TableCell>
+                                <TableCell>{getRowNumber(index, currentPage, 10)}</TableCell>
                                 <TableCell className="font-semibold">
-                                    {diklat.judul}
+                                    <TextLink
+                                        url={`/diklat/${diklat.id}`}
+                                        targetBlank={true}>
+                                        {diklat.judul}
+                                    </TextLink>
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`${diklat.metodeDiklat.backgroundColor}`}>
@@ -57,6 +65,15 @@ export default function KelolaDiklatTable({
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
+                                    <TextLink url={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`}>
+                                        {
+                                            diklat.materiDiklat.length > 0 ?
+                                                `${diklat.materiDiklat.length} Materi`
+                                                : <span className="text-red-500 font-semibold">Tidak ada materi</span>
+                                        }
+                                    </TextLink>
+                                </TableCell>
+                                <TableCell>
                                     {diklat.maksimalKuota} Peserta
                                 </TableCell>
                                 <TableCell>
@@ -64,11 +81,11 @@ export default function KelolaDiklatTable({
                                 </TableCell>
                                 <TableCell className="space-x-2">
                                     {/* Info aksi */}
-                                    <Link href={`/admin/kelola-diklat/${diklat.id}`}>
+                                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}`}>
                                         <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
                                     </Link>
                                     {/* Edit Aksi */}
-                                    <Link href={`/admin/kelola-diklat/${diklat.id}/edit`}>
+                                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/edit`}>
                                         <Button size='icon-sm'><BiEdit /></Button>
                                     </Link>
                                     {/* Aksi hapus */}
