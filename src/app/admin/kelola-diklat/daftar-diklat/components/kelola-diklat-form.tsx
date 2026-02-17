@@ -130,53 +130,55 @@ export default function KelolaDiklatForm({
                         }
                     </Field>
 
-                    <Field>
-                        <FieldLabel>Tanggal Buka Pendaftaran</FieldLabel>
-                        <Input
-                            type="date"
-                            name="tanggalBukaPendaftaran"
-                            defaultValue={actionState.state?.values?.tanggalBukaPendaftaran ?? toDateInputValue(diklat?.tanggalBukaPendaftaran)} />
-                        {
-                            actionState.state?.errors?.tanggalBukaPendaftaran &&
-                            <FieldError>{actionState.state?.errors?.tanggalBukaPendaftaran}</FieldError>
-                        }
-                    </Field>
+                    <FieldSet className="grid grid-cols-2 max-md:grid-cols-1">
+                        <Field>
+                            <FieldLabel>Tanggal Buka Pendaftaran</FieldLabel>
+                            <Input
+                                type="date"
+                                name="tanggalBukaPendaftaran"
+                                defaultValue={actionState.state?.values?.tanggalBukaPendaftaran ?? toDateInputValue(diklat?.tanggalBukaPendaftaran)} />
+                            {
+                                actionState.state?.errors?.tanggalBukaPendaftaran &&
+                                <FieldError>{actionState.state?.errors?.tanggalBukaPendaftaran}</FieldError>
+                            }
+                        </Field>
 
-                    <Field>
-                        <FieldLabel>Tanggal Tutup Pendaftaran</FieldLabel>
-                        <Input
-                            type="date"
-                            name="tanggalTutupPendaftaran"
-                            defaultValue={actionState.state?.values?.tanggalTutupPendaftaran ?? toDateInputValue(diklat?.tanggalTutupPendaftaran)} />
-                        {
-                            actionState.state?.errors?.tanggalTutupPendaftaran &&
-                            <FieldError>{actionState.state?.errors?.tanggalTutupPendaftaran}</FieldError>
-                        }
-                    </Field>
+                        <Field>
+                            <FieldLabel>Tanggal Tutup Pendaftaran</FieldLabel>
+                            <Input
+                                type="date"
+                                name="tanggalTutupPendaftaran"
+                                defaultValue={actionState.state?.values?.tanggalTutupPendaftaran ?? toDateInputValue(diklat?.tanggalTutupPendaftaran)} />
+                            {
+                                actionState.state?.errors?.tanggalTutupPendaftaran &&
+                                <FieldError>{actionState.state?.errors?.tanggalTutupPendaftaran}</FieldError>
+                            }
+                        </Field>
 
-                    <Field>
-                        <FieldLabel>Tanggal Mulai Diklat</FieldLabel>
-                        <Input
-                            type="date"
-                            name="tanggalMulaiAcara"
-                            defaultValue={actionState.state?.values?.tanggalMulaiAcara ?? toDateInputValue(diklat?.tanggalMulaiAcara)} />
-                        {
-                            actionState.state?.errors?.tanggalMulaiAcara &&
-                            <FieldError>{actionState.state?.errors?.tanggalMulaiAcara}</FieldError>
-                        }
-                    </Field>
+                        <Field>
+                            <FieldLabel>Tanggal Mulai Diklat</FieldLabel>
+                            <Input
+                                type="date"
+                                name="tanggalMulaiAcara"
+                                defaultValue={actionState.state?.values?.tanggalMulaiAcara ?? toDateInputValue(diklat?.tanggalMulaiAcara)} />
+                            {
+                                actionState.state?.errors?.tanggalMulaiAcara &&
+                                <FieldError>{actionState.state?.errors?.tanggalMulaiAcara}</FieldError>
+                            }
+                        </Field>
 
-                    <Field>
-                        <FieldLabel>Tanggal Selesai Diklat</FieldLabel>
-                        <Input
-                            type="date"
-                            name="tanggalSelesaiAcara"
-                            defaultValue={actionState.state?.values?.tanggalSelesaiAcara ?? toDateInputValue(diklat?.tanggalSelesaiAcara)} />
-                        {
-                            actionState.state?.errors?.tanggalSelesaiAcara &&
-                            <FieldError>{actionState.state?.errors?.tanggalSelesaiAcara}</FieldError>
-                        }
-                    </Field>
+                        <Field>
+                            <FieldLabel>Tanggal Selesai Diklat</FieldLabel>
+                            <Input
+                                type="date"
+                                name="tanggalSelesaiAcara"
+                                defaultValue={actionState.state?.values?.tanggalSelesaiAcara ?? toDateInputValue(diklat?.tanggalSelesaiAcara)} />
+                            {
+                                actionState.state?.errors?.tanggalSelesaiAcara &&
+                                <FieldError>{actionState.state?.errors?.tanggalSelesaiAcara}</FieldError>
+                            }
+                        </Field>
+                    </FieldSet>
 
                     <Field>
                         <FieldLabel>Persyaratan Peserta</FieldLabel>

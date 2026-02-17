@@ -19,7 +19,6 @@ type SearchProps = {
 export default function Search({
     name = "search",
 }: SearchProps) {
-    const [value, setValue] = useState<string>("");
     const formRef = useRef<HTMLFormElement>(null);
 
     const handleClear = () => {
@@ -34,6 +33,8 @@ export default function Search({
     const router = useRouter();
     const searchParams = useSearchParams();
     const params = new URLSearchParams(searchParams.toString());
+
+    const [value, setValue] = useState<string>(params.get(name) ?? "");
 
     function onSearch(formData: FormData) {
         const search = formData.get(name)?.toString() ?? "";

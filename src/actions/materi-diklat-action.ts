@@ -51,6 +51,29 @@ export async function createMateriDiklatAction(
         }
     }
 
+    // pastikan tanggal pelaksanaan tidak lebih kecil dari diklat
+    const diklat = await prisma.diklat.findUnique({
+        where: {
+            id: diklatId
+        },
+        select: {
+            tanggalMulaiAcara: true
+        }
+    })
+
+    const tanggalPelaksanaan = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
+    const tanggalMulaiAcara = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+
+    if (tanggalPelaksanaan < tanggalMulaiAcara) {
+        return {
+            success: false,
+            errors: {
+                tanggalPelaksanaan: ["Tanggal pelaksanaan tidak boleh lebih kecil dari tanggal mulai diklat"]
+            },
+            values: values
+        }
+    }
+
     try {
         await prisma.materiDiklat.create({
             data: {
@@ -58,6 +81,7 @@ export async function createMateriDiklatAction(
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 narasumberId: Number(resultData.data.narasumberId),
+                tanggalPelaksanaan: resultData.data.tanggalPelaksanaan,
                 waktuMulai: resultData.data.waktuMulai,
                 waktuSelesai: resultData.data.waktuSelesai,
             }
@@ -94,10 +118,38 @@ export async function updateMateriDiklatAction(
         }
     }
 
-    let diklat
+    const materiDiklat = await prisma.materiDiklat.findUnique({
+        where: {
+            id: materiDiklatId
+        },
+        select: {
+            diklatId: true
+        }
+    })
+
+    const diklat = await prisma.diklat.findUnique({
+        where: {
+            id: materiDiklat?.diklatId
+        },
+    })
+
+    const tanggalPelaksanaan = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
+    const tanggalMulaiAcara = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+
+    if (tanggalPelaksanaan < tanggalMulaiAcara) {
+        return {
+            success: false,
+            errors: {
+                tanggalPelaksanaan: ["Tanggal pelaksanaan tidak boleh lebih kecil dari tanggal mulai diklat"]
+            },
+            values: values
+        }
+    }
+
+    let diklatBaru
 
     try {
-        diklat = await prisma.materiDiklat.update({
+        diklatBaru = await prisma.materiDiklat.update({
             where: {
                 id: materiDiklatId
             },
@@ -105,6 +157,7 @@ export async function updateMateriDiklatAction(
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 narasumberId: Number(resultData.data.narasumberId),
+                tanggalPelaksanaan: resultData.data.tanggalPelaksanaan,
                 waktuMulai: resultData.data.waktuMulai,
                 waktuSelesai: resultData.data.waktuSelesai,
             }
@@ -120,14 +173,14 @@ export async function updateMateriDiklatAction(
 
     (await cookies()).set(
         "flash",
-        `Materi diklat dengan judul "${diklat.judul}" berhasil diperbarui.`,
+        `Materi diklat dengan judul "${diklatBaru.judul}" berhasil diperbarui.`,
         {
             path: "/admin/kelola-narasumber",
             maxAge: 10
         }
     )
 
-    revalidatePath(`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`)
+    revalidatePath(`/admin/kelola-diklat/daftar-diklat/${diklatBaru.id}/materi`)
 
     return {
         success: true,

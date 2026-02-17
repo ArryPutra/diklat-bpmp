@@ -1,22 +1,9 @@
 "use server"
 
 import prisma from "@/lib/prisma";
-import ButtonNav from "./components/button-nav";
-import StatsCards from "./components/stats-cards";
-import VerifikasiPesertaDiklatServer from "./content/verifikasi-peserta-diklat/server";
-import VerifikasiRegistrasiInstansiServer from "./content/verifikasi-registrasi-instansi/server";
+import Admin_Dashboard_View from "./view";
 
-export default async function AdminDashboardPage({
-    searchParams
-}: {
-    searchParams: Promise<{
-        search?: string
-        page?: string
-        status?: string
-        content?: string
-    }>
-}) {
-    const _searchParams = await searchParams;
+export default async function AdminDashboardPage() {
 
     const dataStatistik = {
         totalDiklat: await prisma.diklat.count(),
@@ -25,25 +12,21 @@ export default async function AdminDashboardPage({
         totalNarasumber: await prisma.narasumber.count(),
     }
 
+    const totalVerifikasiInstansi = await prisma.registrasiInstansi.count({
+        where: {
+            statusRegistrasiInstansiId: 1
+        }
+    })
+    const totalVerifikasiPesertaDiklat = await prisma.pesertaDiklat.count({
+        where: {
+            statusDaftarPesertaDiklatId: 1
+        }
+    })
+
     return (
-        <>
-            <StatsCards dataStatistik={{
-                totalDiklat: dataStatistik.totalDiklat,
-                totalInstansi: dataStatistik.totalInstansi,
-                totalPeserta: dataStatistik.totalPeserta,
-                totalNarasumber: dataStatistik.totalNarasumber
-            }} />
-
-            <ButtonNav />
-
-            {
-                (_searchParams.content === 'verifikasi-registrasi-instansi' || _searchParams.content === undefined) &&
-                <VerifikasiRegistrasiInstansiServer searchQuery={_searchParams} />
-            }
-            {
-                _searchParams.content === 'verifikasi-peserta-diklat' &&
-                <VerifikasiPesertaDiklatServer searchQuery={_searchParams} />
-            }
-        </>
+        <Admin_Dashboard_View 
+        dataStatistik={dataStatistik} 
+        totalVerifikasiInstansi={totalVerifikasiInstansi}
+        totalVerifikasiPesertaDiklat={totalVerifikasiPesertaDiklat} />
     )
 }

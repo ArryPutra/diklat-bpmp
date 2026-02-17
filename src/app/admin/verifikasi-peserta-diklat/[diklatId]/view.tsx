@@ -38,11 +38,11 @@ export default function VerifikasiPesertaDiklatView_PesertaDiklat({
 
     return (
         <ContentCanvas>
-            <BackButton url="/admin/dashboard?content=verifikasi-peserta-diklat" />
+            <BackButton url="/admin/verifikasi-peserta-diklat" />
 
-            <div className='flex justify-between flex-wrapgap-3'>
+            <div className='flex justify-between flex-wrap gap-3'>
                 <div>
-                    <h1 className='font-bold'>Registrasi Peserta Diklat</h1>
+                    <h1 className='font-bold'>Registrasi Peserta Diklat - {diklat?.judul}</h1>
                     <p className='text-sm'>Daftar registrasi peserta diklat yang perlu ditinjau</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@ export default function VerifikasiPesertaDiklatView_PesertaDiklat({
                             ))
                             :
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center">Tidak ada data</TableCell>
+                                <TableCell colSpan={6} className="text-center">Tidak ada data</TableCell>
                             </TableRow>
                     }
                 </TableBody>

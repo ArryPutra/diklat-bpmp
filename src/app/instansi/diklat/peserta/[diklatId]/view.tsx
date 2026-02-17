@@ -13,11 +13,9 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { useActionState } from "react"
 import { BiReply, BiX } from "react-icons/bi"
 
-export default function DaftarPesertaDiklatView({
-    diklat,
+export default function Instansi_DiklatPesertaDetail_View({
     daftarPeserta
 }: {
-    diklat: any
     daftarPeserta: {
         data: any[]
         total: number
@@ -30,7 +28,7 @@ export default function DaftarPesertaDiklatView({
                 <p className="text-sm text-gray-500">Berikut daftar diklat yang pernah atau sedang diikuti</p>
             </div>
 
-            <BackButton url="/instansi/dashboard" />
+            <BackButton url="/instansi/diklat/peserta" />
 
             <Table>
                 <TableHeader>
@@ -51,8 +49,9 @@ export default function DaftarPesertaDiklatView({
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell className="font-semibold">
                                         <TextLink
-                                            value={dataPeserta.peserta.user.name}
-                                            url={`kelola-peserta/${dataPeserta.peserta.id}`} />
+                                            url={`/instansi/kelola-peserta/${dataPeserta.peserta.id}`}>
+                                            {dataPeserta.peserta.user.name}
+                                        </TextLink>
                                     </TableCell>
                                     <TableCell>
                                         {dataPeserta.statusDaftarPesertaDiklat.nama || "-"}

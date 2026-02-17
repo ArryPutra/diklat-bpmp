@@ -90,11 +90,11 @@ export default function KelolaNarasumberForm({
                     </Field>
 
                     <Field>
-                        <FieldLabel>Password</FieldLabel>
+                        <FieldLabel>Password {!narasumber && <span className="text-red-500">*</span>}</FieldLabel>
                         <PasswordInput
-                            placeholder="Masukkan password"
+                            placeholder={narasumber ? "Kosongkan jika tidak ingin mengubah password" : "Masukkan password"}
                             name="password"
-                            defaultValue={actionState.state?.values?.password ?? narasumber?.password} />
+                            defaultValue={actionState.state?.values?.password ?? ""} />
                         {
                             actionState.state?.errors?.password &&
                             <FieldError>{actionState.state?.errors?.password}</FieldError>
@@ -104,9 +104,9 @@ export default function KelolaNarasumberForm({
                     <Field>
                         <FieldLabel>Konfirmasi Password</FieldLabel>
                         <PasswordInput
-                            placeholder="Masukkan konfirmasi password"
+                            placeholder={narasumber ? "Kosongkan jika tidak ingin mengubah password" : "Masukkan konfirmasi password"}
                             name="konfirmasiPassword"
-                            defaultValue={actionState.state?.values?.konfirmasiPassword ?? narasumber?.password} />
+                            defaultValue={actionState.state?.values?.konfirmasiPassword ?? ""} />
                         {
                             actionState.state?.errors?.konfirmasiPassword &&
                             <FieldError>{actionState.state?.errors?.konfirmasiPassword}</FieldError>

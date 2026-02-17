@@ -1,13 +1,10 @@
 "use client"
 
-import { deleteDiklatAction } from "@/actions/diklat-action";
-import LoadingScreen from "@/components/shared/loading-screen";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getRowNumber } from "@/utils/getRowNumber";
 import Link from "next/link";
-import { useActionState } from "react";
-import { BiInfoCircle } from "react-icons/bi";
+import { BiEdit, BiInfoCircle } from "react-icons/bi";
 
 export default function KelolaNarasumberTable({
     daftarNarasumber
@@ -15,13 +12,8 @@ export default function KelolaNarasumberTable({
     daftarNarasumber: any[]
 }) {
 
-    const [stateDeleteDiklat, formActionDeleteDiklat, pendingDeleteDiklat] =
-        useActionState(deleteDiklatAction, null);
-
     return (
         <>
-            <LoadingScreen isLoading={pendingDeleteDiklat} />
-
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -52,6 +44,9 @@ export default function KelolaNarasumberTable({
                                     <Link href={`/admin/kelola-narasumber/${narasumber.id}`}>
                                         <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
                                     </Link>
+                                    <Link href={`/admin/kelola-narasumber/${narasumber.id}/edit`}>
+                                        <Button size='icon-sm'><BiEdit /></Button>
+                                    </Link>
                                 </TableCell>
                             </TableRow>
                         )
@@ -64,9 +59,6 @@ export default function KelolaNarasumberTable({
                     }
                 </TableBody>
             </Table>
-
-            {/* <PaginationWithLinks
-            page={}/> */}
         </>
     )
 }

@@ -1,28 +1,32 @@
 "use client"
 
 import { ContentCanvas } from "@/components/layouts/auth-layout";
+import LoadingScreen from "@/components/shared/loading-screen";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { BiBookOpen, BiUser } from "react-icons/bi";
 
-export default function DaftarDiklatView({
+export default function Instansi_DiklatPeserta_View({
     daftarDiklatDiikuti
 }: {
     daftarDiklatDiikuti: any[]
 }) {
-
-    const pathName = usePathname()
+    const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
     function handleDiklatClick(diklatId: string) {
-        router.push(`${pathName}?diklatId=${diklatId}`)
+        startTransition(() => {
+            router.push(`/instansi/diklat/peserta/${diklatId}`)
+        })
     }
 
     return (
         <ContentCanvas>
+            <LoadingScreen isLoading={isPending}/>
             <div>
                 <h1 className="font-semibold">Daftar Diklat Diikuti</h1>
                 <p className="text-sm text-gray-500">Berikut daftar diklat yang pernah atau sedang diikuti</p>
@@ -57,7 +61,7 @@ export default function DaftarDiklatView({
                                             onClick={() => handleDiklatClick(dataDiklat.id)}>
                                             <BiUser /> Peserta
                                         </Button>
-                                        <Link href={`../diklat/${dataDiklat.id}`} target="_blank">
+                                        <Link href={`/diklat/${dataDiklat.id}`} target="_blank">
                                             <Button size='sm' variant='outline'><BiBookOpen /> Diklat</Button>
                                         </Link>
                                     </TableCell>

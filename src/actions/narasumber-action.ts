@@ -3,9 +3,10 @@
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { CreateNarasumberSchema } from "@/schemas/narasumber.schema";
+import { CreateNarasumberSchema, UpdateNarasumberSchema } from "@/schemas/narasumber.schema";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "./auth-action";
 
 
 export async function getAllNarasumberAction({
@@ -21,6 +22,7 @@ export async function getAllNarasumberAction({
 
     const where: Prisma.NarasumberWhereInput = {
         user: {
+            banned: false,
             OR: [
                 {
                     name: {
@@ -148,6 +150,95 @@ export async function createNarasumberAction(prevState: any, formData: FormData)
     redirect('/admin/kelola-narasumber');
 }
 
-export async function updateNarasumberAction(prevState: any, formData: FormData) {
+export async function updateNarasumberAction(
+    narasumberId: number,
+    prevState: any,
+    formData: FormData
+) {
+    const values = Object.fromEntries(formData);
+    const resultData = UpdateNarasumberSchema.safeParse(values);
 
+    if (!resultData.success) {
+        return {
+            success: false,
+            errors: resultData.error.flatten().fieldErrors,
+            values: values,
+        }
+    }
+
+    const narasumber = await getNarasumberAction(narasumberId);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: narasumber?.user.id } });
+
+    try {
+        // Update user data (name and email)
+        await auth.api.adminUpdateUser({
+
+            body: {
+                userId: user.id,
+                data: {
+                    name: resultData.data.nama,
+                    email: resultData.data.email,
+                },
+            },
+            headers: await headers()
+        });
+
+        // Update password if provided
+        if (resultData.data.password) {
+            await auth.api.setUserPassword({
+                body: {
+                    userId: user.id,
+                    newPassword: resultData.data.password,
+                },
+                headers: await headers()
+            });
+        }
+
+        // Update narasumber-specific data
+        await prisma.narasumber.update({
+            where: { id: narasumberId },
+            data: {
+                nomorTelepon: resultData.data.nomorTelepon,
+                jenisKelamin: resultData.data.jenisKelamin,
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        let errorMessage = "Terjadi kesalahan saat memperbarui narasumber."
+
+        if (error instanceof Error) {
+            errorMessage = error.message
+        }
+
+        return {
+            success: false,
+            message: errorMessage,
+            values: values,
+        }
+    }
+
+    (await cookies()).set(
+        "flash",
+        `Narasumber dengan nama "${resultData.data.nama}" berhasil diperbarui.`,
+        {
+            path: "/admin/kelola-narasumber",
+            maxAge: 10
+        }
+    );
+
+    redirect('/admin/kelola-narasumber');
+}
+
+export async function getCurrentNarasumber() {
+    const currentUser = await getCurrentUser()
+
+    const currentNarasumber = await prisma.narasumber.findUnique({
+        where: {
+            userId: currentUser?.id
+        }
+    })
+
+    return currentNarasumber
 }

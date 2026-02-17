@@ -22,7 +22,7 @@ export default function AdminKelolaNarasumberView({
 
     return (
         <ContentCanvas>
-            <Link href='/admin/kelola-narasumber/create'>
+            <Link href='/admin/kelola-narasumber/create' className="block">
                 <Button>Tambah Narasumber <BiPlus /></Button>
             </Link>
 

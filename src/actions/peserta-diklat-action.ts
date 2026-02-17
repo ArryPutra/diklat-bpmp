@@ -306,3 +306,131 @@ export async function updateManyStatusDaftarPesertaDiklatAction(
         };
     }
 }
+
+/**
+ * Fungsi untuk narasumber: Get peserta diklat dengan relasi lengkap
+ */
+export async function getPesertaNarasumberAction(diklatId: string) {
+    const data = await prisma.pesertaDiklat.findMany({
+        include: {
+            peserta: {
+                select: {
+                    id: true,
+                    user: {
+                        select: {
+                            name: true,
+                            email: true,
+                        }
+                    },
+                    instansi: {
+                        select: {
+                            user: {
+                                select: {
+                                    name: true
+                                }
+                            }
+                        }
+                    },
+                    jabatan: true,
+                    nomorTelepon: true,
+                }
+            },
+            statusDaftarPesertaDiklat: {
+                select: {
+                    id: true,
+                    nama: true,
+                }
+            },
+            statusPelaksanaanPesertaDiklat: {
+                select: {
+                    id: true,
+                    nama: true,
+                }
+            },
+            statusKelulusanPesertaDiklat: {
+                select: {
+                    id: true,
+                    nama: true,
+                }
+            },
+        },
+        where: {
+            diklatId: diklatId,
+        },
+        orderBy: {
+            peserta: {
+                user: {
+                    name: 'asc'
+                }
+            }
+        }
+    })
+
+    return data
+}
+
+/**
+ * Fungsi untuk update status pelaksanaan peserta (narasumber)
+ */
+export async function updatePesertaPelaksanaanAction(
+    pesertaDiklatId: number,
+    statusPelaksanaanPesertaDiklatId: number,
+    diklatId: string
+) {
+    try {
+        await prisma.pesertaDiklat.update({
+            where: {
+                id: pesertaDiklatId
+            },
+            data: {
+                statusPelaksanaanPesertaDiklatId: statusPelaksanaanPesertaDiklatId,
+            }
+        })
+
+        revalidatePath(`/narasumber/diklat-saya`)
+
+        return {
+            success: true,
+            message: "Status peserta berhasil diupdate"
+        }
+    } catch (error) {
+        console.error(error)
+        return {
+            success: false,
+            message: "Gagal update status peserta"
+        }
+    }
+}
+
+/**
+ * Fungsi untuk update status kelulusan peserta (narasumber)
+ */
+export async function updatePesertaKelulusanAction(
+    pesertaDiklatId: number,
+    statusKelulusanPesertaDiklatId: number,
+    diklatId: string
+) {
+    try {
+        await prisma.pesertaDiklat.update({
+            where: {
+                id: pesertaDiklatId
+            },
+            data: {
+                statusKelulusanPesertaDiklatId: statusKelulusanPesertaDiklatId,
+            }
+        })
+
+        revalidatePath(`/narasumber/diklat-saya`)
+
+        return {
+            success: true,
+            message: "Status kelulusan peserta berhasil diupdate"
+        }
+    } catch (error) {
+        console.error(error)
+        return {
+            success: false,
+            message: "Gagal update status kelulusan"
+        }
+    }
+}

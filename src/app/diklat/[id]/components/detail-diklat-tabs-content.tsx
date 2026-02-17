@@ -8,7 +8,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { dateRangeFormatted, formatDateId, formatDateTimeId } from "@/utils/dateFormatted";
 import { differenceInDays } from "date-fns";
 import { useEffect, useState } from "react";
-import { BiBook, BiBuilding, BiCalendar, BiInfoCircle, BiTargetLock, BiUser } from "react-icons/bi";
+import { BiBook, BiBuilding, BiCalendar, BiInfoCircle, BiTargetLock, BiTime, BiUser } from "react-icons/bi";
 import DialogDaftarSekarang from "./dialog-daftar-sekarang";
 
 export default function DetailDiklatTabsContent({
@@ -76,10 +76,10 @@ export default function DetailDiklatTabsContent({
                                                         </p>
                                                         <div className="flex flex-col gap-1 text-xs">
                                                             <div className="flex items-center gap-1">
-                                                                <span>Mulai: <b>{formatDateTimeId(materi.waktuMulai)}</b></span>
+                                                                <span className="flex items-center gap-1"><BiCalendar/> <b>{formatDateId(materi.tanggalPelaksanaan)}</b></span>
                                                             </div>
                                                             <div className="flex items-center gap-1">
-                                                                <span>Selesai: <b>{formatDateTimeId(materi.waktuSelesai)}</b></span>
+                                                                <span className="flex items-center gap-1"><BiTime/> <b>{materi.waktuMulai}</b> - <b>{materi.waktuSelesai}</b></span>
                                                             </div>
                                                         </div>
                                                     </div>

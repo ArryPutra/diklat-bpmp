@@ -1,9 +1,9 @@
 "use server"
 
 import { getNarasumberAction } from "@/actions/narasumber-action";
-import KelolaNarasumberDetailView from "./view";
+import KelolaNarasumberEditView from "./view";
 
-export default async function KelolaNarasumberDetailPage({
+export default async function KelolaNarasumberEditPage({
     params
 }: {
     params: Promise<{ id: string }>
@@ -11,7 +11,7 @@ export default async function KelolaNarasumberDetailPage({
     const _params = await params
 
     return (
-        <KelolaNarasumberDetailView
+        <KelolaNarasumberEditView
             narasumber={await getNarasumberAction(Number(_params.id))} />
     )
 }

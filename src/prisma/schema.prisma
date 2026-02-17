@@ -292,6 +292,7 @@ model PesertaDiklat {
   statusDaftarPesertaDiklat      StatusDaftarPesertaDiklat       @relation(fields: [statusDaftarPesertaDiklatId], references: [id])
   statusPelaksanaanPesertaDiklat StatusPelaksanaanPesertaDiklat? @relation(fields: [statusPelaksanaanPesertaDiklatId], references: [id])
   statusKelulusanPesertaDiklat   StatusKelulusanPesertaDiklat?   @relation(fields: [statusKelulusanPesertaDiklatId], references: [id])
+  absensiPesertaDiklat           AbsensiPesertaDiklat[]
 
   @@unique([diklatId, pesertaId])
   @@map("peserta_diklat")
@@ -359,18 +360,51 @@ model MateriDiklat {
   diklatId     String
   narasumberId Int
 
-  judul        String
-  deskripsi    String
-  fileMateri   String?
-  lokasi       String?
-  waktuMulai   DateTime
-  waktuSelesai DateTime
+  judul              String
+  deskripsi          String
+  fileMateri         String?
+  lokasi             String?
+  tanggalPelaksanaan DateTime
+  waktuMulai         String
+  waktuSelesai       String
 
   diklat     Diklat     @relation(fields: [diklatId], references: [id])
   narasumber Narasumber @relation(fields: [narasumberId], references: [id])
 
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  absensiPesertaDiklat AbsensiPesertaDiklat[]
+
+  @@map("materi_diklat")
+}
+
+model AbsensiPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  pesertaDiklatId Int
+  materiDiklatId  Int
+  statusAbsensiId Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("materi_diklat")
+  pesertaDiklat              PesertaDiklat              @relation(fields: [pesertaDiklatId], references: [id])
+  materiDiklat               MateriDiklat               @relation(fields: [materiDiklatId], references: [id])
+  statusAbsensiPesertaDiklat StatusAbsensiPesertaDiklat @relation(fields: [statusAbsensiId], references: [id])
+
+  @@unique([pesertaDiklatId, materiDiklatId])
+  @@map("absensi_peserta_diklat")
+}
+
+model StatusAbsensiPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  nama String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AbsensiPesertaDiklat AbsensiPesertaDiklat[]
+
+  @@map("status_absensi_peserta_diklat")
 }

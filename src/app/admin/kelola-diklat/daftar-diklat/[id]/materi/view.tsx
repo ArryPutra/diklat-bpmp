@@ -11,11 +11,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertDialogAction } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { formatDateTimeId } from "@/utils/dateFormatted"
+import { formatDateId, formatDateTimeId } from "@/utils/dateFormatted"
 import { useRouter } from "next/navigation"
 import { useActionState } from "react"
-import { BiEdit, BiPlus, BiTime, BiX } from "react-icons/bi"
+import { BiCalendar, BiEdit, BiPlus, BiTime, BiX } from "react-icons/bi"
 import DialogFormMateri from "./components/dialog-form-materi"
+import { formatDate } from "date-fns"
+import { Separator } from "@/components/ui/separator"
 
 export default function Admin_DaftarDiklatMateri_View({
     diklatId,
@@ -60,7 +62,6 @@ export default function Admin_DaftarDiklatMateri_View({
                             <TableHead>Deskripsi</TableHead>
                             <TableHead>Waktu Pelaksanaan</TableHead>
                             <TableHead>Narasumber</TableHead>
-                            <TableHead>Lokasi</TableHead>
                             <TableHead>File Materi</TableHead>
                             <TableHead>Aksi</TableHead>
                         </TableRow>
@@ -76,16 +77,16 @@ export default function Admin_DaftarDiklatMateri_View({
                                         <TableCell>
                                             <div className="flex flex-col gap-2 py-1">
                                                 <div className="flex items-center gap-2">
-                                                    <BiTime className="text-green-500 w-4 h-4 flex-shrink-0" />
+                                                    <BiCalendar />
                                                     <span className="text-sm font-medium text-gray-900">
-                                                        {formatDateTimeId(materi.waktuMulai)}
+                                                        {formatDateId(materi.tanggalPelaksanaan)}
                                                     </span>
                                                 </div>
-                                                <div className="h-px bg-gradient-to-r from-gray-300 to-transparent" />
+                                                <Separator/>
                                                 <div className="flex items-center gap-2">
-                                                    <BiTime className="text-red-500 w-4 h-4 flex-shrink-0" />
+                                                    <BiTime />
                                                     <span className="text-sm font-medium text-gray-900">
-                                                        {formatDateTimeId(materi.waktuSelesai)}
+                                                        {materi.waktuMulai} - {materi.waktuSelesai}
                                                     </span>
                                                 </div>
                                             </div>
@@ -96,7 +97,6 @@ export default function Admin_DaftarDiklatMateri_View({
                                                 {materi.narasumber.user.name}
                                             </TextLink>
                                         </TableCell>
-                                        <TableCell>{materi.lokasi || '-'}</TableCell>
                                         <TableCell>{materi.fileMateri || '-'}</TableCell>
                                         <TableCell className="space-x-2">
                                             <DialogInfoMateri
@@ -138,7 +138,7 @@ function DialogTambahMateri({
 
     return (
         <FormDialog
-            triggerButton={<Button>Tambah Diklat <BiPlus /></Button>}
+            triggerButton={<Button>Tambah Materi <BiPlus /></Button>}
             title="Tambah Materi Diklat"
             description="Silahkan tambahkan materi diklat baru."
             formContent={
@@ -168,10 +168,10 @@ function DialogInfoMateri({
                     fields: [
                         { label: 'Judul Materi', value: materi.judul },
                         { label: 'Deskripsi', value: materi.deskripsi },
-                        { label: 'Waktu Mulai', value: formatDateTimeId(materi.waktuMulai) },
-                        { label: 'Waktu Selesai', value: formatDateTimeId(materi.waktuSelesai) },
+                        { label: 'Tanggal Pelaksanaan', value: formatDateId(materi.tanggalPelaksanaan) },
+                        { label: 'Waktu Mulai', value: materi.waktuMulai },
+                        { label: 'Waktu Selesai', value: materi.waktuSelesai },
                         { label: 'Narasumber', value: materi.narasumber.user.name },
-                        { label: 'Lokasi', value: materi.lokasi || '-' },
                         { label: 'File Materi', value: materi.fileMateri || '-' }
                     ]
                 }

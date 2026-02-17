@@ -1,15 +1,15 @@
 "use client";
 
-import Layout from '@/components/layouts/guest-layout'
-import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel, FieldSet } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import Image from 'next/image'
-import { Spinner } from '@/components/ui/spinner';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useActionState } from 'react';
 import { loginAction } from '@/actions/auth-action';
+import Layout from '@/components/layouts/guest-layout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldLabel, FieldSet } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Spinner } from '@/components/ui/spinner';
+import Image from 'next/image';
+import { useActionState } from 'react';
 
 export default function Masuk() {
     const [state, formAction, pending] = useActionState(loginAction, null);
@@ -44,6 +44,7 @@ export default function Masuk() {
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
+                                        autoFocus
                                         placeholder='Masukkan email'
                                         type='email'
                                         name='email'

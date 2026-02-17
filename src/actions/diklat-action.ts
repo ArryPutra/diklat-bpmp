@@ -100,6 +100,29 @@ export async function getDiklatAction(diklatId: string) {
     return diklat
 }
 
+export async function isDiklatAcaraAktifByDiklatIdAction(diklatId: string) {
+    const diklat = await prisma.diklat.findUnique({
+        where: {
+            id: diklatId
+        },
+        select: {
+            tanggalMulaiAcara: true,
+            tanggalSelesaiAcara: true
+        }
+    })
+
+    if (!diklat) {
+        return false
+    }
+
+    const apakahAktif = isTanggalPelaksanaanDiklatAktif(
+        diklat.tanggalMulaiAcara,
+        diklat.tanggalSelesaiAcara
+    )
+
+    return apakahAktif
+}
+
 export async function createDiklatAction(
     prevState: any,
     formData: FormData
@@ -280,4 +303,20 @@ function getStatusPendaftaranDiklatId(
     } else {
         return 3 // Sudah tutup
     }
+}
+
+function isTanggalPelaksanaanDiklatAktif(
+    tanggalMulaiAcara: Date,
+    tanggalSelesaiAcara: Date,
+    tanggalAcuan: Date = new Date()
+): boolean {
+    const tanggalSekarang = new Date(tanggalAcuan)
+    const mulai = new Date(tanggalMulaiAcara)
+    const selesai = new Date(tanggalSelesaiAcara)
+
+    tanggalSekarang.setHours(0, 0, 0, 0)
+    mulai.setHours(0, 0, 0, 0)
+    selesai.setHours(23, 59, 59, 999)
+
+    return tanggalSekarang >= mulai && tanggalSekarang <= selesai
 }

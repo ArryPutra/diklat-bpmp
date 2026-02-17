@@ -56,9 +56,19 @@ export default function DialogFormMateri({
         }
       </Field>
       <Field>
+        <FieldLabel>Tanggal Pelaksanaan</FieldLabel>
+        <Input name="tanggalPelaksanaan" type="date" defaultValue={
+          materiDiklat?.tanggalPelaksanaan ? formatDateOnly(materiDiklat.tanggalPelaksanaan) : ''
+        } />
+        {
+          state?.errors?.tanggalPelaksanaan &&
+          <FieldError>{state?.errors?.tanggalPelaksanaan}</FieldError>
+        }
+      </Field>
+      <Field>
         <FieldLabel>Waktu Mulai</FieldLabel>
-        <Input name="waktuMulai" type="datetime-local" defaultValue={
-          materiDiklat?.waktuMulai ? formatDatetimeLocal(materiDiklat.waktuMulai) : ''
+        <Input name="waktuMulai" type="time" defaultValue={
+          materiDiklat?.waktuMulai ? materiDiklat.waktuMulai : ''
         } />
         {
           state?.errors?.waktuMulai &&
@@ -67,8 +77,8 @@ export default function DialogFormMateri({
       </Field>
       <Field>
         <FieldLabel>Waktu Selesai</FieldLabel>
-        <Input name="waktuSelesai" type="datetime-local" defaultValue={
-          materiDiklat?.waktuSelesai ? formatDatetimeLocal(materiDiklat.waktuSelesai) : ''
+        <Input name="waktuSelesai" type="time" defaultValue={
+          materiDiklat?.waktuSelesai ? materiDiklat.waktuSelesai : ''
         } />
         {
           state?.errors?.waktuSelesai &&
@@ -79,9 +89,8 @@ export default function DialogFormMateri({
   )
 }
 
-function formatDatetimeLocal(date: Date) {
+function formatDateOnly(date: Date) {
   const pad = (n: number) => n.toString().padStart(2, '0');
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 

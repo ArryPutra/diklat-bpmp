@@ -1,6 +1,7 @@
 "use client"
 
 import { ContentCanvas } from "@/components/layouts/auth-layout";
+import LoadingScreen from "@/components/shared/loading-screen";
 import { PaginationWithLinks } from "@/components/shared/pagination-with-links";
 import Search from "@/components/shared/search";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 import { BiDetail, BiUser } from "react-icons/bi";
 
 export default function VerifikasiPesertaDiklatView_Diklat({
@@ -17,13 +19,16 @@ export default function VerifikasiPesertaDiklatView_Diklat({
     daftarDiklatStatusDibuka: any[]
     totalDaftarDiklat: number
 }) {
+    const router = useRouter()
+    const [isPending, startTransition] = useTransition()
 
-    const router = useRouter();
     const params = new URLSearchParams(useSearchParams().toString());
     const currentPage = parseInt(params.get("page") ?? "1");
 
     return (
         <ContentCanvas>
+            <LoadingScreen isLoading={isPending} />
+
             <div className='flex justify-between flex-wrap gap-3'>
                 <div>
                     <h1 className='font-bold'>Registrasi Peserta Diklat</h1>
@@ -59,10 +64,9 @@ export default function VerifikasiPesertaDiklatView_Diklat({
                                     <TableCell className="space-x-2">
                                         <Button size='sm'
                                             onClick={() => {
-                                                const params = new URLSearchParams()
-                                                params.set("content", 'verifikasi-peserta-diklat')
-                                                params.set("diklatId", diklat.id)
-                                                router.push(`?${params.toString()}`)
+                                                startTransition(() => {
+                                                    router.push(`/admin/verifikasi-peserta-diklat/${diklat.id}`)
+                                                })
                                             }}>
                                             <BiUser /> Peserta
                                         </Button>

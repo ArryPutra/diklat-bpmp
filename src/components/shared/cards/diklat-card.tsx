@@ -1,9 +1,14 @@
+"use client"
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { dateRangeFormatted, formatDateId } from "@/utils/dateFormatted";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { BiBook, BiCalendar, BiLocationPlus, BiRightArrowAlt, BiTargetLock, BiUser } from "react-icons/bi";
 
 export function DiklatCard({
@@ -11,6 +16,10 @@ export function DiklatCard({
 }: {
     diklat: any
 }) {
+
+    const router = useRouter()
+
+    const [isPending, startTransition] = useTransition()
 
     return (
         <Card className={`hover:shadow-lg duration-300 pt-0 overflow-hidden`}>
@@ -69,8 +78,13 @@ export function DiklatCard({
             </CardContent>
             <CardFooter className="flex justify-between mt-auto">
                 <Link href={`/diklat/${diklat.id}`}>
-                    <Button className={`w-full ${diklat.statusPendaftaranDiklat.backgroundColor} hover:${diklat.statusPendaftaranDiklat.backgroundColor}`}>
-                        Lihat Detail <BiRightArrowAlt />
+                    <Button className={`w-full ${diklat.statusPendaftaranDiklat.backgroundColor} hover:${diklat.statusPendaftaranDiklat.backgroundColor}`}
+                        onClick={() => {
+                            startTransition(() => {
+                                router.push(`/diklat/${diklat.id}`)
+                            })
+                        }}>
+                        Lihat Detail {isPending ? <Spinner /> : <BiRightArrowAlt />}
                     </Button>
                 </Link>
             </CardFooter>
