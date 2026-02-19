@@ -12,6 +12,7 @@ export async function getAllDiklatAction({
     page = "1",
     metodeDiklatId,
     statusPendaftaranDiklatId = [1, 2, 3],
+    statusPelaksanaanAcaraDiklatId = [1, 2, 3],
     take = 10,
     where: customWhere = {}
 }: {
@@ -19,6 +20,7 @@ export async function getAllDiklatAction({
     page?: string
     metodeDiklatId?: number
     statusPendaftaranDiklatId?: number[]
+    statusPelaksanaanAcaraDiklatId?: number[]
     take?: number
     where?: Prisma.DiklatWhereInput
 }) {
@@ -29,6 +31,11 @@ export async function getAllDiklatAction({
         ...(statusPendaftaranDiklatId && {
             statusPendaftaranDiklatId: {
                 in: statusPendaftaranDiklatId
+            }
+        }),
+        ...(statusPelaksanaanAcaraDiklatId && {
+            statusPelaksanaanAcaraDiklatId: {
+                in: statusPelaksanaanAcaraDiklatId
             }
         }),
         ...(_search && {
@@ -57,6 +64,7 @@ export async function getAllDiklatAction({
         include: {
             metodeDiklat: true,
             statusPendaftaranDiklat: true,
+            statusPelaksanaanAcaraDiklat: true,
             pesertaDiklat: true,
             materiDiklat: true
         },
@@ -80,6 +88,7 @@ export async function getDiklatAction(diklatId: string) {
         include: {
             metodeDiklat: true,
             statusPendaftaranDiklat: true,
+            statusPelaksanaanAcaraDiklat: true,
             pesertaDiklat: true,
             materiDiklat: {
                 include: {
@@ -145,20 +154,28 @@ export async function createDiklatAction(
                 tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
                 tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
                 tanggalTutupPendaftaran: formData.get("tanggalTutupPendaftaran")?.toString(),
+                persyaratanPeserta: formData.get("persyaratanPeserta")?.toString(),
             }
         }
     }
+
+    let diklat
 
     try {
         const statusPendaftaranDiklatId = getStatusPendaftaranDiklatId(
             resultData.data.tanggalBukaPendaftaran,
             resultData.data.tanggalTutupPendaftaran
         )
+        const statusPelaksanaanAcaraDiklatId = getStatusPelaksanaanAcaraDiklatId(
+            resultData.data.tanggalMulaiAcara,
+            resultData.data.tanggalSelesaiAcara
+        )
 
-        await prisma.diklat.create({
+        diklat = await prisma.diklat.create({
             data: {
                 metodeDiklatId: resultData.data.metodeDiklatId,
                 statusPendaftaranDiklatId: statusPendaftaranDiklatId,
+                statusPelaksanaanAcaraDiklatId: statusPelaksanaanAcaraDiklatId,
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 tujuan: resultData.data.tujuan,
@@ -180,12 +197,12 @@ export async function createDiklatAction(
         }
     }
 
-    (await cookies()).set("flash", `Diklat dengan judul "${resultData.data.judul}" berhasil ditambahkan.`, {
+    (await cookies()).set("flash", `Diklat dengan judul "${resultData.data.judul}" berhasil ditambahkan. Silahkan tambahkan materi.`, {
         path: "/admin/kelola-diklat",
         maxAge: 10
     })
 
-    redirect("/admin/kelola-diklat")
+    redirect(`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`)
 }
 
 export async function updateDiklatAction(
@@ -193,24 +210,63 @@ export async function updateDiklatAction(
     prevState: any,
     formData: FormData
 ) {
+    const values = {
+        judul: formData.get("judul")?.toString(),
+        deskripsi: formData.get("deskripsi")?.toString(),
+        tujuan: formData.get("tujuan")?.toString(),
+        targetSasaran: formData.get("targetSasaran")?.toString(),
+        metodeDiklatId: formData.get("metodeDiklatId")?.toString(),
+        maksimalKuota: formData.get("maksimalKuota")?.toString(),
+        tanggalMulaiAcara: formData.get("tanggalMulaiAcara")?.toString(),
+        tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
+        tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
+        tanggalTutupPendaftaran: formData.get("tanggalTutupPendaftaran")?.toString(),
+        persyaratanPeserta: formData.get("persyaratanPeserta")?.toString(),
+    }
+
     const resultData = DiklatSchema.safeParse(Object.fromEntries(formData))
 
     if (!resultData.success) {
         return {
             success: false,
             errors: resultData.error.flatten().fieldErrors,
-            values: {
-                judul: formData.get("judul")?.toString(),
-                deskripsi: formData.get("deskripsi")?.toString(),
-                tujuan: formData.get("tujuan")?.toString(),
-                targetSasaran: formData.get("targetSasaran")?.toString(),
-                metodeDiklatId: formData.get("metodeDiklatId")?.toString(),
-                maksimalKuota: formData.get("maksimalKuota")?.toString(),
-                tanggalMulaiAcara: formData.get("tanggalMulaiAcara")?.toString(),
-                tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
-                tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
-                tanggalTutupPendaftaran: formData.get("tanggalTutupPendaftaran")?.toString(),
-            }
+            values
+        }
+    }
+
+    const materiDiLuarRentang = await prisma.materiDiklat.findFirst({
+        where: {
+            diklatId: id,
+            OR: [
+                {
+                    tanggalPelaksanaan: {
+                        lt: resultData.data.tanggalMulaiAcara
+                    }
+                },
+                {
+                    tanggalPelaksanaan: {
+                        gt: resultData.data.tanggalSelesaiAcara
+                    }
+                }
+            ]
+        },
+        select: {
+            judul: true
+        }
+    })
+
+    if (materiDiLuarRentang) {
+        return {
+            success: false,
+            errors: {
+                tanggalMulaiAcara: [
+                    `Tidak dapat memperbarui tanggal acara diklat karena materi "${materiDiLuarRentang.judul}" berada di luar rentang tanggal acara.`
+                ],
+                tanggalSelesaiAcara: [
+                    "Silakan untuk memperbarui tanggal materi diklat terlebih dahulu agar berada di dalam rentang tanggal mulai dan selesai diklat."
+                ]
+            },
+            values
         }
     }
 
@@ -218,6 +274,10 @@ export async function updateDiklatAction(
         const statusPendaftaranDiklatId = getStatusPendaftaranDiklatId(
             resultData.data.tanggalBukaPendaftaran,
             resultData.data.tanggalTutupPendaftaran
+        )
+        const statusPelaksanaanAcaraDiklatId = getStatusPelaksanaanAcaraDiklatId(
+            resultData.data.tanggalMulaiAcara,
+            resultData.data.tanggalSelesaiAcara
         )
 
         await prisma.diklat.update({
@@ -227,6 +287,7 @@ export async function updateDiklatAction(
             data: {
                 metodeDiklatId: resultData.data.metodeDiklatId,
                 statusPendaftaranDiklatId: statusPendaftaranDiklatId,
+                statusPelaksanaanAcaraDiklatId: statusPelaksanaanAcaraDiklatId,
                 judul: resultData.data.judul,
                 deskripsi: resultData.data.deskripsi,
                 tujuan: resultData.data.tujuan,
@@ -302,6 +363,25 @@ function getStatusPendaftaranDiklatId(
         return 2 // Sedang buka
     } else {
         return 3 // Sudah tutup
+    }
+}
+
+function getStatusPelaksanaanAcaraDiklatId(
+    tanggalMulaiAcara: Date,
+    tanggalSelesaiAcara: Date
+): number {
+    const tanggalSekarang = new Date()
+    const mulai = new Date(tanggalMulaiAcara)
+    const selesai = new Date(tanggalSelesaiAcara)
+
+    selesai.setHours(23, 59, 59, 999)
+
+    if (tanggalSekarang < mulai) {
+        return 1 // Belum dimulai
+    } else if (tanggalSekarang <= selesai) {
+        return 2 // Sedang berlangsung
+    } else {
+        return 3 // Selesai
     }
 }
 

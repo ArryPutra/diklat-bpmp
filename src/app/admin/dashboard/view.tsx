@@ -19,7 +19,7 @@ export default function Admin_Dashboard_View({
         <>
             {
                 totalVerifikasiInstansi > 0 &&
-                <Alert variant='destructive'>
+                <Alert variant='danger'>
                     <BiCheckDouble />
                     <AlertTitle>Lakukan verifikasi instansi</AlertTitle>
                     <AlertDescription className='mb-2'>Silahkan lakukan verifikasi instansi segera, terdapat {totalVerifikasiInstansi} instansi menunggu verifikasi.</AlertDescription>
@@ -29,7 +29,7 @@ export default function Admin_Dashboard_View({
                 </Alert>
             }
             {totalVerifikasiPesertaDiklat > 0 &&
-                <Alert variant='destructive'>
+                <Alert variant='danger'>
                     <BiCheckDouble />
                     <AlertTitle>Lakukan verifikasi peserta diklat</AlertTitle>
                     <AlertDescription className='mb-2'>Silahkan lakukan verifikasi peserta diklat segera, terdapat {totalVerifikasiPesertaDiklat} peserta diklat menunggu verifikasi.</AlertDescription>

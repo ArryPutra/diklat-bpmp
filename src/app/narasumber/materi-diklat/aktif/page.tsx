@@ -9,18 +9,34 @@ export default async function Narasumber_DiklatSaya_Page() {
 
   const daftarDiklatAktifSaya = await prisma.diklat.findMany({
     where: {
+      statusPelaksanaanAcaraDiklatId: {
+        in: [1, 2] // Belum Dimulai, Sedang Berlangsung
+      },
       materiDiklat: {
         some: {
           narasumberId: currentNarasumber?.id,
         }
-      }
+      },
     },
     include: {
-      materiDiklat: true,
-      metodeDiklat: true
+      materiDiklat: {
+        where: {
+          narasumberId: currentNarasumber?.id,
+        },
+        orderBy: [
+          {
+            tanggalPelaksanaan: "asc"
+          },
+          {
+            waktuMulai: "asc"
+          }
+        ]
+      },
+      metodeDiklat: true,
+      statusPendaftaranDiklat: true,
+      statusPelaksanaanAcaraDiklat: true,
     }
   })
-
 
   return (
     <Narasumber_DiklatSaya_View

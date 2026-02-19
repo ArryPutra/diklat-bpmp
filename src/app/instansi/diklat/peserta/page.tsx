@@ -6,6 +6,7 @@ import Instansi_DiklatPeserta_View from "./view";
 
 export default async function InstansiDiklatPesertaPage() {
 
+
     const currentInstansi = await getCurrentInstansi()
 
     const daftarDiklatDiikuti = await prisma.diklat.findMany({

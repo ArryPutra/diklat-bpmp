@@ -148,9 +148,7 @@ model RegistrasiPicInstansi {
 model Instansi {
   id                   Int                @id @default(autoincrement())
   registrasiInstansiId String             @unique
-  registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id])
   userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id])
   nomorTelepon         String
   desaKelurahan        String
   kecamatan            String
@@ -163,6 +161,9 @@ model Instansi {
   updatedAt            DateTime           @updatedAt
   picInstansi          PicInstansi?
   peserta              Peserta[]
+
+  user                 User               @relation(fields: [userId], references: [id])
+  registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id])
 
   @@map("instansi")
 }
@@ -190,8 +191,9 @@ model PicInstansi {
 model Diklat {
   id String @id @default(cuid())
 
-  metodeDiklatId            Int
-  statusPendaftaranDiklatId Int
+  metodeDiklatId                 Int
+  statusPendaftaranDiklatId      Int
+  statusPelaksanaanAcaraDiklatId Int
 
   judul                   String
   deskripsi               String?
@@ -209,10 +211,11 @@ model Diklat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  metodeDiklat            MetodeDiklat?            @relation(fields: [metodeDiklatId], references: [id])
-  statusPendaftaranDiklat StatusPendaftaranDiklat? @relation(fields: [statusPendaftaranDiklatId], references: [id])
-  pesertaDiklat           PesertaDiklat[]
-  materiDiklat            MateriDiklat[]
+  metodeDiklat                 MetodeDiklat?                 @relation(fields: [metodeDiklatId], references: [id])
+  statusPendaftaranDiklat      StatusPendaftaranDiklat?      @relation(fields: [statusPendaftaranDiklatId], references: [id])
+  statusPelaksanaanAcaraDiklat StatusPelaksanaanAcaraDiklat? @relation(fields: [statusPelaksanaanAcaraDiklatId], references: [id])
+  pesertaDiklat                PesertaDiklat[]
+  materiDiklat                 MateriDiklat[]
 
   @@map("diklat")
 }
@@ -229,6 +232,20 @@ model StatusPendaftaranDiklat {
   diklat Diklat[]
 
   @@map("status_pendaftaran_diklat")
+}
+
+model StatusPelaksanaanAcaraDiklat {
+  id Int @id @default(autoincrement())
+
+  nama            String @unique
+  backgroundColor String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  diklat Diklat[]
+
+  @@map("status_pelaksanaan_acara_diklat")
 }
 
 model MetodeDiklat {
@@ -362,7 +379,7 @@ model MateriDiklat {
 
   judul              String
   deskripsi          String
-  fileMateri         String?
+  linkMateri         String?
   lokasi             String?
   tanggalPelaksanaan DateTime
   waktuMulai         String

@@ -31,7 +31,18 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     const router = useRouter();
     const pathname = usePathname();
 
-    const getTitle = menuItems.find(item => item.url === pathname || pathname.startsWith(item.url + '/'));
+    const activeMenu = menuItems.find(item => item.url === pathname || pathname.startsWith(item.url + '/'));
+    const activeSubmenu = menuItems
+        .flatMap(item =>
+            (item.submenu ?? []).map(subitem => ({
+                parentName: item.name,
+                subitem,
+            }))
+        )
+        .find(({ subitem }) => pathname === subitem.url || pathname.startsWith(subitem.url + '/'));
+
+    const parentTitle = activeSubmenu?.parentName ?? activeMenu?.name ?? '';
+    const submenuTitle = activeSubmenu?.subitem.name;
 
     useEffect(() => {
         async function fetchCurrentUser() {
@@ -159,7 +170,14 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
                     <h1 className="text-2xl font-bold text-primary
             max-md:hidden">
-                        {getTitle?.name}
+                        {submenuTitle ? (
+                            <span className="flex items-center gap-2">
+                                <span>{parentTitle}</span>
+                                <span className="text-base font-medium text-primary/80">&gt; {submenuTitle}</span>
+                            </span>
+                        ) : (
+                            parentTitle
+                        )}
                     </h1>
                     <div className="flex items-center gap-3 cursor-pointer"
                         onClick={() => setProfileMenu(!profileMenu)}>
@@ -176,7 +194,14 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                 <main className="w-full pl-65 pt-25 min-h-dvh p-5
                 max-md:pl-5 max-md:pt-25">
                     <h1 className="md:hidden text-xl font-bold text-primary mb-6">
-                        {getTitle?.name}
+                        {submenuTitle ? (
+                            <span className="flex items-center gap-2">
+                                <span>{parentTitle}</span>
+                                <span className="text-sm font-medium text-primary/80">&gt; {submenuTitle}</span>
+                            </span>
+                        ) : (
+                            parentTitle
+                        )}
                     </h1>
 
                     {/* CONTENT VIEW */}

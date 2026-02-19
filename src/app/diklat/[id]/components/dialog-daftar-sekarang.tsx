@@ -103,9 +103,9 @@ function DialogForInstansi({
                             {state.message}
                             {
                                 state?.success &&
-                                <Link href='/instansi/dashboard'>
+                                <Link href='/instansi/diklat/peserta'>
                                     <Button size='sm' variant='outline' className="mt-2">
-                                        Kunjungi Dashboard <BiRightArrowAlt />
+                                        Lihat Peserta Saya <BiRightArrowAlt />
                                     </Button>
                                 </Link>
                             }

@@ -7,7 +7,7 @@ import { BiInfoCircle } from 'react-icons/bi'
 type InfoDialogProps = {
     title: string
     description: string
-    sections: { title: string, fields: { label: string, value: string }[] }[]
+    sections: { title: string, fields: { label: string, value: string, isLink?: boolean }[] }[]
 }
 
 export default function InfoDialog({ title, description, sections }: InfoDialogProps) {
@@ -34,7 +34,13 @@ export default function InfoDialog({ title, description, sections }: InfoDialogP
                                 {section.fields.map((field: any) => (
                                     <div key={field.label}>
                                         <p className='text-gray-500 text-xs'>{field.label}</p>
-                                        <p className='font-medium'>{field.value || '-'}</p>
+                                        {field.isLink ? (
+                                            <a href={field.value} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline">
+                                                {field.value || '-'}
+                                            </a>
+                                        ) : (
+                                            <p className='font-medium'>{field.value || '-'}</p>
+                                        )}
                                     </div>
                                 ))}
                             </div>

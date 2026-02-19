@@ -12,6 +12,7 @@ export default async function AdminDiklatPage({
         page?: string
         metodeDiklatId?: string
         statusPendaftaranDiklatId?: string
+        statusPelaksanaanAcaraDiklatId?: string
     }>
 }) {
 
@@ -19,13 +20,15 @@ export default async function AdminDiklatPage({
 
     const metodeDiklatId = parseInt(_searchParams.metodeDiklatId ?? "0");
     const statusPendaftaranDiklatId = parseInt(_searchParams.statusPendaftaranDiklatId ?? "0");
+    const statusPelaksanaanAcaraDiklatId = parseInt(_searchParams.statusPelaksanaanAcaraDiklatId ?? "0");
 
 
     const daftarDiklat = await getAllDiklatAction({
         search: _searchParams.search,
         page: _searchParams.page,
         metodeDiklatId: metodeDiklatId === 0 ? undefined : metodeDiklatId,
-        statusPendaftaranDiklatId: statusPendaftaranDiklatId === 0 ? [1, 2, 3] : [statusPendaftaranDiklatId]
+        statusPendaftaranDiklatId: statusPendaftaranDiklatId === 0 ? [1, 2, 3] : [statusPendaftaranDiklatId],
+        statusPelaksanaanAcaraDiklatId: statusPelaksanaanAcaraDiklatId === 0 ? [1, 2, 3] : [statusPelaksanaanAcaraDiklatId]
     });
 
     return (

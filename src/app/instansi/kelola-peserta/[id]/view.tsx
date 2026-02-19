@@ -17,7 +17,7 @@ export default function KelolaPesertaDetailView({
                         { label: "Nama Peserta", value: peserta.user.name },
                         { label: "Email", value: peserta.user.email },
                         { label: "Nomor Telepon", value: peserta.nomorTelepon },
-                        { label: "NIK", value: peserta.nik },
+                        { label: "Nomor Induk Kependudukan", value: peserta.nik },
                         { label: "Jabatan", value: peserta.jabatan },
                         { label: "Jenis Kelamin", value: peserta.jenisKelamin },
                         { label: "Tempat Lahir", value: peserta.tempatLahir },

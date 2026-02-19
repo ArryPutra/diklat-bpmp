@@ -2,6 +2,7 @@
 
 import { ContentCanvas } from "@/components/layouts/auth-layout"
 import { PaginationWithLinks } from "@/components/shared/pagination-with-links"
+import Search from "@/components/shared/search"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -22,10 +23,6 @@ export default function AdminKelolaNarasumberView({
 
     return (
         <ContentCanvas>
-            <Link href='/admin/kelola-narasumber/create' className="block">
-                <Button>Tambah Narasumber <BiPlus /></Button>
-            </Link>
-
             {
                 newMessage &&
                 <Alert>
@@ -33,6 +30,13 @@ export default function AdminKelolaNarasumberView({
                     <AlertDescription>{newMessage}</AlertDescription>
                 </Alert>
             }
+
+            <div className="flex justify-between">
+                <Link href='/admin/kelola-narasumber/create' className="block">
+                    <Button>Tambah Narasumber <BiPlus /></Button>
+                </Link>
+                <Search />
+            </div>
 
             <KelolaNarasumberTable
                 daftarNarasumber={daftarNarasumber} />

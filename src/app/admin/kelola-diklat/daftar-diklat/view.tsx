@@ -54,6 +54,19 @@ export default function AdminDiklatView({
                             { label: "Ditutup", value: "3" }
                         ],
                     }} />
+                <SelectDropdown
+                    label='Status Pelaksanaan'
+                    query={{
+                        name: "statusPelaksanaanAcaraDiklatId",
+                        defaultValue: "0",
+                        deleteValue: "0",
+                        values: [
+                            { label: "Semua", value: "0" },
+                            { label: "Belum Dimulai", value: "1" },
+                            { label: "Sedang Berlangsung", value: "2" },
+                            { label: "Selesai", value: "3" }
+                        ],
+                    }} />
                 <div className="ml-auto">
                     <Search />
                 </div>

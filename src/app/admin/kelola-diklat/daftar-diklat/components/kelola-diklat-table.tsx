@@ -12,7 +12,7 @@ import { formatDateId } from "@/utils/dateFormatted";
 import { getRowNumber } from "@/utils/getRowNumber";
 import Link from "next/link";
 import { useActionState } from "react";
-import { BiEdit, BiInfoCircle, BiTrash } from "react-icons/bi";
+import { BiBookOpen, BiEdit, BiInfoCircle, BiTrash } from "react-icons/bi";
 
 export default function KelolaDiklatTable({
     daftarDiklat,
@@ -36,6 +36,7 @@ export default function KelolaDiklatTable({
                         <TableHead>Judul</TableHead>
                         <TableHead>Metode</TableHead>
                         <TableHead>Status Pendaftaran</TableHead>
+                        <TableHead>Status Pelaksanaan</TableHead>
                         <TableHead>Jumlah Materi</TableHead>
                         <TableHead>Maksimal Kuota</TableHead>
                         <TableHead>Tanggal Buka Pendaftaran</TableHead>
@@ -65,6 +66,11 @@ export default function KelolaDiklatTable({
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
+                                    <Badge className={`${diklat.statusPelaksanaanAcaraDiklat.backgroundColor}`}>
+                                        {diklat.statusPelaksanaanAcaraDiklat.nama}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>
                                     <TextLink url={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`}>
                                         {
                                             diklat.materiDiklat.length > 0 ?
@@ -83,6 +89,10 @@ export default function KelolaDiklatTable({
                                     {/* Info aksi */}
                                     <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}`}>
                                         <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
+                                    </Link>
+                                    {/* Materi Aksi */}
+                                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`}>
+                                        <Button size='icon-sm' className="bg-amber-500 hover:bg-amber-500/90"><BiBookOpen /></Button>
                                     </Link>
                                     {/* Edit Aksi */}
                                     <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/edit`}>

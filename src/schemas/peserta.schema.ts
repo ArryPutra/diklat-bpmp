@@ -16,8 +16,8 @@ export const CreatePesertaSchema = z.object({
         .max(15, "Nomor telepon maksimum 15 karakter"),
     nik: z
         .string()
-        .min(16, "NIK harus 16 digit")
-        .max(16, "NIK harus 16 digit"),
+        .min(16, "NIK harus 18 digit")
+        .max(16, "NIK harus 18 digit"),
 
     jabatan: z
         .string()
@@ -54,8 +54,8 @@ export const UpdatePesertaSchema = z.object({
         .max(15, "Nomor telepon maksimum 15 karakter"),
     nik: z
         .string()
-        .min(16, "NIK harus 16 digit")
-        .max(16, "NIK harus 16 digit"),
+        .min(16, "NIK harus 18 digit")
+        .max(16, "NIK harus 18 digit"),
     jabatan: z.string().min(1, "Jabatan wajib diisi"),
     jenisKelamin: JenisKelaminSchema,
     tanggalLahir: z.coerce.date({

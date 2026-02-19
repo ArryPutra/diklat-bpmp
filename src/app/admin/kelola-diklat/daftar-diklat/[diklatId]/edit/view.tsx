@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useActionState } from "react";
+import { BiRightArrowAlt } from "react-icons/bi";
 import KelolaDiklatForm from "../../components/kelola-diklat-form";
 
 export default function KelolaDiklatEditView({
@@ -21,18 +22,16 @@ export default function KelolaDiklatEditView({
 
     return (
         <>
-            <div className="flex gap-3 flex-wrap">
-                <Button>Umum</Button>
-                <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`}>
-                    <Button variant='outline'>Materi</Button>
-                </Link>
-            </div>
-
             {
                 !isMateriDiklatExist &&
-                <Alert variant='destructive'>
+                <Alert variant='danger'>
                     <AlertTitle>Pesan:</AlertTitle>
                     <AlertDescription>Saat ini materi kosong, silahkan masukkan materi terlebih dahulu.</AlertDescription>
+                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`} className="w-fit">
+                        <Button variant='outline' size='sm' className="w-fit mt-2">
+                            Tambah Materi <BiRightArrowAlt />
+                        </Button>
+                    </Link>
                 </Alert>
             }
 

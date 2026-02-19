@@ -13,13 +13,6 @@ export default function KelolaDiklatDetailView({
 }) {
     return (
         <>
-            <div className="flex gap-3 flex-wrap">
-                <Button>Umum</Button>
-                <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/materi`}>
-                    <Button variant='outline'>Materi</Button>
-                </Link>
-            </div>
-
             <DetailDataPage
                 listData={[
                     {
@@ -33,10 +26,10 @@ export default function KelolaDiklatDetailView({
                             { label: "Target/Sasaran", value: diklat.targetSasaran },
                             { label: "Maksimal Kuota", value: diklat.maksimalKuota },
                             { label: "Lokasi", value: diklat.lokasi },
-                            { label: "Tanggal Mulai Acara", value: formatDateId(diklat.tanggalMulaiAcara) },
-                            { label: "Tanggal Selesai Acara", value: formatDateId(diklat.tanggalSelesaiAcara) },
                             { label: "Tanggal Buka Pendaftaran", value: formatDateId(diklat.tanggalBukaPendaftaran) },
                             { label: "Tanggal Tutup Pendaftaran", value: formatDateId(diklat.tanggalTutupPendaftaran) },
+                            { label: "Tanggal Mulai Acara", value: formatDateId(diklat.tanggalMulaiAcara) },
+                            { label: "Tanggal Selesai Acara", value: formatDateId(diklat.tanggalSelesaiAcara) },
                         ]
                     },
                     {

@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { dateRangeFormatted } from '@/utils/dateFormatted'
-import { isTanggalPelaksanaanDiklatAktif } from '@/utils/isDiklatAktif'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
-import { BiRightArrowAlt, BiTime } from 'react-icons/bi'
+import MateriDiklatNarasumberCard from './components/materi-diklat-narasumber-card'
 
 export default function Narasumber_DiklatSaya_View({
     daftarDiklatAktifSaya
@@ -30,10 +29,9 @@ export default function Narasumber_DiklatSaya_View({
                         <Card key={diklat.id}>
                             <CardHeader>
                                 {
-                                    isTanggalPelaksanaanDiklatAktif(diklat.tanggalMulaiAcara, diklat.tanggalSelesaiAcara) ?
-                                        <Badge>Aktif</Badge>
-                                        :
-                                        <Badge variant='destructive'>Tidak aktif</Badge>
+                                    <Badge className={`${diklat.statusPelaksanaanAcaraDiklat.backgroundColor}`}>
+                                        {diklat.statusPelaksanaanAcaraDiklat.nama}
+                                    </Badge>
                                 }
                                 <CardTitle className='text-lg'>{diklat.judul}</CardTitle>
                                 <CardDescription className='mb-4'>{diklat.deskripsi}</CardDescription>
@@ -65,54 +63,22 @@ export default function Narasumber_DiklatSaya_View({
                                 <CardTitle className='mb-1'>Daftar Materi Diklat yang Anda Ajarkan</CardTitle>
                                 <CardDescription className='mb-6'>Materi Diklat ditemukan: {diklat.materiDiklat.length}</CardDescription>
 
-                                {
-                                    diklat.materiDiklat.map((materi: any) => (
-                                        <div key={materi.id} className='text-sm border p-4 rounded-md bg-linear-to-r from-white to-slate-50'>
-                                            {
-                                                (materi.waktuMulai <= new Date().getHours() + ':' + new Date().getMinutes())
-                                                &&
-                                                (materi.waktuSelesai >= new Date().getHours() + ':' + new Date().getMinutes())
-                                                    &&
-                                                    new Date().setHours(0, 0, 0, 0) >= new Date(diklat.tanggalMulaiAcara).setHours(0, 0, 0, 0)
-                                                    ?
-                                                    <Badge className='mb-2'>
-                                                        Aktif
-                                                    </Badge>
-                                                    :
-                                                    <Badge className='mb-2' variant='destructive'>
-                                                        Tidak aktif
-                                                    </Badge>
-                                            }
-                                            <h1 className='font-semibold text-base'>{materi.judul}</h1>
-                                            <h1 className='mb-3 text-slate-500'>{materi.deskripsi}</h1>
-                                            <div className='flex gap-6 mb-3'>
-                                                <div className='flex items-center gap-1'>
-                                                    <BiTime />
-                                                    <h1 className='font-semibold'>
-                                                        <span>{materi.waktuMulai}</span>
-                                                        <span> - </span>
-                                                        <span>{materi.waktuSelesai}</span>
-                                                    </h1>
-                                                </div>
-                                            </div>
-
-                                            <Button size='sm'
-                                                onClick={() => {
-                                                    startTransition(() => {
-                                                        router.push(`/narasumber/materi-diklat/aktif/${materi.id}`)
-                                                    })
-                                                }}>
-                                                Kelola Materi <BiRightArrowAlt />
-                                            </Button>
-                                        </div>
-                                    ))
-                                }
+                                <div className='space-y-4'>
+                                    {
+                                        diklat.materiDiklat.map((materi: any) => (
+                                            <MateriDiklatNarasumberCard
+                                                key={materi.id}
+                                                materi={materi} />
+                                        ))
+                                    }
+                                </div>
+                                <p className='text-sm text-gray-500 mt-4'>Hanya menampilkan daftar materi diklat yang akan Anda ajarkan.</p>
                             </CardContent>
 
                             <Separator />
 
                             <CardFooter>
-                                <Link href='/diklat/diklatId'>
+                                <Link href={`/diklat/${diklat.id}`} target='_blank'>
                                     <Button>Detail Diklat</Button>
                                 </Link>
                             </CardFooter>

@@ -21,7 +21,7 @@ export default async function Narasumber_KelolaMateriDiklatAktif_Page({
   const currentNarasumber = await getCurrentNarasumber()
 
   // pastikan materi diklat adalah milik narasumber
-  const materiDiklat = await prisma.materiDiklat.findFirstOrThrow({
+  const materiDiklat = await prisma.materiDiklat.findFirst({
     where: {
       id: Number(_params.materiDiklatId),
       narasumberId: currentNarasumber?.id
@@ -30,21 +30,33 @@ export default async function Narasumber_KelolaMateriDiklatAktif_Page({
       diklat: {
         include: {
           pesertaDiklat: {
+            where: {
+              statusDaftarPesertaDiklatId: 2, // diterima sebagai peserta
+            },
             select: {
+              id: true,
+              absensiPesertaDiklat: {
+                where: {
+                  materiDiklatId: Number(_params.materiDiklatId)
+                },
+                select: {
+                  statusAbsensiId: true,
+                }
+              },
               peserta: {
                 select: {
                   instansi: {
                     select: {
                       user: {
                         select: {
-                          name: true
+                          name: true // mendapatkan nama instansi peserta
                         }
                       }
                     }
                   },
                   user: {
                     select: {
-                      name: true
+                      name: true // mendapatkan nama peserta
                     }
                   }
                 }
@@ -56,16 +68,39 @@ export default async function Narasumber_KelolaMateriDiklatAktif_Page({
     }
   })
 
-  const diklat = materiDiklat.diklat ?? notFound() // pastikan diklat ada, jika tidak ada tampilkan halaman not found
+  if (!materiDiklat) {
+    notFound()
+  }
 
+  const statusAbsensiPesertaDiklat = await prisma.statusAbsensiPesertaDiklat.findMany({
+    orderBy: {
+      id: 'asc'
+    },
+    select: {
+      id: true,
+      nama: true,
+    }
+  })
+
+  const totalAbsensiStatus = await prisma.absensiPesertaDiklat.groupBy({
+    where: {
+      materiDiklatId: Number(_params.materiDiklatId)
+    },
+    by: ["statusAbsensiId"],
+    _count: {
+      _all: true,
+    }
+  })
+
+  const diklat = materiDiklat.diklat ?? notFound() // pastikan diklat ada, jika tidak ada tampilkan halaman not found
   const apakahDiklatAktif = await isDiklatAcaraAktifByDiklatIdAction(diklat.id); // Ganti dengan logika sebenarnya untuk memeriksa status diklat
 
-  console.log(materiDiklat.diklat.pesertaDiklat)
-
-  if (apakahDiklatAktif) {
+  if (apakahDiklatAktif) { // pastikan acara diklat berlangsung
     return (
       <Narasumber_KelolaMateriDiklatAktif_View
-      materiDiklat={materiDiklat} />
+        materi={materiDiklat}
+        statusAbsensiPesertaDiklat={statusAbsensiPesertaDiklat}
+        totalAbsensiStatus={totalAbsensiStatus} />
     )
   }
 

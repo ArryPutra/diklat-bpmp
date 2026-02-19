@@ -33,7 +33,7 @@ export default function DialogFormMateri({
       </Field>
       <Field>
         <FieldLabel>Pilih Narasumber</FieldLabel>
-        <Select name="narasumberId" defaultValue={materiDiklat?.narasumberId?.toString() ?? ''}>
+        <Select name="narasumberId" defaultValue={materiDiklat?.narasumberId?.toString()}>
           <SelectTrigger>
             <SelectValue placeholder="Narasumber" />
           </SelectTrigger>
@@ -83,6 +83,14 @@ export default function DialogFormMateri({
         {
           state?.errors?.waktuSelesai &&
           <FieldError>{state?.errors?.waktuSelesai}</FieldError>
+        }
+      </Field>
+      <Field>
+        <FieldLabel>Link Materi (Opsional)</FieldLabel>
+        <Input name="linkMateri" type="text" placeholder="Masukkan link materi diklat" defaultValue={materiDiklat?.linkMateri ?? ''} />
+        {
+          state?.errors?.linkMateri &&
+          <FieldError>{state?.errors?.linkMateri}</FieldError>
         }
       </Field>
     </FieldSet>

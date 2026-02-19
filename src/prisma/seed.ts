@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import diklatSeed from "./seeds/diklat.seed";
 import registrasiInstansiSeed from "./seeds/registrasi-instansi.seed";
+import narasumberSeed from "./seeds/narasumber.seed";
 
 async function main() {
     await prisma.peran.createMany({
@@ -37,6 +38,14 @@ async function main() {
         ]
     })
 
+    await prisma.statusPelaksanaanAcaraDiklat.createMany({
+        data: [
+            { nama: "Belum Dimulai", backgroundColor: "bg-yellow-500 " },
+            { nama: "Sedang Berlangsung", backgroundColor: "bg-green-500 " },
+            { nama: "Selesai", backgroundColor: "bg-gray-500 " },
+        ]
+    })
+
     await prisma.statusDaftarPesertaDiklat.createMany({
         data: [
             { nama: "Menunggu Persetujuan" }, // menunggu persetujuan dari admin
@@ -62,6 +71,15 @@ async function main() {
         ]
     })
 
+    await prisma.statusAbsensiPesertaDiklat.createMany({
+        data: [
+            { nama: "Hadir" },
+            { nama: "Tidak Hadir" },
+            { nama: "Izin" },
+            { nama: "Sakit" },
+        ]
+    })
+
     await auth.api.createUser({
         body: {
             name: "Admin BPMP",
@@ -76,6 +94,7 @@ async function main() {
 
     await registrasiInstansiSeed()
     await diklatSeed()
+    await narasumberSeed()
 }
 
 main()

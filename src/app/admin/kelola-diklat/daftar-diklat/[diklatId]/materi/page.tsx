@@ -8,7 +8,7 @@ import Admin_DaftarDiklatMateri_View from "./view";
 export default async function Admin_DaftarDiklatMateri_Page({
     params
 }: {
-    params: Promise<{ id: string }>
+    params: Promise<{ diklatId: string }>
 }
 ) {
     const _params = await params
@@ -26,10 +26,10 @@ export default async function Admin_DaftarDiklatMateri_Page({
 
     return (
         <Admin_DaftarDiklatMateri_View
-            diklatId={_params.id}
+            diklatId={_params.diklatId}
             daftarNarasumber={daftarNarasumber}
             daftarMateriDiklat={await getAllMateriDiklatAction({
-                diklatId: _params.id
+                diklatId: _params.diklatId,
             })}
             newMessage={(await cookies()).get("flash")?.value} />
     )

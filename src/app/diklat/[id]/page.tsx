@@ -44,6 +44,7 @@ export default async function DiklatPage({
         })
     }
 
+    // daftar peserta diklat ditampilkan publik, pastikan filter data tidak fatal
     daftarPesertaDiklat = await prisma.pesertaDiklat.findMany({
         where: { diklatId: diklat?.id },
         select: {

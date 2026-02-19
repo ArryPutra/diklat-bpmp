@@ -4,8 +4,9 @@ import StatsCard from "@/components/shared/cards/stats-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
-import { dateRangeFormatted, formatDateId, formatDateTimeId } from "@/utils/dateFormatted";
+import { dateRangeFormatted, formatDateId } from "@/utils/dateFormatted";
 import { differenceInDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { BiBook, BiBuilding, BiCalendar, BiInfoCircle, BiTargetLock, BiTime, BiUser } from "react-icons/bi";
@@ -23,7 +24,7 @@ export default function DetailDiklatTabsContent({
     const totalPesertaDariPersentase =
         (diklat.pesertaDiklat.length / diklat.maksimalKuota) * 100;
 
-    console.log(diklat.materiDiklat)
+    const totalMateriDiklat = diklat.materiDiklat.length
 
     return (
         <TabsContent value="detail">
@@ -56,17 +57,17 @@ export default function DetailDiklatTabsContent({
                         <CardContent>
                             {
                                 diklat.materiDiklat.length > 0 ? (
-                                    <div className="space-y-6">
+                                    <div className="space-y-0">
                                         {diklat.materiDiklat.map((materi: any, index: number) => (
                                             <div
                                                 key={index}
-                                                className="relative border border-l-4 border-l-blue-400 border-slate-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-sm transition-all duration-200 bg-white">
+                                                className={`relative pl-6 border-l-4 ${totalMateriDiklat - 1 === index ? 'border-l-transparent' : 'border-l-blue-300'}`}>
                                                 {/* Nomor Urut Floating */}
-                                                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold shadow-md">
+                                                <div className="absolute -top-1 -left-4.5 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold shadow-md">
                                                     {index + 1}
                                                 </div>
                                                 {/* Konten */}
-                                                <div className="flex items-start justify-between gap-4 max-md:flex-col">
+                                                <div className={`flex items-start justify-between gap-4 max-md:flex-col ${totalMateriDiklat - 1 !== index ? '' : ''}`}>
                                                     <div className="flex-1 min-w-0">
                                                         <h3 className="font-semibold text-slate-900 mb-1 text-sm">
                                                             {materi.judul}
@@ -76,10 +77,10 @@ export default function DetailDiklatTabsContent({
                                                         </p>
                                                         <div className="flex flex-col gap-1 text-xs">
                                                             <div className="flex items-center gap-1">
-                                                                <span className="flex items-center gap-1"><BiCalendar/> <b>{formatDateId(materi.tanggalPelaksanaan)}</b></span>
+                                                                <span className="flex items-center gap-1"><BiCalendar /> <b>{formatDateId(materi.tanggalPelaksanaan)}</b></span>
                                                             </div>
                                                             <div className="flex items-center gap-1">
-                                                                <span className="flex items-center gap-1"><BiTime/> <b>{materi.waktuMulai}</b> - <b>{materi.waktuSelesai}</b></span>
+                                                                <span className="flex items-center gap-1"><BiTime /> <b>{materi.waktuMulai}</b> - <b>{materi.waktuSelesai}</b></span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -87,6 +88,12 @@ export default function DetailDiklatTabsContent({
                                                         <BiUser /> {materi.narasumber.user.name}
                                                     </Badge>
                                                 </div>
+                                                {
+                                                    totalMateriDiklat - 1 !== index &&
+                                                    <div className="py-4">
+                                                        <Separator />
+                                                    </div>
+                                                }
                                             </div>
                                         ))}
                                     </div>

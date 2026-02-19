@@ -401,6 +401,30 @@ export async function getPesertaByInstansi(instansiId: number) {
     return daftarPeserta
 }
 
+export async function getCurrentPeserta() {
+    const currentUser = await getCurrentUser()
+
+    if (!currentUser?.id) {
+        return null
+    }
+
+    const currentPeserta = await prisma.peserta.findUnique({
+        where: {
+            userId: currentUser.id
+        },
+        include: {
+            user: true,
+            instansi: {
+                include: {
+                    user: true
+                }
+            }
+        }
+    })
+
+    return currentPeserta
+}
+
 export async function updateStatusBannedPesertaAction(
     prevState: any,
     formData: FormData

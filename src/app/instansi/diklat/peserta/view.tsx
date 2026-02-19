@@ -69,7 +69,7 @@ export default function Instansi_DiklatPeserta_View({
                             ))
                             :
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center">Tidak ada diklat diikuti</TableCell>
+                                <TableCell colSpan={99} className="text-center py-4">Tidak ada diklat diikuti</TableCell>
                             </TableRow>
                     }
                 </TableBody>

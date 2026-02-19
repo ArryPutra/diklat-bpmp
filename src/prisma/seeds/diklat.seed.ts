@@ -8,6 +8,7 @@ export default async function diklatSeed() {
                 judul: `Diklat ${i + 1}`,
                 metodeDiklatId: randomInt(1, 3),
                 statusPendaftaranDiklatId: 2,
+                statusPelaksanaanAcaraDiklatId: 2,
                 maksimalKuota: 100,
                 tanggalMulaiAcara: new Date(),
                 tanggalSelesaiAcara: new Date(),

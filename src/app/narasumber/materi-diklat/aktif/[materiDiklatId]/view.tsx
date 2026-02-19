@@ -1,72 +1,125 @@
 "use client"
 
+import { upsertManyAbsensiPesertaDiklatFormAction } from '@/actions/absensi-peserta-diklat-action'
 import { ContentCanvas } from '@/components/layouts/auth-layout'
 import BackButton from '@/components/shared/back-button'
+import GetStatusMateriDiklatBadge from '@/components/shared/get-status-materi-diklat-badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
+import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDateId } from '@/utils/dateFormatted'
-import { BiChevronDown, BiChevronUp } from 'react-icons/bi'
+import Link from 'next/link'
+import { useActionState } from 'react'
+import { BiCalendar, BiLink, BiLocationPlus, BiTime } from 'react-icons/bi'
 
 export default function Narasumber_KelolaMateriDiklatAktif_View({
-    materiDiklat
+    materi,
+    statusAbsensiPesertaDiklat,
+    totalAbsensiStatus
 }: {
-    materiDiklat: any
+    materi: any
+    statusAbsensiPesertaDiklat: any
+    totalAbsensiStatus: any
 }) {
+    const [state, formAction, pending] = useActionState(
+        upsertManyAbsensiPesertaDiklatFormAction,
+        null,
+    )
+
     return (
         <ContentCanvas>
             <BackButton />
 
             <section className='space-y-6'>
-                <div>
-                    <Badge className='w-fit mb-2'>Materi Aktif</Badge>
-                    <h1 className='text-xl font-semibold'>Detail Kelola Materi Diklat</h1>
-                    <p className='text-sm text-slate-500'>
-                        Halaman ini menampilkan informasi utama materi dan absensi peserta pada sesi yang sedang berjalan.
-                    </p>
-                </div>
 
-                <div className='space-y-6'>
-                    <details className='group rounded-md border p-4'>
-                        <summary className='flex cursor-pointer list-none items-center justify-between font-semibold text-sm'>
-                            <span>Informasi Materi (klik untuk melihat)</span>
-                            <span>
-                                <BiChevronDown className='text-lg group-open:hidden' />
-                                <BiChevronUp className='hidden text-lg group-open:block' />
-                            </span>
-                        </summary>
-
-                        <div className='mt-4 space-y-4'>
-                            <div className='grid grid-cols-2 gap-4 text-sm max-md:grid-cols-1'>
-                                <div className='rounded-md border p-4'>
-                                    <h2 className='text-slate-500 mb-1'>Judul Materi</h2>
-                                    <p className='font-semibold'>{materiDiklat.judul}</p>
-                                </div>
-                                <div className='rounded-md border p-4'>
-                                    <h2 className='text-slate-500 mb-1'>Tanggal & Waktu</h2>
-                                    <p className='font-semibold'>{formatDateId(materiDiklat.tanggalPelaksanaan)}, {materiDiklat.waktuMulai} - {materiDiklat.waktuSelesai}</p>
-                                </div>
+                <Card className='bg-linear-to-br from-white to-primary/5'>
+                    <CardHeader>
+                        <GetStatusMateriDiklatBadge materi={materi} />
+                        <h1 className='text-xl font-semibold'>{materi.judul}</h1>
+                        <p className='text-sm text-slate-500'>
+                            {materi.deskripsi ? materi.deskripsi : 'Tidak ada deskripsi yang diberikan untuk materi ini.'}
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='text-sm grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-4'>
+                            <div>
+                                <h1 className='text-gray-500 flex gap-1 items-center flex-wrap'><BiCalendar /> Tanggal Pelaksanaan:</h1>
+                                <h1 className='font-semibold'>{formatDateId(materi.tanggalPelaksanaan)}</h1>
                             </div>
-
-                            <div className='rounded-md border p-4 text-sm'>
-                                <h2 className='font-semibold mb-2'>Deskripsi Materi</h2>
-                                <p className='text-slate-600'>
-                                    {materiDiklat.deskripsi ? materiDiklat.deskripsi : 'Tidak ada deskripsi yang diberikan untuk materi ini.'}
-                                </p>
+                            <div>
+                                <h1 className='text-gray-500 flex gap-1 items-center flex-wrap'><BiTime /> Waktu:</h1>
+                                <h1 className='font-semibold'>{materi.waktuMulai} - {materi.waktuSelesai} WITA</h1>
+                            </div>
+                            <div>
+                                <h1 className='text-gray-500 flex gap-1 items-center flex-wrap'><BiLocationPlus /> Lokasi:</h1>
+                                <h1 className='font-semibold'>{materi.lokasi}</h1>
                             </div>
                         </div>
-                    </details>
+                    </CardContent>
+                    <CardFooter>
+                        <Link href={materi.linkMateri} target='_blank'>
+                            <Button size='sm' variant='outline'><BiLink /> Link Materi</Button>
+                        </Link>
+                    </CardFooter>
+                </Card>
 
-                    <Separator />
+                <Separator />
 
-                    <div>
-                        <h2 className='font-semibold'>Absensi Peserta</h2>
-                        <p className='text-sm text-slate-500 mb-4'>
-                            Tentukan status kehadiran setiap peserta untuk sesi materi ini.
-                        </p>
+                <div className='grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1'>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Informasi Absensi</CardTitle>
+                        </CardHeader>
+                        <CardContent className='space-y-3'>
+                            <div className='flex justify-between'>
+                                <CardDescription>Hadir:</CardDescription>
+                                <Badge>{totalAbsensiStatus.find((item: any) => item.statusAbsensiId === 1)?._count._all || 0}</Badge>
+                            </div>
+                            <div className='flex justify-between'>
+                                <CardDescription>Tidak Hadir:</CardDescription>
+                                <Badge variant='destructive'>{totalAbsensiStatus.find((item: any) => item.statusAbsensiId === 2)?._count._all || 0}</Badge>
+                            </div>
+                            <div className='flex justify-between'>
+                                <CardDescription>Izin:</CardDescription>
+                                <Badge className='bg-amber-500'>{totalAbsensiStatus.find((item: any) => item.statusAbsensiId === 3)?._count._all || 0}</Badge>
+                            </div>
+                            <div className='flex justify-between'>
+                                <CardDescription>Sakit:</CardDescription>
+                                <Badge className='bg-purple-500'>{totalAbsensiStatus.find((item: any) => item.statusAbsensiId === 4)?._count._all || 0}</Badge>
+                            </div>
+                        </CardContent>
+                        <Separator />
+                        <CardFooter className='flex justify-between'>
+                            <CardDescription>Total Peserta:</CardDescription>
+                            <Badge variant='secondary'>{materi.diklat.pesertaDiklat.length}</Badge>
+                        </CardFooter>
+                    </Card>
+                </div>
+
+                <div className='space-y-6 border p-4 rounded-xl'>
+                    <form action={formAction} className='space-y-6'>
+                        <input type='hidden' name='materiDiklatId' value={materi.id} />
+
+                        <div>
+                            <h2 className='font-semibold'>Absensi Peserta</h2>
+                            <p className='text-sm text-slate-500'>
+                                Tentukan status kehadiran setiap peserta untuk sesi materi ini.
+                            </p>
+                        </div>
+
+                        {
+                            state?.message &&
+                            <Alert variant={state.success ? 'default' : 'destructive'}>
+                                <AlertTitle>Pesan</AlertTitle>
+                                <AlertDescription>{state.message}</AlertDescription>
+                            </Alert>
+                        }
 
                         <Table>
                             <TableHeader>
@@ -79,41 +132,57 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                             </TableHeader>
                             <TableBody>
                                 {
-                                    materiDiklat.diklat.pesertaDiklat.map((pesertaDiklat: any, index: number) => (
+                                    materi.diklat.pesertaDiklat.length > 0 ?
+                                        materi.diklat.pesertaDiklat.map((pesertaDiklat: any, index: number) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{pesertaDiklat.peserta.user.name}</TableCell>
+                                                <TableCell>{pesertaDiklat.peserta.instansi.user.name}</TableCell>
+                                                <TableCell>
+                                                    <RadioGroup
+                                                        name={`statusAbsensi-${pesertaDiklat.id}`}
+                                                        defaultValue={
+                                                            pesertaDiklat.absensiPesertaDiklat[0]?.statusAbsensiId
+                                                                ? String(pesertaDiklat.absensiPesertaDiklat[0].statusAbsensiId)
+                                                                : undefined
+                                                        }
+                                                        className='flex flex-wrap gap-4'
+                                                    >
+                                                        {
+                                                            statusAbsensiPesertaDiklat.map((statusAbsensi: any) => {
+                                                                const id = `status-${pesertaDiklat.id}-${statusAbsensi.id}`
+
+                                                                return (
+                                                                    <div key={id} className='flex items-center gap-2'>
+                                                                        <RadioGroupItem
+                                                                            value={String(statusAbsensi.id)}
+                                                                            id={id}
+                                                                        />
+                                                                        <Label htmlFor={id}>{statusAbsensi.nama}</Label>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </RadioGroup>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                        :
                                         <TableRow>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{pesertaDiklat.peserta.user.name}</TableCell>
-                                            <TableCell>{pesertaDiklat.peserta.instansi.user.name}</TableCell>
-                                            <TableCell>
-                                                <RadioGroup className='flex flex-wrap gap-4'>
-                                                    <div className='flex items-center gap-2'>
-                                                        <RadioGroupItem value='hadir' id='p1-hadir' />
-                                                        <Label htmlFor='p1-hadir'>Hadir</Label>
-                                                    </div>
-                                                    <div className='flex items-center gap-2'>
-                                                        <RadioGroupItem value='tidak-hadir' id='p1-tidak-hadir' />
-                                                        <Label htmlFor='p1-tidak-hadir'>Tidak Hadir</Label>
-                                                    </div>
-                                                    <div className='flex items-center gap-2'>
-                                                        <RadioGroupItem value='izin' id='p1-izin' />
-                                                        <Label htmlFor='p1-izin'>Izin</Label>
-                                                    </div>
-                                                    <div className='flex items-center gap-2'>
-                                                        <RadioGroupItem value='sakit' id='p1-sakit' />
-                                                        <Label htmlFor='p1-sakit'>Sakit</Label>
-                                                    </div>
-                                                </RadioGroup>
+                                            <TableCell colSpan={99} className='text-center py-4'>
+                                                Tidak ada peserta yang terdaftar pada materi diklat ini.
                                             </TableCell>
                                         </TableRow>
-                                    ))
                                 }
                             </TableBody>
                         </Table>
-                    </div>
 
-                    <div className='flex justify-end gap-2'>
-                        <Button>Simpan Absensi</Button>
-                    </div>
+                        <div className='flex justify-end gap-2'>
+                            <Button disabled={pending}>
+                                Simpan Absensi {pending && <Spinner />}
+                            </Button>
+                        </div>
+                    </form>
                 </div>
             </section>
         </ContentCanvas>

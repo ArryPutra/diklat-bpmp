@@ -65,7 +65,7 @@ export function Header({
                         <li className={`text-slate-700 transition hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary"}`}><a href="/#diklat">Diklat</a></li>
                         <li className="text-slate-700 transition hover:text-primary"><a href="/#faq">FAQ</a></li>
                     </ul>
-                    <Button className="min-w-24" onClick={() => {
+                    <Button onClick={() => {
                         startTransition(() => {
                             router.push('/login')
                         })

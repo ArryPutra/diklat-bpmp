@@ -29,7 +29,15 @@ export async function getAllMateriDiklatAction({
         where: {
             diklatId: diklatId,
             ...extraWhere
-        }
+        },
+        orderBy: [
+            {
+                tanggalPelaksanaan: "asc"
+            },
+            {
+                waktuMulai: "asc"
+            }
+        ]
     })
 
     return data
@@ -57,14 +65,21 @@ export async function createMateriDiklatAction(
             id: diklatId
         },
         select: {
-            tanggalMulaiAcara: true
+            tanggalMulaiAcara: true,
+            tanggalSelesaiAcara: true,
+            lokasi: true
         }
     })
 
-    const tanggalPelaksanaan = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
-    const tanggalMulaiAcara = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+    const tanggalPelaksanaanMateriDiklat = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
+    const tanggalMulaiAcaraDiklat = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+    const tanggalSelesaiAcaraDiklat = new Date(diklat?.tanggalSelesaiAcara!).toISOString().split("T")[0]
 
-    if (tanggalPelaksanaan < tanggalMulaiAcara) {
+    if (
+        tanggalPelaksanaanMateriDiklat < tanggalMulaiAcaraDiklat
+        ||
+        tanggalPelaksanaanMateriDiklat > tanggalSelesaiAcaraDiklat
+    ) {
         return {
             success: false,
             errors: {
@@ -84,6 +99,8 @@ export async function createMateriDiklatAction(
                 tanggalPelaksanaan: resultData.data.tanggalPelaksanaan,
                 waktuMulai: resultData.data.waktuMulai,
                 waktuSelesai: resultData.data.waktuSelesai,
+                lokasi: resultData.data.lokasi ?? diklat?.lokasi,
+                linkMateri: resultData.data.linkMateri
             }
         })
     } catch (error) {
@@ -123,7 +140,8 @@ export async function updateMateriDiklatAction(
             id: materiDiklatId
         },
         select: {
-            diklatId: true
+            diklatId: true,
+            lokasi: true
         }
     })
 
@@ -133,14 +151,19 @@ export async function updateMateriDiklatAction(
         },
     })
 
-    const tanggalPelaksanaan = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
-    const tanggalMulaiAcara = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+    const tanggalPelaksanaanMateriDiklat = new Date(resultData.data.tanggalPelaksanaan).toISOString().split("T")[0]
+    const tanggalMulaiAcaraDiklat = new Date(diklat?.tanggalMulaiAcara!).toISOString().split("T")[0]
+    const tanggalSelesaiAcaraDiklat = new Date(diklat?.tanggalSelesaiAcara!).toISOString().split("T")[0]
 
-    if (tanggalPelaksanaan < tanggalMulaiAcara) {
+    if (
+        tanggalPelaksanaanMateriDiklat < tanggalMulaiAcaraDiklat
+        ||
+        tanggalPelaksanaanMateriDiklat > tanggalSelesaiAcaraDiklat
+    ) {
         return {
             success: false,
             errors: {
-                tanggalPelaksanaan: ["Tanggal pelaksanaan tidak boleh lebih kecil dari tanggal mulai diklat"]
+                tanggalPelaksanaan: ["Tanggal pelaksanaan tidak boleh lebih kecil dari tanggal mulai acara diklat atau lebih besar dari tanggal selesai acara diklat"]
             },
             values: values
         }
@@ -160,6 +183,8 @@ export async function updateMateriDiklatAction(
                 tanggalPelaksanaan: resultData.data.tanggalPelaksanaan,
                 waktuMulai: resultData.data.waktuMulai,
                 waktuSelesai: resultData.data.waktuSelesai,
+                lokasi: resultData.data.lokasi ?? materiDiklat?.lokasi,
+                linkMateri: resultData.data.linkMateri
             }
         })
     } catch (error) {

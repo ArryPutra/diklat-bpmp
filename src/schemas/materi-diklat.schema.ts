@@ -5,7 +5,7 @@ export const CreateMateriDiklatSchema = z
         judul: z.string().min(1, "Judul materi wajib diisi"),
         deskripsi: z.string().min(1, "Deskripsi materi wajib diisi"),
         narasumberId: z.string().min(1, "Narasumber wajib dipilih"),
-        fileMateri: z.string().optional().nullable(),
+        linkMateri: z.string().optional().nullable(),
         lokasi: z.string().optional().nullable(),
         tanggalPelaksanaan: z.coerce.date({
             invalid_type_error: "Tanggal pelaksanaan tidak valid",
@@ -50,7 +50,7 @@ export const UpdateMateriDiklatSchema = z
         judul: z.string().min(1, "Judul materi wajib diisi"),
         deskripsi: z.string().min(1, "Deskripsi materi wajib diisi"),
         narasumberId: z.string().min(1, "Narasumber wajib dipilih"),
-        fileMateri: z.string().optional().nullable(),
+        linkMateri: z.string().optional().nullable(),
         lokasi: z.string().optional().nullable(),
         tanggalPelaksanaan: z.coerce.date({
             invalid_type_error: "Tanggal pelaksanaan tidak valid",
