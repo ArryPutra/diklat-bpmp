@@ -12,10 +12,12 @@ import { BiCalendar, BiRightArrowAlt, BiTime } from 'react-icons/bi'
 
 export default function MateriDiklatNarasumberCard({
     materi,
-    totalPeserta
+    totalPeserta,
+    detailBasePath = '/narasumber/diklat/aktif'
 }: {
     materi: any
     totalPeserta?: number
+    detailBasePath?: string
 }) {
 
     const router = useRouter()
@@ -54,7 +56,7 @@ export default function MateriDiklatNarasumberCard({
                 <Button size='sm' variant='outline'
                     onClick={() => {
                         startTransition(() => {
-                            router.push(`/narasumber/diklat/aktif/${materi.id}`)
+                            router.push(`${detailBasePath}/${materi.id}`)
                         })
                     }}>
                     Detail Materi <BiRightArrowAlt />

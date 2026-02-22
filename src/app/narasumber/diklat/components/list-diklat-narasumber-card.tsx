@@ -1,33 +1,38 @@
 "use client"
 
-import LoadingScreen from '@/components/shared/loading-screen'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { dateRangeFormatted } from '@/utils/dateFormatted'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
 import { BiCalendar, BiCategory, BiLocationPlus, BiSolidGraduation } from 'react-icons/bi'
-import MateriDiklatNarasumberCard from './components/materi-diklat-narasumber-card'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import MateriDiklatNarasumberCard from './materi-diklat-narasumber-card'
 
-export default function Narasumber_DiklatSaya_View({
-    daftarDiklatAktifSaya
+export default function ListDiklatNarasumberCard({
+    daftarDiklatSaya,
+    title,
+    description,
+    emptyTitle,
+    emptyDescription,
+    detailBasePath = '/narasumber/diklat/aktif'
 }: {
-    daftarDiklatAktifSaya: any[]
+    daftarDiklatSaya: any[]
+    title: string
+    description: string
+    emptyTitle: string
+    emptyDescription: string
+    detailBasePath?: string
 }) {
-
-    const router = useRouter()
-    const [isPending, startTransition] = useTransition()
-
     return (
         <>
-            <LoadingScreen isLoading={isPending} />
+            <div>
+                <h1 className='text-lg font-semibold'>{title}</h1>
+                <h1 className='text-gray-500 text-sm'>{description}</h1>
+            </div>
             {
-                daftarDiklatAktifSaya.length > 0 ?
-                    daftarDiklatAktifSaya.map((diklat) => (
+                daftarDiklatSaya.length > 0 ?
+                    daftarDiklatSaya.map((diklat) => (
                         <Card key={diklat.id}>
                             <CardHeader>
                                 {
@@ -40,15 +45,15 @@ export default function Narasumber_DiklatSaya_View({
 
                                 <div className='grid grid-cols-4 gap-3 max-lg:grid-cols-2 max-sm:grid-cols-1'>
                                     <div className='text-sm'>
-                                        <h1 className='flex flex-wrap gap-1 items-center'><BiCalendar/> Tanggal Pelaksanaan:</h1>
+                                        <h1 className='flex flex-wrap gap-1 items-center'><BiCalendar /> Tanggal Pelaksanaan:</h1>
                                         <h1 className='font-semibold'>{dateRangeFormatted(diklat.tanggalMulaiAcara, diklat.tanggalSelesaiAcara)}</h1>
                                     </div>
                                     <div className='text-sm'>
-                                        <h1 className='flex flex-wrap gap-1 items-center'><BiCategory/> Metode:</h1>
+                                        <h1 className='flex flex-wrap gap-1 items-center'><BiCategory /> Metode:</h1>
                                         <Badge className={`${diklat.metodeDiklat.backgroundColor}`}>{diklat.metodeDiklat.nama}</Badge>
                                     </div>
                                     <div className='text-sm'>
-                                        <h1 className='flex flex-wrap gap-1 items-center'><BiLocationPlus/> Lokasi:</h1>
+                                        <h1 className='flex flex-wrap gap-1 items-center'><BiLocationPlus /> Lokasi:</h1>
                                         <h1 className='font-semibold'>{diklat.lokasi}</h1>
                                     </div>
                                     <div className='text-sm'>
@@ -75,7 +80,8 @@ export default function Narasumber_DiklatSaya_View({
                                             <MateriDiklatNarasumberCard
                                                 key={materi.id}
                                                 materi={materi}
-                                                totalPeserta={diklat._count.pesertaDiklat} />
+                                                totalPeserta={diklat._count.pesertaDiklat}
+                                                detailBasePath={detailBasePath} />
                                         ))
                                     }
                                 </div>
@@ -89,12 +95,12 @@ export default function Narasumber_DiklatSaya_View({
                                     <Button>Detail Diklat</Button>
                                 </Link>
                             </CardFooter>
-                        </Card>
+                        </Card >
                     ))
                     :
                     <div className='text-center py-10'>
-                        <h1 className='text-lg font-semibold'>Belum ada materi diklat aktif yang Anda ajarkan.</h1>
-                        <p className='text-slate-500'>Materi diklat aktif adalah materi diklat yang tanggal pelaksanaannya hari ini atau di masa depan.</p>
+                        <h1 className='text-lg font-semibold'>{emptyTitle}</h1>
+                        <p className='text-slate-500'>{emptyDescription}</p>
                     </div>
             }
         </>

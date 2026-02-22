@@ -1,7 +1,7 @@
 "use server"
 
-import prisma from "@/lib/prisma"
-import { z } from "zod"
+import prisma from "@/lib/prisma";
+import { z } from "zod";
 
 const GetSertifikasiSchema = z.object({
     kodeSertifikasi: z.string().min(1, "Kode sertifikasi wajib diisi")
@@ -49,21 +49,21 @@ export async function getSertifikasiAction(_prev: any, formData: FormData) {
         });
 
         if (!data) {
-            return { 
-                success: false, 
-                message: "Sertifikat tidak ditemukan dengan kode ini" 
+            return {
+                success: false,
+                message: "Sertifikat tidak ditemukan dengan kode ini"
             };
         }
 
-        return { 
-            success: true, 
-            data: data 
+        return {
+            success: true,
+            data: data
         };
     } catch (error) {
         console.error("Error fetching sertifikasi:", error);
-        return { 
-            success: false, 
-            message: "Terjadi kesalahan pada server" 
+        return {
+            success: false,
+            message: "Terjadi kesalahan pada server"
         };
     }
 }

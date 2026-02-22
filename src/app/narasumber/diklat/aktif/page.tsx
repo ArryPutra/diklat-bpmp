@@ -1,57 +1,19 @@
 "use server"
 
-import { getCurrentNarasumber } from "@/actions/narasumber-action";
-import prisma from "@/lib/prisma";
-import Narasumber_DiklatSaya_View from "./view";
+import NarasumberDiklatContent from "../components/narasumber-diklat-content";
+import { getDaftarDiklatNarasumber } from "../data";
 
 export default async function Narasumber_DiklatSaya_Page() {
-  const currentNarasumber = await getCurrentNarasumber()
-
-  const daftarDiklatAktifSaya = await prisma.diklat.findMany({
-    where: {
-      statusPelaksanaanAcaraDiklatId: {
-        in: [1, 2] // Belum Dimulai, Sedang Berlangsung
-      },
-      materiDiklat: {
-        some: {
-          narasumberId: currentNarasumber?.id,
-        }
-      },
-    },
-    include: {
-      materiDiklat: {
-        where: {
-          narasumberId: currentNarasumber?.id,
-        },
-        orderBy: [
-          {
-            tanggalPelaksanaan: "asc"
-          },
-          {
-            waktuMulai: "asc"
-          }
-        ],
-        include: {
-          _count: {
-            select: {
-              absensiPesertaDiklat: true
-            }
-          }
-        }
-      },
-      _count: {
-        select: {
-          pesertaDiklat: true
-        }
-      },
-      metodeDiklat: true,
-      statusPendaftaranDiklat: true,
-      statusPelaksanaanAcaraDiklat: true,
-    }
-  })
+  const daftarDiklatAktifSaya = await getDaftarDiklatNarasumber([1, 2])
 
   return (
-    <Narasumber_DiklatSaya_View
-      daftarDiklatAktifSaya={daftarDiklatAktifSaya} />
+    <NarasumberDiklatContent
+      daftarDiklatSaya={daftarDiklatAktifSaya}
+      title='Daftar Diklat Diajarkan'
+      description='Anda telah didaftarkan oleh Admin untuk mengajarkan pada diklat ini.'
+      emptyTitle='Belum ada materi diklat aktif yang Anda ajarkan.'
+      emptyDescription='Materi diklat aktif adalah materi diklat yang tanggal pelaksanaannya hari ini atau di masa depan.'
+      detailBasePath='/narasumber/diklat/aktif'
+    />
   )
 }

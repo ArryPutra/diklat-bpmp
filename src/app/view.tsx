@@ -35,10 +35,10 @@ export default function View({
             <Header />
 
             <Beranda />
-            <Statistik dataStatistik={dataStatistik} />
+            <Bantuan />
+            {/* <Statistik dataStatistik={dataStatistik} /> */}
             <Diklat
                 daftarDiklat={daftarDiklat} />
-            <Bantuan />
             <Faq />
 
             <Footer />

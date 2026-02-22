@@ -37,6 +37,11 @@ export async function upsertManyAbsensiPesertaDiklatAction({
         },
         select: {
             diklatId: true,
+            diklat: {
+                select: {
+                    statusPelaksanaanAcaraDiklatId: true,
+                }
+            }
         }
     })
 
@@ -44,6 +49,13 @@ export async function upsertManyAbsensiPesertaDiklatAction({
         return {
             success: false,
             message: "Materi diklat tidak ditemukan atau bukan milik Anda"
+        }
+    }
+
+    if (materiDiklat.diklat?.statusPelaksanaanAcaraDiklatId === 3) {
+        return {
+            success: false,
+            message: "Absensi tidak dapat diubah karena diklat sudah selesai"
         }
     }
 

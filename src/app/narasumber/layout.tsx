@@ -12,18 +12,18 @@ export default function NarasumberLayout({ children }: { children: React.ReactNo
                         url: '/narasumber/dashboard'
                     },
                     {
-                        name: 'Materi Diklat',
+                        name: 'Diklat',
                         icon: <BiBookOpen />,
                         url: '/narasumber/diklat',
                         submenu: [
                             {
                                 icon: <BiBookContent />,
-                                name: 'Materi Aktif',
+                                name: 'Diklat Aktif',
                                 url: '/narasumber/diklat/aktif'
                             },
                             {
                                 icon: <BiHistory />,
-                                name: 'Riwayat Materi',
+                                name: 'Riwayat Diklat',
                                 url: '/narasumber/diklat/riwayat'
                             }
                         ]

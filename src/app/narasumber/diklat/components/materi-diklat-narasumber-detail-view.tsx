@@ -16,16 +16,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDateId, formatDateTimeId } from '@/utils/dateFormatted'
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { BiBlock, BiCalendar, BiLink, BiLocationPlus, BiStop, BiTime } from 'react-icons/bi'
+import { BiBlock, BiCalendar, BiLink, BiLocationPlus, BiTime } from 'react-icons/bi'
 
-export default function Narasumber_KelolaMateriDiklatAktif_View({
+export default function MateriDiklatNarasumberDetailView({
     materi,
     statusAbsensiPesertaDiklat,
-    totalAbsensiStatus
+    totalAbsensiStatus,
+    isReadOnlyAbsensi = false,
+    readOnlyMessage
 }: {
     materi: any
     statusAbsensiPesertaDiklat: any
     totalAbsensiStatus: any
+    isReadOnlyAbsensi?: boolean
+    readOnlyMessage?: string
 }) {
     const [state, formAction, pending] = useActionState(
         upsertManyAbsensiPesertaDiklatFormAction,
@@ -65,11 +69,11 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                     <CardFooter>
                         {
                             materi.linkMateri ?
-                            <Link href={materi.linkMateri} target='_blank'>
-                                <Button size='sm' variant='outline'><BiLink /> Link Materi</Button>
-                            </Link>
-                            :
-                            <Button size='sm' variant='outline' disabled><BiBlock /> Link Materi Kosong</Button>
+                                <Link href={materi.linkMateri} target='_blank'>
+                                    <Button size='sm' variant='outline'><BiLink /> Link Materi</Button>
+                                </Link>
+                                :
+                                <Button size='sm' variant='outline' disabled><BiBlock /> Link Materi Kosong</Button>
                         }
                     </CardFooter>
                 </Card>
@@ -114,9 +118,21 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                         <div>
                             <h2 className='font-semibold'>Absensi Peserta</h2>
                             <p className='text-sm text-slate-500'>
-                                Tentukan status kehadiran setiap peserta untuk sesi materi ini.
+                                {isReadOnlyAbsensi
+                                    ? (readOnlyMessage ?? 'Absensi tidak dapat diubah pada mode ini.')
+                                    : 'Tentukan status kehadiran setiap peserta untuk sesi materi ini.'}
                             </p>
                         </div>
+
+                        {
+                            isReadOnlyAbsensi &&
+                            <Alert>
+                                <AlertTitle>Absensi Dinonaktifkan</AlertTitle>
+                                <AlertDescription>
+                                    {readOnlyMessage ?? 'Diklat sudah selesai, absensi hanya dapat dilihat.'}
+                                </AlertDescription>
+                            </Alert>
+                        }
 
                         {
                             state?.message &&
@@ -154,6 +170,7 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                                                                 : undefined
                                                         }
                                                         className='flex flex-wrap gap-4'
+                                                        disabled={isReadOnlyAbsensi}
                                                     >
                                                         {
                                                             statusAbsensiPesertaDiklat.map((statusAbsensi: any) => {
@@ -185,7 +202,7 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                         </Table>
 
                         <div className='flex justify-end gap-2'>
-                            <Button disabled={pending}>
+                            <Button disabled={pending || isReadOnlyAbsensi}>
                                 Simpan Absensi {pending && <Spinner />}
                             </Button>
                         </div>
