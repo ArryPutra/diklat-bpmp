@@ -30,7 +30,6 @@ export default function KelolaDiklatForm({
 
             <form action={actionState.formAction}>
                 <FieldSet>
-
                     <Field>
                         <FieldLabel>Judul</FieldLabel>
                         <Input
@@ -189,6 +188,20 @@ export default function KelolaDiklatForm({
                         {
                             actionState.state?.errors?.persyaratanPeserta &&
                             <FieldError>{actionState.state?.errors?.persyaratanPeserta}</FieldError>
+                        }
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Minimal Kehadiran/Syarat Kelulusan (%)</FieldLabel>
+                        <Input
+                            placeholder="Masukkan minimal kehadiran dalam persen"
+                            name="minimalKehadiranPersen"
+                            inputMode="numeric"
+                            defaultValue={actionState.state?.values?.minimalKehadiranPersen ?? diklat?.minimalKehadiranPersen}
+                            min={0} max={100} />
+                        {
+                            actionState.state?.errors?.minimalKehadiranPersen &&
+                            <FieldError>{actionState.state?.errors?.minimalKehadiranPersen}</FieldError>
                         }
                     </Field>
                 </FieldSet>

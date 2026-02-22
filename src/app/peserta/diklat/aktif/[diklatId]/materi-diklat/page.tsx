@@ -28,7 +28,7 @@ export default async function Peserta_DiklatMateriDiklat_Page({
                         where: {
                             pesertaDiklat: {
                                 pesertaId: currentPeserta?.id
-                            }
+                            },
                         },
                         include: {
                             statusAbsensiPesertaDiklat: true
@@ -48,6 +48,8 @@ export default async function Peserta_DiklatMateriDiklat_Page({
             statusPelaksanaanAcaraDiklat: true
         }
     })
+
+    console.log(diklat.materiDiklat[0])
 
     return (
         <Peserta_DiklatMateriDiklat_View

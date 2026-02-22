@@ -3,8 +3,10 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { LoginSchema } from "@/schemas/auth.schema";
+import ResetPasswordSchema from "@/schemas/reset-password.schema";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 export async function loginAction(prev: any, formData: FormData) {
     const result = LoginSchema.safeParse(Object.fromEntries(formData));
@@ -114,4 +116,48 @@ export async function logoutAction() {
     });
 
     return redirect("/");
+}
+
+
+export async function resetPasswordAction(prevState: any, formData: FormData) {
+    const result = ResetPasswordSchema.safeParse(Object.fromEntries(formData))
+
+    if (!result.success) {
+        return {
+            success: false,
+            errors: result.error.flatten().fieldErrors,
+            message: "Validasi gagal. Periksa kembali input Anda."
+        }
+    }
+
+    try {
+        const currentUser = await getCurrentUser()
+
+        if (!currentUser?.id) {
+            return {
+                success: false,
+                message: "Unauthorized"
+            }
+        }
+
+        await auth.api.changePassword({
+            body: {
+                currentPassword: result.data.passwordSaat,
+                newPassword: result.data.passwordBaru
+            },
+            headers: await headers()
+        })
+
+        return {
+            success: true,
+            message: "Password berhasil diubah"
+        }
+    } catch (error: any) {
+        console.error(error)
+
+        return {
+            success: false,
+            message: error?.message || "Terjadi kesalahan saat mengubah password"
+        }
+    }
 }

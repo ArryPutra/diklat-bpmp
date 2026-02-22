@@ -6,16 +6,21 @@ import StatsCard from "@/components/shared/cards/stats-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "@bprogress/next/app";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { BiBuilding, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
 
 export default function View({
-    daftarDiklat
+    daftarDiklat,
+    dataStatistik
 }: {
     daftarDiklat: any[]
+    dataStatistik: {
+        totalPeserta: number
+        totalInstansi: number
+    }
 }) {
     useEffect(() => {
         document.documentElement.classList.add("scroll-smooth");
@@ -30,8 +35,9 @@ export default function View({
             <Header />
 
             <Beranda />
-            <Statistik />
-            <Diklat daftarDiklat={daftarDiklat} />
+            <Statistik dataStatistik={dataStatistik} />
+            <Diklat
+                daftarDiklat={daftarDiklat} />
             <Faq />
 
             <Footer />
@@ -118,17 +124,6 @@ function Beranda() {
                         Daftarkan Instansi
                     </Button>
                 </div>
-
-                <div className="mt-8 grid grid-cols-2 gap-3 max-w-md">
-                    <div className="rounded-xl border bg-white p-4">
-                        <p className="text-sm text-slate-500">Fokus Utama</p>
-                        <p className="font-semibold">Pengembangan Kompetensi</p>
-                    </div>
-                    <div className="rounded-xl border bg-white p-4">
-                        <p className="text-sm text-slate-500">Akses</p>
-                        <p className="font-semibold">Instansi & Peserta</p>
-                    </div>
-                </div>
             </div>
 
             <div className="relative w-1/2 max-md:w-full flex justify-center">
@@ -145,26 +140,83 @@ function Beranda() {
     )
 }
 
-function Statistik() {
+function Statistik({
+    dataStatistik
+}: {
+    dataStatistik: {
+        totalPeserta: number
+        totalInstansi: number
+    }
+}) {
+    const statistikRef = useRef<HTMLDivElement | null>(null);
+
+    const [hasAnimated, setHasAnimated] = useState(false);
+    const [animatedValues, setAnimatedValues] = useState({
+        totalPeserta: 0,
+        totalInstansi: 0,
+    });
+
+    useEffect(() => {
+        const section = statistikRef.current;
+
+        if (!section || hasAnimated) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting) return;
+
+                setHasAnimated(true);
+
+                const duration = 1200;
+                const start = performance.now();
+
+                const animate = (now: number) => {
+                    const progress = Math.min((now - start) / duration, 1);
+
+                    setAnimatedValues({
+                        totalPeserta: Math.round(dataStatistik.totalPeserta * progress),
+                        totalInstansi: Math.round(dataStatistik.totalInstansi * progress),
+                    });
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+
+                requestAnimationFrame(animate);
+                observer.disconnect();
+            },
+            { threshold: 0.35 }
+        );
+
+        observer.observe(section);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [dataStatistik.totalInstansi, dataStatistik.totalPeserta, hasAnimated]);
+
     return (
         <GuestLayout parentClassName="bg-linear-to-b from-primary/5 to-white">
-            <div className="mb-6 text-center">
-                <h1 className="font-bold text-3xl">Data Statistik Terkini</h1>
-                <p className="mt-2 text-slate-600">Ringkasan capaian platform diklat saat ini.</p>
-            </div>
+            <div ref={statistikRef}>
+                <div className="mb-6 text-center">
+                    <h1 className="font-bold text-3xl">Data Statistik Terkini</h1>
+                    <p className="mt-2 text-slate-600">Ringkasan capaian platform diklat saat ini.</p>
+                </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-6
+                <div className="mt-6 grid grid-cols-2 gap-6
       max-md:grid-cols-1">
-                <StatsCard
-                    icon={<BiUser />}
-                    label="Total Peserta"
-                    value="100"
-                />
-                <StatsCard
-                    icon={<BiBuilding />}
-                    label="Total Instansi"
-                    value="10"
-                />
+                    <StatsCard
+                        icon={<BiUser />}
+                        label="Total Peserta"
+                        value={animatedValues.totalPeserta.toString()}
+                    />
+                    <StatsCard
+                        icon={<BiBuilding />}
+                        label="Total Instansi"
+                        value={animatedValues.totalInstansi.toString()}
+                    />
+                </div>
             </div>
         </GuestLayout>
     )

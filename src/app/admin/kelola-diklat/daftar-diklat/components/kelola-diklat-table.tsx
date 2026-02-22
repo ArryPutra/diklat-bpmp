@@ -38,7 +38,6 @@ export default function KelolaDiklatTable({
                         <TableHead>Status Pendaftaran</TableHead>
                         <TableHead>Status Pelaksanaan</TableHead>
                         <TableHead>Jumlah Materi</TableHead>
-                        <TableHead>Maksimal Kuota</TableHead>
                         <TableHead>Tanggal Buka Pendaftaran</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
@@ -78,9 +77,6 @@ export default function KelolaDiklatTable({
                                                 : <span className="text-red-500 font-semibold">Tidak ada materi</span>
                                         }
                                     </TextLink>
-                                </TableCell>
-                                <TableCell>
-                                    {diklat.maksimalKuota} Peserta
                                 </TableCell>
                                 <TableCell>
                                     {formatDateId(diklat.tanggalBukaPendaftaran)}

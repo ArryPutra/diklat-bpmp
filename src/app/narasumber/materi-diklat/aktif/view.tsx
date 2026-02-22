@@ -9,6 +9,7 @@ import { dateRangeFormatted } from '@/utils/dateFormatted'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
+import { BiSolidGraduation } from 'react-icons/bi'
 import MateriDiklatNarasumberCard from './components/materi-diklat-narasumber-card'
 
 export default function Narasumber_DiklatSaya_View({
@@ -50,8 +51,12 @@ export default function Narasumber_DiklatSaya_View({
                                         <h1 className='font-semibold'>{diklat.lokasi}</h1>
                                     </div>
                                     <div className='text-sm'>
-                                        <h1>Maksimal Kuota:</h1>
-                                        <h1 className='font-semibold'>{diklat.maksimalKuota} Peserta</h1>
+                                        <h1 className='flex gap-1 items-center text-gray-500 flex-wrap'><BiSolidGraduation /> Syarat Kelulusan:</h1>
+                                        <h1 className="font-semibold">Kehadiran {diklat.minimalKehadiranPersen.toString()}% atau
+                                            {Math.ceil(
+                                                diklat.materiDiklat.length * (diklat.minimalKehadiranPersen / 100)
+                                            )} kehadiran
+                                        </h1>
                                     </div>
                                 </div>
 

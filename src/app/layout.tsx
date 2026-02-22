@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import ProgressBarProvider from "@/components/shared/providers/progress-bar-provider";
 import "@/lib/zod-i18n";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-        {children}
+        <ProgressBarProvider>
+          {children}
+        </ProgressBarProvider>
       </body>
     </html>
   );

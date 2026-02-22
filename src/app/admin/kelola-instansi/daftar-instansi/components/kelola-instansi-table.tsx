@@ -42,16 +42,24 @@ export default function KelolaInstansiTable({
                                     <span className='text-gray-500'>{instansi.nomorTelepon}</span>
                                 </TableCell>
                                 <TableCell>
-                                    <span className='font-semibold'>{instansi.picInstansi.nama}</span>
-                                    <br />
-                                    <span>{instansi.picInstansi.email}</span>
-                                    <br />
-                                    <span className='text-gray-500'>{instansi.picInstansi.nomorTelepon}</span>
+                                    {
+                                        instansi.picInstansi ? (
+                                            <>
+                                                <span className='font-semibold'>{instansi.picInstansi.nama}</span>
+                                                <br />
+                                                <span>{instansi.picInstansi.email}</span>
+                                                <br />
+                                                <span className='text-gray-500'>{instansi.picInstansi.nomorTelepon}</span>
+                                            </>
+                                        ) : (
+                                            <span className='text-gray-500'>Data PIC belum tersedia</span>
+                                        )
+                                    }
                                 </TableCell>
                                 <TableCell>
                                     <div className='flex gap-2'>
                                         {/* Info Action */}
-                                        <Link href={`/admin/kelola-instansi/${instansi.id}`}>
+                                        <Link href={`/admin/kelola-instansi/daftar-instansi/${instansi.id}`}>
                                             <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
                                         </Link>
                                         {/* Edit Action */}

@@ -6,16 +6,22 @@ import BackButton from "@/components/shared/back-button"
 import ActionDialog from "@/components/shared/dialog/action-dialog"
 import TextLink from "@/components/shared/text-link"
 import { AlertDialogAction } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { dateRangeFormatted } from "@/utils/dateFormatted"
+import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useActionState } from "react"
-import { BiReply, BiX } from "react-icons/bi"
+import { BiReply, BiRightArrowAlt, BiX } from "react-icons/bi"
 
 export default function Instansi_DiklatPesertaDetail_View({
+    diklat,
     daftarPeserta
 }: {
+    diklat: any
     daftarPeserta: {
         data: any[]
         total: number
@@ -29,6 +35,41 @@ export default function Instansi_DiklatPesertaDetail_View({
             </div>
 
             <BackButton url="/instansi/diklat/peserta" />
+
+            <Card>
+                <CardHeader>
+                    {
+                        <Badge className={`${diklat.statusPelaksanaanAcaraDiklat.backgroundColor}`}>
+                            {diklat.statusPelaksanaanAcaraDiklat.nama}
+                        </Badge>
+                    }
+                    <CardTitle className='text-lg'>{diklat.judul}</CardTitle>
+                    <CardDescription >{diklat.deskripsi}</CardDescription>
+                </CardHeader>
+                <CardContent className='grid grid-cols-4 gap-3 max-lg:grid-cols-2 max-sm:grid-cols-1'>
+                    <div className='text-sm'>
+                        <h1>Tanggal Pelaksanaan:</h1>
+                        <h1 className='font-semibold'>{dateRangeFormatted(diklat.tanggalMulaiAcara, diklat.tanggalSelesaiAcara)}</h1>
+                    </div>
+                    <div className='text-sm'>
+                        <h1>Metode:</h1>
+                        <Badge className={`${diklat.metodeDiklat.backgroundColor}`}>{diklat.metodeDiklat.nama}</Badge>
+                    </div>
+                    <div className='text-sm'>
+                        <h1>Lokasi:</h1>
+                        <h1 className='font-semibold'>{diklat.lokasi}</h1>
+                    </div>
+                    <div className='text-sm'>
+                        <h1>Maksimal Kuota:</h1>
+                        <h1 className='font-semibold'>{diklat.maksimalKuota} Peserta</h1>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Link href={`/diklat/${diklat.id}`} target="_blank">
+                        <Button size='sm' variant='outline'>Postingan <BiRightArrowAlt /></Button>
+                    </Link>
+                </CardFooter>
+            </Card>
 
             <Table>
                 <TableHeader>

@@ -5,8 +5,8 @@ import LoadingScreen from "@/components/shared/loading-screen";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useRouter } from "@bprogress/next/app";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { BiBookOpen, BiUser } from "react-icons/bi";
 
@@ -62,7 +62,7 @@ export default function Instansi_DiklatPeserta_View({
                                             <BiUser /> Peserta
                                         </Button>
                                         <Link href={`/diklat/${dataDiklat.id}`} target="_blank">
-                                            <Button size='sm' variant='outline'><BiBookOpen /> Diklat</Button>
+                                            <Button size='sm' variant='outline'><BiBookOpen /> Postingan</Button>
                                         </Link>
                                     </TableCell>
                                 </TableRow>

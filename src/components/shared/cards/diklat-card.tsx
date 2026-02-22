@@ -78,7 +78,9 @@ export function DiklatCard({
             </CardContent>
             <CardFooter className="flex justify-between mt-auto">
                 <Link href={`/diklat/${diklat.id}`}>
-                    <Button className={`w-full ${diklat.statusPendaftaranDiklat.backgroundColor} hover:${diklat.statusPendaftaranDiklat.backgroundColor}`}
+                    <Button
+                    disabled={isPending}
+                        className={`w-full ${diklat.statusPendaftaranDiklat.backgroundColor} hover:${diklat.statusPendaftaranDiklat.backgroundColor} cursor-pointer`}
                         onClick={() => {
                             startTransition(() => {
                                 router.push(`/diklat/${diklat.id}`)

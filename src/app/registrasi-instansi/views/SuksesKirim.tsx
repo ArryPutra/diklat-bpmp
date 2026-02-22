@@ -49,13 +49,10 @@ export default function SuksesKirim({
             <div className='border py-3 px-4 text-sm mb-6 rounded-xl w-full animate-fade-in-up delay-200 hover-lift transition-all duration-300'>
                 <h1>Informasi hasil verifikasi akan dikirimkan melalui:</h1>
                 <p className='mt-2'>
-                    Email: <b>{emailInstansi}</b> / <b>{emailPicInstansi}</b>
-                </p>
-                <p className='mt-2 mb-4'>
-                    Nomor Telepon: <b>{nomorTeleponInstansi}</b> / <b>{nomorTeleponPicInstansi}</b>
+                    Email: <b>{emailPicInstansi}</b>
                 </p>
 
-                <div>
+                <div className='mt-6'>
                     <p className='mb-2'>Kode Tiket Registrasi:</p>
                     <div className='flex items-center justify-center gap-2'>
                         <div className='font-bold bg-gray-100 p-2 w-fit rounded-md'>
@@ -70,6 +67,7 @@ export default function SuksesKirim({
                             {copied ? <Check className='w-4 h-4 text-green-500' /> : <Copy className='w-4 h-4' />}
                         </Button>
                     </div>
+                    <p className='text-xs text-gray-500 mt-2'>Kode Tiket Registrasi dapat digunakan untuk melacak status verifikasi.</p>
                 </div>
             </div>
 

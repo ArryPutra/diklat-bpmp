@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { dateRangeFormatted } from "@/utils/dateFormatted";
 import Link from "next/link";
-import { BiCalendar, BiLocationPlus, BiNetworkChart, BiRightArrowAlt } from "react-icons/bi";
+import { BiCalendar, BiLocationPlus, BiNetworkChart, BiRightArrowAlt, BiSolidGraduation } from "react-icons/bi";
 
 export default async function Peserta_Diklat_Layout({
     params,
@@ -55,20 +55,25 @@ export default async function Peserta_Diklat_Layout({
                         <h1 className='flex gap-1 items-center text-gray-500 flex-wrap'><BiNetworkChart /> Metode:</h1>
                         <Badge className={`${diklat.metodeDiklat.backgroundColor}`}>{diklat.metodeDiklat.nama}</Badge>
                     </div>
-
+                    <div className='text-sm'>
+                        <h1 className='flex gap-1 items-center text-gray-500 flex-wrap'><BiSolidGraduation /> Syarat Kelulusan:</h1>
+                        <h1 className="font-semibold">Kehadiran {diklat.minimalKehadiranPersen.toString()}% atau
+                            {Math.ceil(
+                                diklat.materiDiklat.length * (diklat.minimalKehadiranPersen / 100)
+                            )} kehadiran
+                        </h1>
+                    </div>
                 </div>
                 <div>
                     <Link href={`/diklat/${diklat.id}`} target='_blank'>
-                        <Button size='sm' variant='outline'>Lihat Detail <BiRightArrowAlt /></Button>
+                        <Button size='sm' variant='outline'>Postingan <BiRightArrowAlt /></Button>
                     </Link>
                 </div>
             </div>
 
-            <Separator/>
+            <Separator />
 
-            {
-                children
-            }
+            {children}
         </ContentCanvas>
     )
 }

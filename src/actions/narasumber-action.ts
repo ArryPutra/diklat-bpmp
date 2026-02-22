@@ -237,6 +237,9 @@ export async function getCurrentNarasumber() {
     const currentNarasumber = await prisma.narasumber.findUnique({
         where: {
             userId: currentUser?.id
+        },
+        include: {
+            user: true
         }
     })
 

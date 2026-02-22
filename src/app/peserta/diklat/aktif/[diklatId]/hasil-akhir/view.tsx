@@ -17,7 +17,7 @@ export default function Peserta_DiklatHasilAkhir_View({
   return (
     <>
       <div className='flex gap-3 flex-wrap'>
-        <Link href={`/peserta/diklat/${diklatId}/materi-diklat`}>
+        <Link href={`/peserta/diklat/aktif/${diklatId}/materi-diklat`}>
           <Button size='sm' variant='outline'>Materi Diklat</Button>
         </Link>
         <Button size='sm'>Hasil Akhir</Button>

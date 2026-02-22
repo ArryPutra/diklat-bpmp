@@ -136,26 +136,14 @@ export async function createDiklatAction(
     prevState: any,
     formData: FormData
 ) {
-    const resultData = DiklatSchema.safeParse(Object.fromEntries(formData))
+    const values = Object.fromEntries(formData)
+    const resultData = DiklatSchema.safeParse(values)
 
     if (!resultData.success) {
         return {
             success: false,
             errors: resultData.error.flatten().fieldErrors,
-            values: {
-                judul: formData.get("judul")?.toString(),
-                deskripsi: formData.get("deskripsi")?.toString(),
-                tujuan: formData.get("tujuan")?.toString(),
-                targetSasaran: formData.get("targetSasaran")?.toString(),
-                metodeDiklatId: formData.get("metodeDiklatId")?.toString(),
-                maksimalKuota: formData.get("maksimalKuota")?.toString(),
-                lokasi: formData.get("lokasi")?.toString(),
-                tanggalMulaiAcara: formData.get("tanggalMulaiAcara")?.toString(),
-                tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
-                tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
-                tanggalTutupPendaftaran: formData.get("tanggalTutupPendaftaran")?.toString(),
-                persyaratanPeserta: formData.get("persyaratanPeserta")?.toString(),
-            }
+            values: values
         }
     }
 
@@ -187,6 +175,7 @@ export async function createDiklatAction(
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
                 targetSasaran: resultData.data.targetSasaran,
                 persyaratanPeserta: resultData.data.persyaratanPeserta,
+                minimalKehadiranPersen: resultData.data.minimalKehadiranPersen
             }
         })
     } catch (error) {
@@ -210,19 +199,7 @@ export async function updateDiklatAction(
     prevState: any,
     formData: FormData
 ) {
-    const values = {
-        judul: formData.get("judul")?.toString(),
-        deskripsi: formData.get("deskripsi")?.toString(),
-        tujuan: formData.get("tujuan")?.toString(),
-        targetSasaran: formData.get("targetSasaran")?.toString(),
-        metodeDiklatId: formData.get("metodeDiklatId")?.toString(),
-        maksimalKuota: formData.get("maksimalKuota")?.toString(),
-        tanggalMulaiAcara: formData.get("tanggalMulaiAcara")?.toString(),
-        tanggalSelesaiAcara: formData.get("tanggalSelesaiAcara")?.toString(),
-        tanggalBukaPendaftaran: formData.get("tanggalBukaPendaftaran")?.toString(),
-        tanggalTutupPendaftaran: formData.get("tanggalTutupPendaftaran")?.toString(),
-        persyaratanPeserta: formData.get("persyaratanPeserta")?.toString(),
-    }
+    const values = Object.fromEntries(formData)
 
     const resultData = DiklatSchema.safeParse(Object.fromEntries(formData))
 
@@ -298,6 +275,7 @@ export async function updateDiklatAction(
                 tanggalSelesaiAcara: resultData.data.tanggalSelesaiAcara,
                 targetSasaran: resultData.data.targetSasaran,
                 persyaratanPeserta: resultData.data.persyaratanPeserta,
+                minimalKehadiranPersen: resultData.data.minimalKehadiranPersen
             }
         })
     } catch (error) {

@@ -79,7 +79,7 @@ export default function Peserta_DiklatAktif_View({
                                         </CardContent>
 
                                         <CardFooter className="flex gap-3 flex-wrap">
-                                            <Link href={`/peserta/diklat/${diklat.id}/materi-diklat`}>
+                                            <Link href={`/peserta/diklat/aktif/${diklat.id}/materi-diklat`}>
                                                 <Button size="sm">Lihat Detail</Button>
                                             </Link>
                                         </CardFooter>

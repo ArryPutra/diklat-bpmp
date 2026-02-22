@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import diklatSeed from "./seeds/diklat.seed";
-import registrasiInstansiSeed from "./seeds/registrasi-instansi.seed";
+import instansiSeed from "./seeds/instansi.seed";
 import narasumberSeed from "./seeds/narasumber.seed";
+import registrasiInstansiSeed from "./seeds/registrasi-instansi.seed";
 
 async function main() {
     await prisma.peran.createMany({
@@ -93,8 +94,10 @@ async function main() {
     })
 
     await registrasiInstansiSeed()
+    await instansiSeed()
     await diklatSeed()
     await narasumberSeed()
+    // await materiDiklatSeed()
 }
 
 main()

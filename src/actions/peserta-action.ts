@@ -413,7 +413,11 @@ export async function getCurrentPeserta() {
             userId: currentUser.id
         },
         include: {
-            user: true,
+            user: {
+                include: {
+                    peran: true
+                }
+            },
             instansi: {
                 include: {
                     user: true

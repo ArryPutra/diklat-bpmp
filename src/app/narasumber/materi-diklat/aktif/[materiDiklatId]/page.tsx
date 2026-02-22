@@ -39,9 +39,6 @@ export default async function Narasumber_KelolaMateriDiklatAktif_Page({
                 where: {
                   materiDiklatId: Number(_params.materiDiklatId)
                 },
-                select: {
-                  statusAbsensiId: true,
-                }
               },
               peserta: {
                 select: {

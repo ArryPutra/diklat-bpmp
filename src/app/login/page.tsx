@@ -9,10 +9,17 @@ import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Spinner } from '@/components/ui/spinner';
 import Image from 'next/image';
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 
 export default function Masuk() {
     const [state, formAction, pending] = useActionState(loginAction, null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (!pending) {
+            setIsSubmitting(false);
+        }
+    }, [pending]);
 
     return (
         <Layout
@@ -39,7 +46,7 @@ export default function Masuk() {
                             </Alert>
                         }
 
-                        <form action={formAction}>
+                        <form action={formAction} onSubmit={() => setIsSubmitting(true)}>
                             <FieldSet className='mt-8'>
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
@@ -64,8 +71,11 @@ export default function Masuk() {
                                         <FieldError>{state.errors.field.password}</FieldError>
                                     }
                                 </Field>
-                                <Button className='hover-lift transition-all duration-300 hover:shadow-lg'>
-                                    Masuk {pending && <Spinner />}
+                                <Button
+                                    type='submit'
+                                    disabled={isSubmitting || pending}
+                                    className='hover-lift transition-all duration-300 hover:shadow-lg'>
+                                    Masuk {(isSubmitting || pending) && <Spinner />}
                                 </Button>
                             </FieldSet>
                         </form>

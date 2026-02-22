@@ -126,6 +126,9 @@ export async function getCurrentInstansi() {
     const currentInstansi = await prisma.instansi.findUnique({
         where: {
             userId: currentUser?.id
+        },
+        include: {
+            registrasiInstansi: true
         }
     })
 

@@ -13,10 +13,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { formatDateId } from '@/utils/dateFormatted'
+import { formatDateId, formatDateTimeId } from '@/utils/dateFormatted'
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { BiCalendar, BiLink, BiLocationPlus, BiTime } from 'react-icons/bi'
+import { BiBlock, BiCalendar, BiLink, BiLocationPlus, BiStop, BiTime } from 'react-icons/bi'
 
 export default function Narasumber_KelolaMateriDiklatAktif_View({
     materi,
@@ -63,9 +63,14 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Link href={materi.linkMateri} target='_blank'>
-                            <Button size='sm' variant='outline'><BiLink /> Link Materi</Button>
-                        </Link>
+                        {
+                            materi.linkMateri ?
+                            <Link href={materi.linkMateri} target='_blank'>
+                                <Button size='sm' variant='outline'><BiLink /> Link Materi</Button>
+                            </Link>
+                            :
+                            <Button size='sm' variant='outline' disabled><BiBlock /> Link Materi Kosong</Button>
+                        }
                     </CardFooter>
                 </Card>
 
@@ -127,6 +132,7 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                                     <TableHead className='w-14'>No</TableHead>
                                     <TableHead>Nama Peserta</TableHead>
                                     <TableHead>Asal Instansi</TableHead>
+                                    <TableHead>Waktu Absensi</TableHead>
                                     <TableHead>Status Absen</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -138,6 +144,7 @@ export default function Narasumber_KelolaMateriDiklatAktif_View({
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{pesertaDiklat.peserta.user.name}</TableCell>
                                                 <TableCell>{pesertaDiklat.peserta.instansi.user.name}</TableCell>
+                                                <TableCell>{pesertaDiklat.absensiPesertaDiklat[0]?.updatedAt ? formatDateTimeId(pesertaDiklat.absensiPesertaDiklat[0].updatedAt) : "-"}</TableCell>
                                                 <TableCell>
                                                     <RadioGroup
                                                         name={`statusAbsensi-${pesertaDiklat.id}`}

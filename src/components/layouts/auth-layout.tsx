@@ -1,14 +1,12 @@
 'use client'
 
-import { getCurrentUser, logoutAction } from "@/actions/auth-action";
+import { getCurrentUser } from "@/actions/auth-action";
+import { useRouter } from "@bprogress/next/app";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useActionState, useEffect, useState, useTransition } from "react";
-import { BiChevronDown, BiLogOut, BiMenu, BiX } from "react-icons/bi";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { BiChevronDown, BiMenu, BiX } from "react-icons/bi";
 import LoadingScreen from "../shared/loading-screen";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
-import { Spinner } from "../ui/spinner";
 
 type MenuItem = {
     name: string;
@@ -24,12 +22,13 @@ type AuthLayoutProps = {
 
 export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [profileMenu, setProfileMenu] = useState(false);
     const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-    const [user, setUser] = useState({ name: '...', namaPeran: '...' });
+    const [user, setUser] = useState({ name: '...', namaPeran: '...', email: '...' });
 
     const router = useRouter();
     const pathname = usePathname();
+    const roleSegment = pathname.split('/').filter(Boolean)[0];
+    const isProfilePage = pathname === `/${roleSegment}/profil`;
 
     const activeMenu = menuItems.find(item => item.url === pathname || pathname.startsWith(item.url + '/'));
     const activeSubmenu = menuItems
@@ -43,11 +42,17 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
     const parentTitle = activeSubmenu?.parentName ?? activeMenu?.name ?? '';
     const submenuTitle = activeSubmenu?.subitem.name;
+    const headerTitle = isProfilePage ? 'Profil Saya' : parentTitle;
+    const profileInitial = user.name?.trim()?.charAt(0)?.toUpperCase() || '?';
 
     useEffect(() => {
         async function fetchCurrentUser() {
             const user: any = await getCurrentUser();
-            setUser({ name: user?.name!, namaPeran: user?.peran.nama });
+            setUser({
+                name: user?.name ?? 'Pengguna',
+                namaPeran: user?.peran?.nama ?? '-',
+                email: user?.email ?? '-',
+            });
         }
 
         fetchCurrentUser();
@@ -83,7 +88,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
         <div className="bg-gray-50 flex">
             <LoadingScreen isLoading={isPending} />
             {/* SIDEBAR */}
-            <aside className={`min-w-60 bg-white px-5 h-dvh z-50 fixed
+            <aside className={`min-w-60 bg-white px-5 h-dvh z-50 fixed flex flex-col
             max-md:shadow max-md:-left-full max-md:duration-500
                 ${sidebarOpen && 'max-md:left-0'}`}>
                 <div className="border-b h-20 flex items-center justify-center
@@ -100,7 +105,7 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                 </div>
 
                 {/* MENU ITEMS */}
-                <nav className="flex w-full flex-col pt-6 space-y-3 overflow-y-auto max-h-[calc(100dvh-120px)]">
+                <nav className="flex w-full flex-col pt-6 space-y-3 overflow-y-auto flex-1 pb-4">
                     {
                         menuItems.map((item, index) => (
                             <div key={index}>
@@ -158,7 +163,31 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                             </div>
                         ))
                     }
+
                 </nav>
+
+                <div className="border-t py-4 w-50">
+                    <button className={`w-full rounded-xl border px-3 py-3 text-left duration-300
+                        ${isProfilePage ? 'border border-transparent bg-primary text-white shadow' : 'hover:bg-gray-50'}`}
+                        onClick={() => {
+                            if (isProfilePage) return;
+                            startTransition(() => {
+                                router.push(`/${roleSegment}/profil`)
+                                setSidebarOpen(false)
+                            })
+                        }}>
+                        <div className="flex items-center gap-3">
+                            <div className={`size-8 rounded-full flex items-center justify-center font-bold text-sm
+                                ${isProfilePage ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                                {profileInitial}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="block w-full text-sm font-semibold truncate">{user.name}</p>
+                                <p className={`block w-full text-xs truncate ${isProfilePage ? 'text-white/80' : 'text-gray-500'}`}>{user.email}</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
             </aside>
 
             <div className="flex flex-col w-full">
@@ -170,37 +199,27 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
                     <h1 className="text-2xl font-bold text-primary
             max-md:hidden">
-                        {submenuTitle ? (
+                        {!isProfilePage && submenuTitle ? (
                             <span className="flex items-center gap-2">
-                                <span>{parentTitle}</span>
+                                <span>{headerTitle}</span>
                                 <span className="text-base font-medium text-primary/80">&gt; {submenuTitle}</span>
                             </span>
                         ) : (
-                            parentTitle
+                            headerTitle
                         )}
                     </h1>
-                    <div className="flex items-center gap-3 cursor-pointer"
-                        onClick={() => setProfileMenu(!profileMenu)}>
-                        <h1 className="font-semibold select-none">{user.name}</h1>
-                        <BiChevronDown />
-                    </div>
-
-                    <PopupProfileMenu
-                        profileMenu={profileMenu}
-                        name={user.name}
-                        namaPeran={user.namaPeran} />
                 </header>
 
                 <main className="w-full pl-65 pt-25 min-h-dvh p-5
                 max-md:pl-5 max-md:pt-25">
                     <h1 className="md:hidden text-xl font-bold text-primary mb-6">
-                        {submenuTitle ? (
+                        {!isProfilePage && submenuTitle ? (
                             <span className="flex items-center gap-2">
-                                <span>{parentTitle}</span>
+                                <span>{headerTitle}</span>
                                 <span className="text-sm font-medium text-primary/80">&gt; {submenuTitle}</span>
                             </span>
                         ) : (
-                            parentTitle
+                            headerTitle
                         )}
                     </h1>
 
@@ -217,38 +236,6 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
                 onClick={() => { setSidebarOpen(false) }}>
 
             </div>
-        </div>
-    )
-}
-
-function PopupProfileMenu({
-    profileMenu,
-    name,
-    namaPeran,
-}: {
-    profileMenu: boolean
-    name: string
-    namaPeran: string
-}) {
-    const [state, formAction, pending] = useActionState(logoutAction, null);
-
-    return (
-        <div
-            className={`absolute top-24 bg-white/20 backdrop-blur right-10 p-4 shadow border duration-500 z-10
-            max-md:right-5
-            ${profileMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none translate-x-2 translate-y-1 scale-95'}`}>
-
-            <h1 className="text-sm font-semibold mb-1">{name}</h1>
-            <h1 className="text-sm mb-4">{namaPeran}</h1>
-
-            <Separator className="my-4" />
-
-            <form action={formAction}>
-                <Button variant='destructive'>
-                    <BiLogOut />
-                    Keluar {pending && <Spinner />}
-                </Button>
-            </form>
         </div>
     )
 }

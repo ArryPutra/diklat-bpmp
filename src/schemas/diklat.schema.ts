@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-
 export const DiklatSchema = z
     .object({
         metodeDiklatId: z.coerce
@@ -36,6 +35,7 @@ export const DiklatSchema = z
         }),
 
         persyaratanPeserta: z.string().min(1, "Persyaratan wajib diisi"),
+        minimalKehadiranPersen: z.coerce.number().min(0, "Minimal Kehadiran harus antara 0-100").max(100, "Minimal Kehadiran harus antara 0-100"),
     })
     .superRefine((data, ctx) => {
 

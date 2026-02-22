@@ -146,9 +146,9 @@ model RegistrasiPicInstansi {
 }
 
 model Instansi {
-  id                   Int                @id @default(autoincrement())
-  registrasiInstansiId String             @unique
-  userId               String             @unique
+  id                   Int          @id @default(autoincrement())
+  registrasiInstansiId String       @unique
+  userId               String       @unique
   nomorTelepon         String
   desaKelurahan        String
   kecamatan            String
@@ -157,13 +157,13 @@ model Instansi {
   kecamatanKode        String
   kabupatenKotaKode    String
   alamat               String
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
   picInstansi          PicInstansi?
   peserta              Peserta[]
 
-  user                 User               @relation(fields: [userId], references: [id])
-  registrasiInstansi   RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id])
+  user               User               @relation(fields: [userId], references: [id])
+  registrasiInstansi RegistrasiInstansi @relation(fields: [registrasiInstansiId], references: [id])
 
   @@map("instansi")
 }
@@ -207,6 +207,7 @@ model Diklat {
   tanggalMulaiAcara       DateTime
   tanggalSelesaiAcara     DateTime
   persyaratanPeserta      String
+  minimalKehadiranPersen  Int 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -384,6 +385,7 @@ model MateriDiklat {
   tanggalPelaksanaan DateTime
   waktuMulai         String
   waktuSelesai       String
+  isSelesai          Boolean  @default(false)
 
   diklat     Diklat     @relation(fields: [diklatId], references: [id])
   narasumber Narasumber @relation(fields: [narasumberId], references: [id])

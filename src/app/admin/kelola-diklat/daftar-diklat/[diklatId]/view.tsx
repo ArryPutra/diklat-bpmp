@@ -16,7 +16,7 @@ export default function KelolaDiklatDetailView({
             <DetailDataPage
                 listData={[
                     {
-                        title: "Detail Diklat",
+                        title: "Informasi Umum",
                         content: [
                             { label: "Judul", value: diklat.judul },
                             { label: "Deskripsi", value: diklat.deskripsi },
@@ -30,6 +30,12 @@ export default function KelolaDiklatDetailView({
                             { label: "Tanggal Tutup Pendaftaran", value: formatDateId(diklat.tanggalTutupPendaftaran) },
                             { label: "Tanggal Mulai Acara", value: formatDateId(diklat.tanggalMulaiAcara) },
                             { label: "Tanggal Selesai Acara", value: formatDateId(diklat.tanggalSelesaiAcara) },
+                        ]
+                    },
+                    {
+                        title: "Syarat Kelulusan",
+                        content: [
+                            { label: "Minimal Kehadiran", value: `${diklat.minimalKehadiranPersen}%` },
                         ]
                     },
                     {

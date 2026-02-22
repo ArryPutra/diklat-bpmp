@@ -54,7 +54,7 @@ export async function getAllPesertaDiklatAction({
             },
             statusDaftarPesertaDiklat: true,
             statusPelaksanaanPesertaDiklat: true,
-            statusKelulusanPesertaDiklat: true
+            statusKelulusanPesertaDiklat: true,
         },
         orderBy: {
             createdAt: "desc",
@@ -233,11 +233,22 @@ export async function updateStatusDaftarPesertaDiklatAction(
     }
 
     try {
-        await prisma.pesertaDiklat.update({
+        const pesertaDiklat = await prisma.pesertaDiklat.update({
             where: {
                 id: pesertaDiklatId,
                 statusPelaksanaanPesertaDiklatId: null,
                 statusKelulusanPesertaDiklatId: null
+            },
+            select: {
+                peserta: {
+                    select: {
+                        user: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
             },
             data: {
                 statusDaftarPesertaDiklatId: statusDaftarPesertaDiklatId
@@ -250,10 +261,10 @@ export async function updateStatusDaftarPesertaDiklatAction(
 
         switch (statusDaftarPesertaDiklatId) {
             case 2:
-                message = "Peserta berhasil didaftarkan"
+                message = `Peserta ${pesertaDiklat.peserta.user.name} berhasil didaftarkan`
                 break;
             case 3:
-                message = "Peserta berhasil ditolak"
+                message = `Peserta ${pesertaDiklat.peserta.user.name} berhasil ditolak`
                 break;
         }
 

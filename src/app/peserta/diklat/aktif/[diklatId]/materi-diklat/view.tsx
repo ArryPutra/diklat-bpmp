@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { formatDateId } from '@/utils/dateFormatted'
+import { formatDateId, formatDateTimeId } from '@/utils/dateFormatted'
 import { getCurrentHourMinute } from '@/utils/getCurrentHourMinute'
 import Link from 'next/link'
 import { BiBlock, BiBookOpen, BiCalendar, BiLink, BiNetworkChart } from 'react-icons/bi'
@@ -21,7 +21,7 @@ export default function Peserta_DiklatMateriDiklat_View({
     <>
       <div className='flex gap-3 flex-wrap'>
         <Button size='sm'>Materi Diklat</Button>
-        <Link href={`/peserta/diklat/${diklatId}/hasil-akhir`}>
+        <Link href={`/peserta/diklat/aktif/${diklatId}/hasil-akhir`}>
           <Button size='sm' variant='outline'>Hasil Akhir</Button>
         </Link>
       </div>
@@ -66,7 +66,7 @@ export default function Peserta_DiklatMateriDiklat_View({
                         <h1>
                           {
                             materi.absensiPesertaDiklat[0] ?
-                            <span className='font-semibold'>{materi.absensiPesertaDiklat[0].statusAbsensiPesertaDiklat.nama}</span>
+                            <span><span className='font-semibold'>{materi.absensiPesertaDiklat[0].statusAbsensiPesertaDiklat.nama}</span> ({formatDateTimeId(materi.absensiPesertaDiklat[0].updatedAt)})</span>
                             :
                             <span className='font-semibold text-gray-400'>Belum Absen</span>
                           }

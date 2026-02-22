@@ -293,5 +293,4 @@ export async function deleteRegistrasiInstansiAction(id: string) {
 
         return { success: false }
     }
-
 }
