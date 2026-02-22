@@ -22,7 +22,7 @@ export default function Narasumber_Dashboard_View({
                     <AlertTitle>Informasi Materi Diklat Saya</AlertTitle>
                     <AlertDescription>Anda telah didaftarkan pada materi diklat</AlertDescription>
                     <div className="mt-2 ml-6">
-                        <Link href='/narasumber/materi-diklat/aktif'>
+                        <Link href='/narasumber/diklat/aktif'>
                             <Button variant="outline" size='sm'>Lihat Detail <BiRightArrowAlt /></Button>
                         </Link>
                     </div>

@@ -30,7 +30,19 @@ export default async function Narasumber_DiklatSaya_Page() {
           {
             waktuMulai: "asc"
           }
-        ]
+        ],
+        include: {
+          _count: {
+            select: {
+              absensiPesertaDiklat: true
+            }
+          }
+        }
+      },
+      _count: {
+        select: {
+          pesertaDiklat: true
+        }
       },
       metodeDiklat: true,
       statusPendaftaranDiklat: true,

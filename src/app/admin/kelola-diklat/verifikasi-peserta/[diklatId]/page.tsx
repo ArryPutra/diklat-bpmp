@@ -25,14 +25,14 @@ export default async function VerifikasiPesertaDiklatDetailPage({
 
     const diklat = await getDiklatAction(_params.diklatId)
     const daftarPesertaDiklat = await getAllPesertaDiklatAction({
-        page: _searchParams.page,
-        search: _searchParams.search,
-        diklatId: _params.diklatId,
-        extraWhere: {
-            peserta: {
-                instansiId: _searchParams.instansiId ? Number(_searchParams.instansiId) : undefined,
-            }
-        }
+        // page: _searchParams.page,
+        // search: _searchParams.search,
+        // diklatId: _params.diklatId,
+        // extraWhere: {
+        //     peserta: {
+        //         instansiId: _searchParams.instansiId ? Number(_searchParams.instansiId) : undefined,
+        //     }
+        // }
     })
 
     const daftarInstansiUnik = await prisma.peserta.findMany({

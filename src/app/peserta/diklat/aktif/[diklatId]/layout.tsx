@@ -57,8 +57,8 @@ export default async function Peserta_Diklat_Layout({
                     </div>
                     <div className='text-sm'>
                         <h1 className='flex gap-1 items-center text-gray-500 flex-wrap'><BiSolidGraduation /> Syarat Kelulusan:</h1>
-                        <h1 className="font-semibold">Kehadiran {diklat.minimalKehadiranPersen.toString()}% atau
-                            {Math.ceil(
+                        <h1 className="font-semibold">Kehadiran {diklat.minimalKehadiranPersen.toString()}%
+                            atau {Math.ceil(
                                 diklat.materiDiklat.length * (diklat.minimalKehadiranPersen / 100)
                             )} kehadiran
                         </h1>

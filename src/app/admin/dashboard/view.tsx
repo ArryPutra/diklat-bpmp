@@ -33,7 +33,7 @@ export default function Admin_Dashboard_View({
                     <BiCheckDouble />
                     <AlertTitle>Lakukan verifikasi peserta diklat</AlertTitle>
                     <AlertDescription className='mb-2'>Silahkan lakukan verifikasi peserta diklat segera, terdapat {totalVerifikasiPesertaDiklat} peserta diklat menunggu verifikasi.</AlertDescription>
-                    <Link className='ml-7' href="/admin/verifikasi-peserta-diklat">
+                    <Link className='ml-7' href="/admin/kelola-diklat/verifikasi-peserta">
                         <Button size='sm' className='ml-auto' variant='outline'>Verifikasi Sekarang <BiRightArrowAlt /></Button>
                     </Link>
                 </Alert>

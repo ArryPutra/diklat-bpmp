@@ -1,5 +1,5 @@
 import AuthLayout from '@/components/layouts/auth-layout'
-import { BiBookAdd, BiBookContent, BiBookOpen, BiHistory, BiHome } from 'react-icons/bi'
+import { BiBookContent, BiBookOpen, BiHistory, BiHome } from 'react-icons/bi'
 
 export default function NarasumberLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -14,17 +14,17 @@ export default function NarasumberLayout({ children }: { children: React.ReactNo
                     {
                         name: 'Materi Diklat',
                         icon: <BiBookOpen />,
-                        url: '/narasumber/materi-diklat',
+                        url: '/narasumber/diklat',
                         submenu: [
                             {
-                                icon: <BiBookContent/>,
+                                icon: <BiBookContent />,
                                 name: 'Materi Aktif',
-                                url: '/narasumber/materi-diklat/aktif'
+                                url: '/narasumber/diklat/aktif'
                             },
                             {
-                                icon: <BiHistory/>,
+                                icon: <BiHistory />,
                                 name: 'Riwayat Materi',
-                                url: '/narasumber/materi-diklat/riwayat'
+                                url: '/narasumber/diklat/riwayat'
                             }
                         ]
                     },

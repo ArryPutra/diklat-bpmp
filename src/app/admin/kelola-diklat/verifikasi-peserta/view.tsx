@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { BiDetail, BiUser } from "react-icons/bi";
 
-export default function VerifikasiPesertaDiklatView_Diklat({
+export default function Admin_VerifikasiPeserta_View({
     daftarDiklatStatusDibuka,
     totalDaftarDiklat
 }: {
@@ -65,7 +65,7 @@ export default function VerifikasiPesertaDiklatView_Diklat({
                                         <Button size='sm'
                                             onClick={() => {
                                                 startTransition(() => {
-                                                    router.push(`/admin/verifikasi-peserta-diklat/${diklat.id}`)
+                                                    router.push(`/admin/kelola-diklat/verifikasi-peserta/${diklat.id}`)
                                                 })
                                             }}>
                                             <BiUser /> Peserta

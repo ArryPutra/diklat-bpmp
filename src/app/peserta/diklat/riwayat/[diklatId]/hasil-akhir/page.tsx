@@ -1,17 +1,16 @@
 "use server"
 
-import { getCurrentPeserta } from '@/actions/peserta-action'
-import PesertaDiklatHasilAkhir from '@/app/peserta/diklat/components/peserta-diklat-hasil-akhir'
-import prisma from '@/lib/prisma'
+import { getCurrentPeserta } from "@/actions/peserta-action"
+import PesertaDiklatHasilAkhir from "@/app/peserta/diklat/components/peserta-diklat-hasil-akhir"
+import prisma from "@/lib/prisma"
 
-export default async function Peserta_DiklatHasilAkhir_Page({
+export default async function Peserta_DiklatRiwayatHasilAkhir_Page({
     params
 }: {
     params: Promise<{
         diklatId: string
     }>
 }) {
-
     const _params = await params
 
     const currentPeserta = await getCurrentPeserta()
@@ -81,6 +80,7 @@ export default async function Peserta_DiklatHasilAkhir_Page({
     return (
         <PesertaDiklatHasilAkhir
             diklatId={_params.diklatId}
+            routeSegment="riwayat"
             dataRekap={dataRekap}
             dataHasilAkhir={{
                 apakahDiklatSudahSelesai: apakahDiklatSudahSelesai,
@@ -89,3 +89,4 @@ export default async function Peserta_DiklatHasilAkhir_Page({
             }} />
     )
 }
+

@@ -1,17 +1,16 @@
 "use server"
 
-import { getCurrentPeserta } from '@/actions/peserta-action'
-import PesertaDiklatMateriDiklat from '@/app/peserta/diklat/components/peserta-diklat-materi'
-import prisma from '@/lib/prisma'
+import { getCurrentPeserta } from "@/actions/peserta-action"
+import PesertaDiklatMateriDiklat from "@/app/peserta/diklat/components/peserta-diklat-materi"
+import prisma from "@/lib/prisma"
 
-export default async function Peserta_DiklatMateriDiklat_Page({
+export default async function Peserta_DiklatRiwayatMateriDiklat_Page({
     params
 }: {
     params: Promise<{
         diklatId: string
     }>
 }) {
-
     const _params = await params
 
     const currentPeserta = await getCurrentPeserta()
@@ -38,10 +37,10 @@ export default async function Peserta_DiklatMateriDiklat_Page({
                 },
                 orderBy: [
                     {
-                        tanggalPelaksanaan: 'asc',
+                        tanggalPelaksanaan: "asc",
                     },
                     {
-                        waktuMulai: 'asc',
+                        waktuMulai: "asc",
                     }
                 ]
             },
@@ -49,11 +48,10 @@ export default async function Peserta_DiklatMateriDiklat_Page({
         }
     })
 
-    console.log(diklat.materiDiklat[0])
-
     return (
         <PesertaDiklatMateriDiklat
             diklatId={_params.diklatId}
+            routeSegment="riwayat"
             daftarMateriDiklat={diklat.materiDiklat} />
     )
 }

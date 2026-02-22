@@ -207,7 +207,7 @@ model Diklat {
   tanggalMulaiAcara       DateTime
   tanggalSelesaiAcara     DateTime
   persyaratanPeserta      String
-  minimalKehadiranPersen  Int 
+  minimalKehadiranPersen  Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -299,8 +299,8 @@ model PesertaDiklat {
   diklatId                         String
   pesertaId                        Int
   statusDaftarPesertaDiklatId      Int    @default(1)
-  statusPelaksanaanPesertaDiklatId Int?
-  statusKelulusanPesertaDiklatId   Int?
+  statusPelaksanaanPesertaDiklatId Int    @default(1)
+  statusKelulusanPesertaDiklatId   Int    @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -311,6 +311,7 @@ model PesertaDiklat {
   statusPelaksanaanPesertaDiklat StatusPelaksanaanPesertaDiklat? @relation(fields: [statusPelaksanaanPesertaDiklatId], references: [id])
   statusKelulusanPesertaDiklat   StatusKelulusanPesertaDiklat?   @relation(fields: [statusKelulusanPesertaDiklatId], references: [id])
   absensiPesertaDiklat           AbsensiPesertaDiklat[]
+  kelulusanPesertaDiklat         KelulusanPesertaDiklat[]
 
   @@unique([diklatId, pesertaId])
   @@map("peserta_diklat")
@@ -390,8 +391,9 @@ model MateriDiklat {
   diklat     Diklat     @relation(fields: [diklatId], references: [id])
   narasumber Narasumber @relation(fields: [narasumberId], references: [id])
 
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   absensiPesertaDiklat AbsensiPesertaDiklat[]
 
   @@map("materi_diklat")
@@ -423,7 +425,22 @@ model StatusAbsensiPesertaDiklat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  AbsensiPesertaDiklat AbsensiPesertaDiklat[]
+  absensiPesertaDiklat AbsensiPesertaDiklat[]
 
   @@map("status_absensi_peserta_diklat")
+}
+
+model KelulusanPesertaDiklat {
+  id Int @id @default(autoincrement())
+
+  pesertaDiklatId Int @unique
+
+  kodeSertifikasi String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pesertaDiklat PesertaDiklat @relation(fields: [pesertaDiklatId], references: [id])
+
+  @@map("kelulusan_peserta_diklat")
 }

@@ -1,9 +1,9 @@
 "use server"
 
 import { getAllDiklatAction } from "@/actions/diklat-action"
-import VerifikasiPesertaDiklatView_Diklat from "./view"
+import Admin_VerifikasiPeserta_View from "./view"
 
-export default async function VerifikasiPesertaDiklatPage({
+export default async function Admin_VerifikasiPeserta_Page({
     searchParams
 }: {
     searchParams: Promise<{
@@ -21,7 +21,7 @@ export default async function VerifikasiPesertaDiklatPage({
     })
 
     return (
-        <VerifikasiPesertaDiklatView_Diklat
+        <Admin_VerifikasiPeserta_View
             daftarDiklatStatusDibuka={daftarDiklatStatusDibuka.data}
             totalDaftarDiklat={daftarDiklatStatusDibuka.total} />
     )

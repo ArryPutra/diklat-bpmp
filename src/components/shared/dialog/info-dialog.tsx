@@ -1,5 +1,6 @@
 "use client"
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { BiInfoCircle } from 'react-icons/bi'
@@ -7,7 +8,16 @@ import { BiInfoCircle } from 'react-icons/bi'
 type InfoDialogProps = {
     title: string
     description: string
-    sections: { title: string, fields: { label: string, value: string, isLink?: boolean }[] }[]
+    sections: {
+        title: string,
+        fields: {
+            label: string,
+            value: string,
+            isLink?: boolean,
+            isBadge?: boolean,
+            badgeVariant?: "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"
+        }[]
+    }[]
 }
 
 export default function InfoDialog({ title, description, sections }: InfoDialogProps) {
@@ -38,6 +48,8 @@ export default function InfoDialog({ title, description, sections }: InfoDialogP
                                             <a href={field.value} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline">
                                                 {field.value || '-'}
                                             </a>
+                                        ) : field.isBadge ? (
+                                            <Badge variant={field.badgeVariant ?? "default"}>{field.value || '-'}</Badge>
                                         ) : (
                                             <p className='font-medium'>{field.value || '-'}</p>
                                         )}

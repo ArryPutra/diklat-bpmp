@@ -10,7 +10,7 @@ import { useRouter } from "@bprogress/next/app";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { BiBuilding, BiChevronDown, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
+import { BiAward, BiBuilding, BiCheckCircle, BiChevronDown, BiFileBlank, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
 
 export default function View({
     daftarDiklat,
@@ -38,6 +38,7 @@ export default function View({
             <Statistik dataStatistik={dataStatistik} />
             <Diklat
                 daftarDiklat={daftarDiklat} />
+            <Bantuan />
             <Faq />
 
             <Footer />
@@ -251,6 +252,58 @@ function Diklat({
                         Lihat Lainnya <BiRightArrowAlt />
                     </Button>
                 </Link>
+            </div>
+        </GuestLayout>
+    )
+}
+
+function Bantuan() {
+    const bantuanList = [
+        {
+            icon: <BiFileBlank size={32} />,
+            title: "Daftarkan Instansi",
+            description: "Daftarkan instansi Anda dan mulai proses pendaftaran peserta untuk mengikuti diklat.",
+            link: "/registrasi-instansi",
+            buttonLabel: "Daftar"
+        },
+        {
+            icon: <BiAward size={32} />,
+            title: "Cek Sertifikasi",
+            description: "Lihat dan unduh sertifikat diklat Anda setelah berhasil menyelesaikan program pelatihan.",
+            link: "/cek-sertifikasi",
+            buttonLabel: "Lihat Sertifikat"
+        },
+        {
+            icon: <BiCheckCircle size={32} />,
+            title: "Cek Status Pendaftaran",
+            description: "Periksa status pendaftaran instansi Anda secara real-time dan lihat detail verifikasi admin.",
+            link: "/registrasi-instansi/cek-status",
+            buttonLabel: "Cek Status"
+        }
+    ];
+
+    return (
+        <GuestLayout parentClassName="bg-white">
+            <div className="text-center mb-12">
+                <h1 className="font-bold text-3xl">Pusat Bantuan</h1>
+                <p className="mt-2 text-slate-600">Akses cepat ke fitur penting sistem diklat kami</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1">
+                {
+                    bantuanList.map((item, index) => (
+                        <div key={index} className="group rounded-2xl border border-slate-200 bg-slate-50 p-8 hover:border-primary/40 hover:bg-primary/5 transition duration-300">
+                            <div className="mb-4 text-primary">{item.icon}</div>
+                            <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                            <p className="text-sm text-slate-600 mb-6">{item.description}</p>
+                            <Link href={item.link}>
+                                <Button size='sm' variant='outline' className="w-full">
+                                    {item.buttonLabel} <BiRightArrowAlt />
+                                </Button>
+                            </Link>
+                        </div>
+                    ))
+                }
             </div>
         </GuestLayout>
     )

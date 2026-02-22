@@ -88,7 +88,7 @@ export async function upsertManyAbsensiPesertaDiklatAction({
             )
         )
 
-        revalidatePath(`/narasumber/materi-diklat/aktif/${materiDiklatId}`)
+        revalidatePath(`/narasumber/diklat/aktif/${materiDiklatId}`)
 
         return {
             success: true,

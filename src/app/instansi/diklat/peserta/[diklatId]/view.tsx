@@ -105,6 +105,9 @@ export default function Instansi_DiklatPesertaDetail_View({
                                         {dataPeserta?.statusKelulusanPesertaDiklat?.nama || '-'}
                                     </TableCell>
                                     <TableCell className="space-x-3">
+                                        {/* <DialogMengundurkanDiri
+                                            pesertaDiklatId={dataPeserta.id}
+                                            peserta={dataPeserta.peserta} /> */}
                                         {
                                             dataPeserta.statusDaftarPesertaDiklat.id === 2 &&
                                             <DialogMengundurkanDiri

@@ -2,20 +2,28 @@
 
 import GetStatusMateriDiklatBadge from '@/components/shared/get-status-materi-diklat-badge'
 import LoadingScreen from '@/components/shared/loading-screen'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { formatDateId } from '@/utils/dateFormatted'
+import { getStatusMateriDiklat } from '@/utils/getStatusMateriDiklat'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { BiCalendar, BiRightArrowAlt, BiTime } from 'react-icons/bi'
 
 export default function MateriDiklatNarasumberCard({
     materi,
+    totalPeserta
 }: {
     materi: any
+    totalPeserta?: number
 }) {
 
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
+
+    const isMateriSelesaiAndBelumAbsensi = totalPeserta !== undefined &&
+        (getStatusMateriDiklat(materi) === "sudah-selesai") &&
+        (totalPeserta > materi._count.absensiPesertaDiklat)
 
     return (
         <>
@@ -46,12 +54,20 @@ export default function MateriDiklatNarasumberCard({
                 <Button size='sm' variant='outline'
                     onClick={() => {
                         startTransition(() => {
-                            router.push(`/narasumber/materi-diklat/aktif/${materi.id}`)
+                            router.push(`/narasumber/diklat/aktif/${materi.id}`)
                         })
                     }}>
                     Detail Materi <BiRightArrowAlt />
                 </Button>
-            </div >
+
+                {
+                    isMateriSelesaiAndBelumAbsensi &&
+                    <Alert variant='danger' className='mt-4'>
+                        <AlertTitle>Lakukan Absensi</AlertTitle>
+                        <AlertDescription>Sesi materi sudah selesai, silahkan lakukan absensi pada semua peserta.</AlertDescription>
+                    </Alert>
+                }
+            </div>
         </>
     )
 }

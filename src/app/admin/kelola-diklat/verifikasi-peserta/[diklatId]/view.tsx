@@ -45,7 +45,7 @@ export default function VerifikasiPesertaDiklatView_PesertaDiklat({
 
     return (
         <ContentCanvas>
-            <BackButton url="/admin/verifikasi-peserta-diklat" />
+            <BackButton url="/admin/kelola-diklat/verifikasi-peserta" />
 
             <div className='flex justify-between flex-wrap gap-3'>
                 <div>

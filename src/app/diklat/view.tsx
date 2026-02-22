@@ -49,10 +49,13 @@ export default function CariDiklatView({
                     }
                 </div>
 
-                <PaginationWithLinks
-                    page={currentPage}
-                    pageSize={10}
-                    totalCount={totalDaftarDiklat} />
+                {
+                    totalDaftarDiklat > 0 &&
+                    <PaginationWithLinks
+                        page={currentPage}
+                        pageSize={10}
+                        totalCount={totalDaftarDiklat} />
+                }
             </GuestLayout>
 
             <Footer />

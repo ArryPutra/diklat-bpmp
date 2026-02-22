@@ -28,8 +28,6 @@ export default async function Peserta_DiklatAktif_Page() {
         })
         : []
 
-        console.log(daftarDiklatAktifDiikuti)
-
     return (
         <Peserta_DiklatAktif_View
             daftarDiklatAktifDiikuti={daftarDiklatAktifDiikuti} />

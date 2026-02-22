@@ -222,9 +222,13 @@ export async function updateStatusDaftarPesertaDiklatAction(
             }
         }
 
-        // instansi tidak boleh mengubah status menjadi angka 1 atau 3 (menunggu pesertujuan / ditolak)
         const allowedStatus = [2, 4]
-        if (!allowedStatus.includes(statusDaftarPesertaDiklatId)) {
+        if (
+            // instansi tidak boleh mengubah status menjadi angka 1 atau 3 (menunggu pesertujuan / ditolak)
+            !allowedStatus.includes(statusDaftarPesertaDiklatId) ||
+            // jika status peserta  masih menunggu persetujuan (1) maka tidak boleh diubah oleh instansi
+            pesertaDiklat.statusDaftarPesertaDiklatId === 1
+        ) {
             return {
                 success: false,
                 message: "Status tidak valid"
@@ -236,8 +240,6 @@ export async function updateStatusDaftarPesertaDiklatAction(
         const pesertaDiklat = await prisma.pesertaDiklat.update({
             where: {
                 id: pesertaDiklatId,
-                statusPelaksanaanPesertaDiklatId: null,
-                statusKelulusanPesertaDiklatId: null
             },
             select: {
                 peserta: {
@@ -315,6 +317,182 @@ export async function updateManyStatusDaftarPesertaDiklatAction(
             success: false,
             message: "Terjadi kesalahan saat mendaftar peserta"
         };
+    }
+}
+
+export async function publishKelulusanPesertaDiklatAction(
+    prevState: any,
+    formData: FormData
+) {
+    const diklatId = formData.get("diklatId") as string
+    const currentPath = formData.get("currentPath") as string
+    const daftarKelulusanPesertaRaw = formData.get("daftarKelulusanPeserta") as string
+
+    if (!diklatId || !daftarKelulusanPesertaRaw) {
+        return {
+            success: false,
+            message: "Data kelulusan peserta tidak valid"
+        }
+    }
+
+    let daftarKelulusanPeserta: { pesertaDiklatId: number, statusKelulusanPesertaDiklatId: 2 | 3 }[] = []
+
+    try {
+        const parsedDaftarKelulusanPeserta = JSON.parse(daftarKelulusanPesertaRaw)
+
+        if (!Array.isArray(parsedDaftarKelulusanPeserta) || parsedDaftarKelulusanPeserta.length === 0) {
+            return {
+                success: false,
+                message: "Daftar kelulusan peserta tidak valid"
+            }
+        }
+
+        const dataKelulusanUnik = new Map<number, 2 | 3>()
+
+        for (const item of parsedDaftarKelulusanPeserta) {
+            const pesertaDiklatId = Number(item?.pesertaDiklatId)
+            const statusKelulusanPesertaDiklatId = Number(item?.statusKelulusanPesertaDiklatId)
+
+            if (
+                Number.isNaN(pesertaDiklatId) ||
+                (statusKelulusanPesertaDiklatId !== 2 && statusKelulusanPesertaDiklatId !== 3)
+            ) {
+                return {
+                    success: false,
+                    message: "Format data kelulusan peserta tidak valid"
+                }
+            }
+
+            dataKelulusanUnik.set(pesertaDiklatId, statusKelulusanPesertaDiklatId as 2 | 3)
+        }
+
+        daftarKelulusanPeserta = Array.from(dataKelulusanUnik.entries()).map(([pesertaDiklatId, statusKelulusanPesertaDiklatId]) => ({
+            pesertaDiklatId,
+            statusKelulusanPesertaDiklatId
+        }))
+    } catch (error) {
+        console.error(error)
+
+        return {
+            success: false,
+            message: "Gagal membaca data kelulusan peserta"
+        }
+    }
+
+    const daftarPesertaDiterima = await prisma.pesertaDiklat.findMany({
+        where: {
+            diklatId,
+            statusDaftarPesertaDiklatId: 2
+        },
+        select: {
+            id: true
+        }
+    })
+
+    if (daftarPesertaDiterima.length === 0) {
+        return {
+            success: false,
+            message: "Belum ada peserta diterima pada diklat ini"
+        }
+    }
+
+    if (daftarKelulusanPeserta.length !== daftarPesertaDiterima.length) {
+        return {
+            success: false,
+            message: "Silakan tentukan kelulusan untuk semua peserta"
+        }
+    }
+
+    const daftarPesertaDiterimaId = new Set(daftarPesertaDiterima.map((pesertaDiklat) => pesertaDiklat.id))
+    const isSemuaPesertaValid = daftarKelulusanPeserta.every((item) => daftarPesertaDiterimaId.has(item.pesertaDiklatId))
+
+    if (!isSemuaPesertaValid) {
+        return {
+            success: false,
+            message: "Data kelulusan peserta tidak sesuai dengan peserta diklat"
+        }
+    }
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            const statusPelaksanaanSelesai = await tx.statusPelaksanaanAcaraDiklat.findUnique({
+                where: {
+                    nama: "Selesai"
+                },
+                select: {
+                    id: true
+                }
+            })
+
+            if (!statusPelaksanaanSelesai) {
+                throw new Error("Status pelaksanaan 'Selesai' tidak ditemukan")
+            }
+
+            await Promise.all(
+                daftarKelulusanPeserta.map((item) =>
+                    tx.pesertaDiklat.update({
+                        where: {
+                            id: item.pesertaDiklatId
+                        },
+                        data: {
+                            statusKelulusanPesertaDiklatId: item.statusKelulusanPesertaDiklatId
+                        }
+                    })
+                )
+            )
+
+            const daftarPesertaLulusId = daftarKelulusanPeserta
+                .filter((item) => item.statusKelulusanPesertaDiklatId === 2)
+                .map((item) => item.pesertaDiklatId)
+
+            const daftarPesertaTidakLulusId = daftarKelulusanPeserta
+                .filter((item) => item.statusKelulusanPesertaDiklatId !== 2)
+                .map((item) => item.pesertaDiklatId)
+
+            if (daftarPesertaTidakLulusId.length > 0) {
+                await tx.kelulusanPesertaDiklat.deleteMany({
+                    where: {
+                        pesertaDiklatId: {
+                            in: daftarPesertaTidakLulusId
+                        }
+                    }
+                })
+            }
+
+            if (daftarPesertaLulusId.length > 0) {
+                await tx.kelulusanPesertaDiklat.createMany({
+                    data: daftarPesertaLulusId.map((pesertaDiklatId) => ({
+                        pesertaDiklatId,
+                        kodeSertifikasi: `SERT-${diklatId.slice(-6).toUpperCase()}-${pesertaDiklatId}`
+                    })),
+                    skipDuplicates: true
+                })
+            }
+
+            await tx.diklat.update({
+                where: {
+                    id: diklatId
+                },
+                data: {
+                    statusPelaksanaanAcaraDiklatId: statusPelaksanaanSelesai.id
+                }
+            })
+        })
+
+        revalidatePath(currentPath)
+        revalidatePath("/admin/kelola-diklat/verif-kelulusan")
+
+        return {
+            success: true,
+            message: `Kelulusan ${daftarKelulusanPeserta.length} peserta berhasil diterbitkan dan status pelaksanaan diklat menjadi Selesai`
+        }
+    } catch (error) {
+        console.error(error)
+
+        return {
+            success: false,
+            message: "Terjadi kesalahan saat menerbitkan kelulusan peserta"
+        }
     }
 }
 

@@ -17,12 +17,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         url: '/admin/kelola-diklat',
                         submenu: [
                             { name: "Daftar Diklat", icon: <BiTable />, url: "/admin/kelola-diklat/daftar-diklat" },
+                            { name: "Verif Peserta", icon: <BiUser />, url: "/admin/kelola-diklat/verifikasi-peserta" },
+                            { name: "Verif Kelulusan", icon: <BiCheckDouble />, url: "/admin/kelola-diklat/verif-kelulusan" },
                         ]
-                    },
-                    {
-                        name: 'Verifikasi Peserta',
-                        icon: <BiUser />,
-                        url: '/admin/verifikasi-peserta-diklat'
                     },
                     {
                         name: 'Kelola Instansi',
