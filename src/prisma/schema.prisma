@@ -217,6 +217,7 @@ model Diklat {
   statusPelaksanaanAcaraDiklat StatusPelaksanaanAcaraDiklat? @relation(fields: [statusPelaksanaanAcaraDiklatId], references: [id])
   pesertaDiklat                PesertaDiklat[]
   materiDiklat                 MateriDiklat[]
+  sertifikatDiklat             SertifikatDiklat?
 
   @@map("diklat")
 }
@@ -443,4 +444,18 @@ model KelulusanPesertaDiklat {
   pesertaDiklat PesertaDiklat @relation(fields: [pesertaDiklatId], references: [id])
 
   @@map("kelulusan_peserta_diklat")
+}
+
+model SertifikatDiklat {
+  id Int @id @default(autoincrement())
+
+  diklatId           String @unique
+  templateSertifikat String
+
+  diklat Diklat @relation(fields: [diklatId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sertifikat_diklat")
 }

@@ -1,7 +1,11 @@
+"use client"
+
+import { downloadSertifikatAction } from "@/actions/sertifikasi-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { useState, useTransition } from "react";
 import { BiBookOpen, BiCheckDouble, BiSolidGraduation } from "react-icons/bi";
 
 export default function PesertaDiklatHasilAkhir({
@@ -23,6 +27,36 @@ export default function PesertaDiklatHasilAkhir({
         kodeSertifikasi: string | null
     }
 }) {
+    const [isPending, startTransition] = useTransition()
+    const [downloadError, setDownloadError] = useState<string | null>(null)
+
+    const handleDownloadSertifikat = (kodeSertifikasi: string) => {
+        setDownloadError(null)
+
+        startTransition(async () => {
+            const result = await downloadSertifikatAction(kodeSertifikasi)
+
+            if (!result.success) {
+                setDownloadError(result.message)
+                return
+            }
+
+            const binaryString = atob(result.data.base64Pdf)
+            const bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0))
+            const blob = new Blob([bytes], { type: "application/pdf" })
+            const downloadUrl = URL.createObjectURL(blob)
+
+            const anchor = document.createElement("a")
+            anchor.href = downloadUrl
+            anchor.download = result.data.fileName
+            document.body.appendChild(anchor)
+            anchor.click()
+            anchor.remove()
+
+            URL.revokeObjectURL(downloadUrl)
+        })
+    }
+
     return (
         <>
             <div className='flex gap-3 flex-wrap'>
@@ -72,6 +106,13 @@ export default function PesertaDiklatHasilAkhir({
 
                 <CardFooter>
                     {
+                        downloadError &&
+                        <Alert variant='danger'>
+                            <AlertTitle>Gagal Mengunduh Sertifikat</AlertTitle>
+                            <AlertDescription>{downloadError}</AlertDescription>
+                        </Alert>
+                    }
+                    {
                         // jika diklat belum selesai
                         !dataHasilAkhir.apakahDiklatSudahSelesai &&
                         <Alert>
@@ -82,12 +123,12 @@ export default function PesertaDiklatHasilAkhir({
                     {
                         // jika diklat sudah selesai dan peserta lullus
                         (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
-                        <Link href={`/api/sertifikat/${dataHasilAkhir.kodeSertifikasi}`}>
-                            <Button>
-                                <BiCheckDouble />
-                                Unduh Sertifikasi
-                            </Button>
-                        </Link>
+                        <Button
+                            disabled={isPending}
+                            onClick={() => handleDownloadSertifikat(dataHasilAkhir.kodeSertifikasi)}>
+                            <BiCheckDouble />
+                            {isPending ? "Mengunduh..." : "Unduh Sertifikasi"}
+                        </Button>
                     }
                     {
                         // jika diklat sudah selesai, lulus, tetapi sertifikasi belum tersedia

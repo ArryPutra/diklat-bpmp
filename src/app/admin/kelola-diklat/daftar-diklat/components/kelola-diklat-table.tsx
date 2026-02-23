@@ -12,7 +12,8 @@ import { formatDateId } from "@/utils/dateFormatted";
 import { getRowNumber } from "@/utils/getRowNumber";
 import Link from "next/link";
 import { useActionState } from "react";
-import { BiBookOpen, BiEdit, BiInfoCircle, BiTrash } from "react-icons/bi";
+import { BiAward, BiBookOpen, BiCertification, BiEdit, BiInfoCircle, BiShield, BiShieldAlt, BiSolidCertification, BiTrash } from "react-icons/bi";
+import { FaCertificate } from "react-icons/fa";
 
 export default function KelolaDiklatTable({
     daftarDiklat,
@@ -93,6 +94,10 @@ export default function KelolaDiklatTable({
                                     {/* Edit Aksi */}
                                     <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/edit`}>
                                         <Button size='icon-sm'><BiEdit /></Button>
+                                    </Link>
+                                    {/* Sertifikasi */}
+                                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/sertifikat`}>
+                                        <Button size='icon-sm' className="bg-purple-500 hover:bg-purple-500/90"><BiAward /></Button>
                                     </Link>
                                     {/* Aksi hapus */}
                                     <ActionDialog
