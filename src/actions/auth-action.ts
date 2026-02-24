@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { LoginSchema } from "@/schemas/auth.schema";
 import ResetPasswordSchema from "@/schemas/reset-password.schema";
@@ -39,7 +40,7 @@ export async function loginAction(prev: any, formData: FormData) {
             },
         });
     } catch (error: any) {
-        console.log(error);
+        logger.error("Login gagal", "auth-action", error);
 
         let message: string = "Email atau password salah"
 
@@ -153,7 +154,7 @@ export async function resetPasswordAction(prevState: any, formData: FormData) {
             message: "Password berhasil diubah"
         }
     } catch (error: any) {
-        console.error(error)
+        logger.error("Gagal ubah password", "auth-action", error)
 
         return {
             success: false,

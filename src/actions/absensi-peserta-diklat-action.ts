@@ -1,5 +1,6 @@
 "use server"
 
+import logger from "@/lib/logger"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { getCurrentNarasumber } from "./narasumber-action"
@@ -107,7 +108,7 @@ export async function upsertManyAbsensiPesertaDiklatAction({
             message: "Absensi peserta berhasil disimpan"
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal simpan absensi peserta", "absensi-peserta-diklat-action", error)
 
         return {
             success: false,

@@ -49,8 +49,6 @@ export default async function Peserta_DiklatMateriDiklat_Page({
         }
     })
 
-    console.log(diklat.materiDiklat[0])
-
     return (
         <PesertaDiklatMateriDiklat
             diklatId={_params.diklatId}

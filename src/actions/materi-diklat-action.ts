@@ -1,6 +1,7 @@
 "use server"
 
 import { Prisma } from "@/generated/prisma/client"
+import logger from "@/lib/logger"
 import prisma from "@/lib/prisma"
 import { CreateMateriDiklatSchema, UpdateMateriDiklatSchema } from "@/schemas/materi-diklat.schema"
 import { revalidatePath } from "next/cache"
@@ -104,7 +105,7 @@ export async function createMateriDiklatAction(
             }
         })
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal buat materi diklat", "materi-diklat-action", error)
 
         return {
             success: false,
@@ -188,7 +189,7 @@ export async function updateMateriDiklatAction(
             }
         })
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal update materi diklat", "materi-diklat-action", error)
 
         return {
             success: false,
@@ -223,7 +224,7 @@ export async function deleteMateriDiklatAction(
             }
         })
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal hapus materi diklat", "materi-diklat-action", error)
         return {
             success: false,
             message: "Terjadi kesalahan saat menghapus materi diklat."

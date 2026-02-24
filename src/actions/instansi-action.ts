@@ -2,6 +2,7 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { UpdateInstansiSchema } from "@/schemas/instansi.schema";
 import { cookies, headers } from "next/headers";
@@ -104,7 +105,7 @@ export async function updateInstansiAction(
             headers: await headers()
         })
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal update instansi", "instansi-action", error)
 
         return {
             success: false,

@@ -1,6 +1,7 @@
 "use server"
 
 import { Prisma } from "@/generated/prisma/client"
+import logger from "@/lib/logger"
 import prisma from "@/lib/prisma"
 import { DiklatSchema } from "@/schemas/diklat.schema"
 import { revalidatePath } from "next/cache"
@@ -179,7 +180,7 @@ export async function createDiklatAction(
             }
         })
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal buat diklat", "diklat-action", error)
 
         return {
             success: false
@@ -279,7 +280,7 @@ export async function updateDiklatAction(
             }
         })
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal update diklat", "diklat-action", error)
 
         return {
             success: false
@@ -309,7 +310,7 @@ export async function deleteDiklatAction(
             }
         })
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal hapus diklat", "diklat-action", error)
 
         return {
             success: false

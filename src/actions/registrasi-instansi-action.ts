@@ -2,6 +2,7 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import RegistrasiInstansi from "@/models/RegistrasiInstansi";
 import { CreateRegistrasiInstansiSchema, GetRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
@@ -107,7 +108,7 @@ export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
 
         return { success: true, data: data };
     } catch (error) {
-        console.error("Error fetching registration status:", error);
+        logger.error("Gagal fetch status registrasi instansi", "registrasi-instansi-action", error)
         return { success: false, message: "Terjadi kesalahan pada server" };
     }
 }
@@ -160,7 +161,7 @@ export async function createRegistrasiInstansiAction(instansi: RegistrasiInstans
             data: data
         }
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal buat registrasi instansi", "registrasi-instansi-action", error)
 
         return {
             success: false,
@@ -250,7 +251,7 @@ export async function updateStatusRegistrasiInstansiAction(
                     }
                 })
             } catch (error) {
-                console.log(error)
+                logger.error("Gagal buat data instansi setelah approve", "registrasi-instansi-action", error)
 
                 // Hapus akun instansi (karena data instansi gagal dibuat)
                 await auth.api.deleteUser({ body: { password: updateRegistrasiInstansi.password } })
@@ -275,7 +276,7 @@ export async function updateStatusRegistrasiInstansiAction(
             message: message,
         }
     } catch (error) {
-        console.log(error);
+        logger.error("Gagal update status registrasi instansi", "registrasi-instansi-action", error)
 
         return {
             success: false
@@ -289,7 +290,7 @@ export async function deleteRegistrasiInstansiAction(id: string) {
 
         return { success: true }
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal hapus registrasi instansi", "registrasi-instansi-action", error)
 
         return { success: false }
     }

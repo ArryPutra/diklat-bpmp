@@ -2,6 +2,7 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { CreatePesertaSchema, UpdatePesertaSchema } from "@/schemas/peserta.schema";
 import { revalidatePath } from "next/cache";
@@ -153,7 +154,7 @@ export async function createPesertaAction(
         })
 
     } catch (error: any) {
-        console.error(error)
+        logger.error("Gagal buat peserta", "peserta-action", error)
 
         // =========================
         // HANDLE UNIQUE DB ERROR
@@ -337,7 +338,7 @@ export async function updatePesertaAction(
         })
 
     } catch (error: any) {
-        console.error(error)
+        logger.error("Gagal update peserta", "peserta-action", error)
 
         // =========================
         // HANDLE UNIQUE DB ERROR
@@ -454,7 +455,7 @@ export async function updateStatusBannedPesertaAction(
             message: `Pengguna ${userPesertaUpdate.name} berhasil ${banned === "true" ? "nonaktifkan" : "aktifkan"}`
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal toggle ban peserta", "peserta-action", error)
 
         return { success: false, message: "Terjadi kesalahan" }
     }

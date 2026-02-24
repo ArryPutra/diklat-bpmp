@@ -1,5 +1,6 @@
 "use server"
 
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import RegistrasiPicInstansi from "@/models/RegistrasiPicInstansi";
 import { RegistrasiPicInstansiSchema } from "@/schemas/registrasi-pic-instansi.schema";
@@ -31,7 +32,7 @@ export async function createRegistrasiPicInstansi(
 
         return { success: true, data: data }
     } catch (error) {
-        console.log(error)
+        logger.error("Gagal buat PIC instansi", "registrasi-pic-instansi-action", error)
 
         return { success: false }
     }

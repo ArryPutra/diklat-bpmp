@@ -1,5 +1,6 @@
 "use server";
 
+import logger from "@/lib/logger";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -21,9 +22,9 @@ export async function sendEmailAction({
             html: html,
         });
 
-        console.info(result)
+        logger.info("Email terkirim", "send-email-action", { to: toEmail, subject })
     } catch (err) {
-        console.error("Gagal mengirim email:", err);
+        logger.error("Gagal mengirim email", "send-email-action", err, { toEmail, subject })
         throw new Error("Email gagal dikirim");
     }
 }

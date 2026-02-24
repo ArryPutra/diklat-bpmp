@@ -1,5 +1,6 @@
 "use server"
 
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./auth-action";
@@ -22,7 +23,7 @@ export async function updateStatusBannedAction(prevState: any, formData: FormDat
 
             return { success: true, message: `Pengguna ${userInstansiUpdate.name} berhasil ${banned === "true" ? "nonaktifkan" : "aktifkan"}` }
         } catch (error) {
-            console.log(error)
+            logger.error("Gagal update status banned user", "user-action", error, { userId })
 
             return { success: false, message: "Terjadi kesalahan" }
         }

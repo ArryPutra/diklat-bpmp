@@ -1,5 +1,6 @@
 "use server"
 
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
 
@@ -60,7 +61,7 @@ export async function getSertifikasiAction(_prev: any, formData: FormData) {
             data: data
         };
     } catch (error) {
-        console.error("Error fetching sertifikasi:", error);
+        logger.error("Gagal fetch sertifikasi", "sertifikasi-action", error)
         return {
             success: false,
             message: "Terjadi kesalahan pada server"

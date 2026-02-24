@@ -2,6 +2,7 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { CreateNarasumberSchema, UpdateNarasumberSchema } from "@/schemas/narasumber.schema";
 import { cookies, headers } from "next/headers";
@@ -114,7 +115,7 @@ export async function createNarasumberAction(prevState: any, formData: FormData)
         })
 
     } catch (error) {
-        console.error(error);
+        logger.error("Gagal buat narasumber", "narasumber-action", error);
 
         if (user) {
             await auth.api.removeUser({
@@ -204,7 +205,7 @@ export async function updateNarasumberAction(
         });
 
     } catch (error) {
-        console.error(error);
+        logger.error("Gagal update narasumber", "narasumber-action", error);
 
         let errorMessage = "Terjadi kesalahan saat memperbarui narasumber."
 

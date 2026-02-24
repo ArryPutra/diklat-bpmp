@@ -1,6 +1,7 @@
 "use server"
 
 import { Prisma } from "@/generated/prisma/client";
+import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentInstansi } from "./instansi-action";
@@ -168,7 +169,7 @@ export async function createPendaftarPesertaDiklatAction(
             message: "Peserta berhasil didaftarkan, silahkan cek pada menu dashboard untuk melihat daftar peserta diklat"
         };
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal daftar peserta diklat", "peserta-diklat-action", error)
 
         return {
             success: false,
@@ -275,7 +276,7 @@ export async function updateStatusDaftarPesertaDiklatAction(
             message: message
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal update status diterima", "peserta-diklat-action", error)
 
         return {
             success: false,
@@ -311,7 +312,7 @@ export async function updateManyStatusDaftarPesertaDiklatAction(
             message: "Semua peserta berhasil didaftarkan, silahkan cek menu pada daftar peserta diklat"
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal daftarkan semua peserta", "peserta-diklat-action", error)
 
         return {
             success: false,
@@ -371,7 +372,7 @@ export async function publishKelulusanPesertaDiklatAction(
             statusKelulusanPesertaDiklatId
         }))
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal baca data kelulusan", "peserta-diklat-action", error)
 
         return {
             success: false,
@@ -487,7 +488,7 @@ export async function publishKelulusanPesertaDiklatAction(
             message: `Kelulusan ${daftarKelulusanPeserta.length} peserta berhasil diterbitkan dan status pelaksanaan diklat menjadi Selesai`
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal terbitkan kelulusan", "peserta-diklat-action", error)
 
         return {
             success: false,
@@ -583,7 +584,7 @@ export async function updatePesertaPelaksanaanAction(
             message: "Status peserta berhasil diupdate"
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal update status peserta", "peserta-diklat-action", error)
         return {
             success: false,
             message: "Gagal update status peserta"
@@ -616,7 +617,7 @@ export async function updatePesertaKelulusanAction(
             message: "Status kelulusan peserta berhasil diupdate"
         }
     } catch (error) {
-        console.error(error)
+        logger.error("Gagal update kelulusan peserta", "peserta-diklat-action", error)
         return {
             success: false,
             message: "Gagal update status kelulusan"
