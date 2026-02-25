@@ -3,60 +3,55 @@
 import prisma from "@/lib/prisma"
 import Admin_VerifKelulusan_View from "./view"
 
-export default async function Admin_VerifKelulusan_Page() {
+export default async function Admin_VerifKelulusan_Page({
+    searchParams
+}: {
+    searchParams: Promise<{
+        kelulusanDiklat?: string
+    }>
+}) {
 
-    const daftarDiklatSelesaiRaw = await prisma.diklat.findMany({
-        where: {
-            statusPelaksanaanAcaraDiklatId:{
-                in: [2, 3]
+    const _searchParams = await searchParams
+
+    const daftarDiklatSelesai = await prisma.diklat.findMany({
+        include: {
+            _count: {
+                select: {
+                    pesertaDiklat: {
+                        where: {
+                            statusDaftarPesertaDiklatId: 2
+                        }
+                    }
+                }
             }
         },
-        include: {
-            materiDiklat: {
-                select: {
-                    id: true
-                }
-            },
-            pesertaDiklat: {
-                where: {
-                    statusDaftarPesertaDiklat: {
-                        nama: "Diterima"
+        where: {
+            AND: [
+                {
+                    materiDiklat: {
+                        some: {}
                     }
                 },
-                include: {
-                    absensiPesertaDiklat: {
-                        select: {
-                            materiDiklatId: true
+                {
+                    materiDiklat: {
+                        every: {
+                            isSelesai: true
                         }
+                    }
+                }
+            ],
+            pesertaDiklat: {
+                every: {
+                    statusKelulusanPesertaDiklatId: {
+                        in: _searchParams.kelulusanDiklat === "sudahValidasi" ? [2, 3] : [1]
                     }
                 }
             }
         }
     })
 
-    const daftarDiklatSelesai = daftarDiklatSelesaiRaw
-        .map((diklat) => {
-            const totalMateri = diklat.materiDiklat.length
-            const totalPesertaDiterima = diklat.pesertaDiklat.length
-            const totalAbsensiWajib = totalMateri * totalPesertaDiterima
-            const totalAbsensiTerisi = diklat.pesertaDiklat.reduce((jumlah, pesertaDiklat) => {
-                return jumlah + pesertaDiklat.absensiPesertaDiklat.length
-            }, 0)
-
-            return {
-                id: diklat.id,
-                judul: diklat.judul,
-                tanggalSelesaiAcara: diklat.tanggalSelesaiAcara,
-                totalPesertaDiterima,
-                totalAbsensiWajib,
-                totalAbsensiTerisi,
-                isAbsensiLengkap: totalAbsensiWajib > 0 && totalAbsensiTerisi === totalAbsensiWajib
-            }
-        })
-        .filter((diklat) => diklat.isAbsensiLengkap)
-
     return (
-        <Admin_VerifKelulusan_View 
-        daftarDiklatSelesai={daftarDiklatSelesai}/>
+        <Admin_VerifKelulusan_View
+            daftarDiklatSelesai={daftarDiklatSelesai} />
     )
 }

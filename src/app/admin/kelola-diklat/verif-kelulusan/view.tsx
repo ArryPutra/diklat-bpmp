@@ -1,6 +1,7 @@
 "use client"
 
 import { ContentCanvas } from "@/components/layouts/auth-layout"
+import SelectDropdown from "@/components/shared/select-dropdown"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDateId } from "@/utils/dateFormatted"
@@ -18,6 +19,17 @@ export default function Admin_VerifKelulusan_View({
                 <h1 className="font-bold">Verifikasi Kelulusan Peserta Diklat</h1>
                 <p className="text-sm text-gray-500">Daftar diklat selesai yang seluruh materi dan seluruh peserta diterima sudah memiliki absensi lengkap.</p>
             </div>
+
+            <SelectDropdown
+            label="Kelulusan Diklat"
+            query={{ 
+                name: "kelulusanDiklat",
+                values: [
+                    { label: "Butuh Validasi", value: "butuhValidasi" },
+                    { label: "Sudah Validasi", value: "sudahValidasi" },
+                ],
+                defaultValue: "butuhValidasi"
+             }}/>
 
             <Table>
                 <TableHeader>
@@ -37,7 +49,7 @@ export default function Admin_VerifKelulusan_View({
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell className="font-semibold">{diklat.judul}</TableCell>
                                     <TableCell>{formatDateId(diklat.tanggalSelesaiAcara)}</TableCell>
-                                    <TableCell>{diklat.totalPesertaDiterima}</TableCell>
+                                    <TableCell>{diklat._count.pesertaDiklat}</TableCell>
                                     <TableCell>
                                         <Link href={`/admin/kelola-diklat/verif-kelulusan/${diklat.id}`}>
                                             <Button size='sm'>Detail</Button>

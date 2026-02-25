@@ -85,7 +85,8 @@ export default async function Peserta_DiklatRiwayatHasilAkhir_Page({
             dataHasilAkhir={{
                 apakahDiklatSudahSelesai: apakahDiklatSudahSelesai,
                 apakahLulus,
-                kodeSertifikasi
+                kodeSertifikasi,
+                statusKelulusan: pesertaDiklat?.statusKelulusanPesertaDiklat?.nama ?? "Belum Dinilai"
             }} />
     )
 }

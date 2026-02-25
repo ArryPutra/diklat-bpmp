@@ -19,7 +19,7 @@ export default function Peserta_DiklatRiwayat_View({
 
             <PesertaDiklatList
                 daftarDiklat={daftarDiklatRiwayatDiikuti}
-                detailBasePath="/peserta/diklat/riwayat"
+                detailBasePath="/peserta/diklat/riwayat/[diklatId]/materi-diklat"
                 emptyTitle="Belum ada riwayat diklat."
                 emptyDescription="Riwayat akan muncul saat diklat yang Anda ikuti sudah selesai." />
         </ContentCanvas>

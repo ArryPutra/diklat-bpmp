@@ -27,6 +27,14 @@ export default function PesertaDiklatList({
     emptyDescription: string
     actionLabel?: string
 }) {
+    const getDetailHref = (basePath: string, diklatId: string) => {
+        if (basePath.includes("[diklatId]")) {
+            return basePath.replace("[diklatId]", diklatId)
+        }
+
+        return `${basePath.replace(/\/$/, "")}/${diklatId}`
+    }
+
     if (daftarDiklat.length === 0) {
         return (
             <div className="py-10 text-center">
@@ -84,7 +92,7 @@ export default function PesertaDiklatList({
                         </CardContent>
 
                         <CardFooter className="flex gap-3 flex-wrap">
-                            <Link href={`${detailBasePath}/${diklat.id}`}>
+                            <Link href={getDetailHref(detailBasePath, diklat.id)}>
                                 <Button size="sm">{actionLabel}</Button>
                             </Link>
                         </CardFooter>

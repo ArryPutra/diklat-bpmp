@@ -71,6 +71,61 @@ export async function getAllPesertaDiklatAction({
     };
 }
 
+export async function getTotalDiklatButuhVerifikasiKelulusanAction() {
+    const daftarDiklat = await prisma.diklat.findMany({
+        select: {
+            pesertaDiklat: {
+                select: {
+                    statusDaftarPesertaDiklatId: true,
+                }
+            },
+            materiDiklat: {
+                select: {
+                    _count: {
+                        select: {
+                            absensiPesertaDiklat: {
+                                where: {
+                                    pesertaDiklat: {
+                                        statusDaftarPesertaDiklatId: 2,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    const totalDiklatButuhVerifikasi = daftarDiklat.reduce((total, diklat) => {
+        const totalPendaftar = diklat.pesertaDiklat.length
+        const totalPeserta = diklat.pesertaDiklat.filter(
+            (pesertaDiklat) => pesertaDiklat.statusDaftarPesertaDiklatId === 2
+        ).length
+        const totalSesiMateri = diklat.materiDiklat.length
+
+        if (totalPendaftar === 0 || totalSesiMateri === 0) {
+            return total
+        }
+
+        if (totalPeserta !== totalPendaftar) {
+            return total
+        }
+
+        const semuaSesiSudahAbsensi = diklat.materiDiklat.every(
+            (materiDiklat) => materiDiklat._count.absensiPesertaDiklat === totalPeserta
+        )
+
+        if (!semuaSesiSudahAbsensi) {
+            return total
+        }
+
+        return total + 1
+    }, 0)
+
+    return totalDiklatButuhVerifikasi
+}
+
 export async function createPendaftarPesertaDiklatAction(
     daftarPesertaId: any[],
     diklatId: string,

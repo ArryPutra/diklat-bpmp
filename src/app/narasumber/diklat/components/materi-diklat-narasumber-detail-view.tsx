@@ -201,7 +201,8 @@ export default function MateriDiklatNarasumberDetailView({
                             </TableBody>
                         </Table>
 
-                        <div className='flex justify-end gap-2'>
+                        <div className='flex justify-end items-center gap-3 flex-wrap-reverse'>
+                            <p className='text-sm text-gray-500'>Pastikan semua peserta diabsen agar tercatat sebagai sesi materi ini selesai.</p>
                             <Button disabled={pending || isReadOnlyAbsensi}>
                                 Simpan Absensi {pending && <Spinner />}
                             </Button>

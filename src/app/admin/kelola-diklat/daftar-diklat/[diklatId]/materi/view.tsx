@@ -33,8 +33,6 @@ export default function Admin_DaftarDiklatMateri_View({
     newMessage?: string
 }) {
 
-    const router = useRouter();
-
     return (
         <ContentCanvas>
             <div>

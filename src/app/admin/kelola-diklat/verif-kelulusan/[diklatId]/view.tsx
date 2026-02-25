@@ -33,6 +33,7 @@ export default function AdminSelesaikanDiklatView({
         totalSesiMateri: number
         persenKehadiran: number
         statusRekomendasiKelulusan: "Lulus" | "Tidak Lulus"
+        statusAkhirKelulusan: "Lulus" | "Tidak Lulus" | null
         totalStatusAbsensi: {
             hadir: number
             tidakHadir: number
@@ -50,7 +51,6 @@ export default function AdminSelesaikanDiklatView({
 
     const [statePublishKelulusanPesertaDiklatAction, formActionPublishKelulusanPesertaDiklatAction] =
         useActionState(publishKelulusanPesertaDiklatAction, null)
-    const isPublished = statePublishKelulusanPesertaDiklatAction?.success === true
 
     const getBadgeVariantByStatusAbsensi = (statusAbsensi: string): "default" | "secondary" | "destructive" | "outline" => {
         if (statusAbsensi === "Hadir") {
@@ -73,10 +73,13 @@ export default function AdminSelesaikanDiklatView({
 
     const initialStatusKelulusanByPesertaId = useMemo(
         () => Object.fromEntries(
-            daftarPesertaEvaluasi.map((peserta) => ([
-                peserta.id,
-                peserta.statusRekomendasiKelulusan === "Lulus" ? 2 : 3
-            ]))
+            daftarPesertaEvaluasi.map((peserta) => {
+                const statusKelulusanAwal = peserta.statusAkhirKelulusan
+                    ? peserta.statusAkhirKelulusan === "Lulus" ? 2 : 3
+                    : peserta.statusRekomendasiKelulusan === "Lulus" ? 2 : 3
+
+                return [peserta.id, statusKelulusanAwal]
+            })
         ) as Record<number, 2 | 3>,
         [daftarPesertaEvaluasi]
     )
@@ -140,6 +143,7 @@ export default function AdminSelesaikanDiklatView({
                         <TableHead>Kehadiran</TableHead>
                         <TableHead>Persentase Kehadiran</TableHead>
                         <TableHead>Status Rekomendasi</TableHead>
+                        <TableHead>Status Akhir</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -159,6 +163,16 @@ export default function AdminSelesaikanDiklatView({
                                                 <Badge>Lulus</Badge>
                                                 :
                                                 <Badge variant="destructive">Tidak Lulus</Badge>
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        {
+                                            peserta.statusAkhirKelulusan === "Lulus" ?
+                                                <Badge>Lulus</Badge>
+                                                : peserta.statusAkhirKelulusan === "Tidak Lulus" ?
+                                                    <Badge variant="destructive">Tidak Lulus</Badge>
+                                                    :
+                                                    <Badge variant="outline">Belum Dinilai</Badge>
                                         }
                                     </TableCell>
                                     <TableCell className="space-x-2">
@@ -215,7 +229,7 @@ export default function AdminSelesaikanDiklatView({
                             ))
                             :
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center">Belum ada peserta diterima untuk dinilai</TableCell>
+                                <TableCell colSpan={8} className="text-center">Belum ada peserta diterima untuk dinilai</TableCell>
                             </TableRow>
                     }
                 </TableBody>
@@ -237,14 +251,14 @@ export default function AdminSelesaikanDiklatView({
                             ]
                         }
                     ]}
-                    triggerButton={<Button disabled={isPublished}>Terbitkan Kelulusan Peserta</Button>}
+                    triggerButton={<Button>Terbitkan Kelulusan Peserta</Button>}
                     actionButton={
                         <form action={formActionPublishKelulusanPesertaDiklatAction}>
                             <input type="hidden" name="diklatId" value={diklat.id} />
                             <input type="hidden" name="daftarKelulusanPeserta" value={JSON.stringify(daftarKelulusanPeserta)} />
                             <input type="hidden" name="currentPath" value={pathName + "?" + searchParams.toString()} />
 
-                            <AlertDialogAction type="submit" disabled={isPublished}>Ya, Terbitkan</AlertDialogAction>
+                            <AlertDialogAction type="submit">Ya, Terbitkan</AlertDialogAction>
                         </form>
                     }
                 />

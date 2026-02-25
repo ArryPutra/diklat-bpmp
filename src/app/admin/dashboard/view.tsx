@@ -9,11 +9,13 @@ import { BiBookReader, BiBuilding, BiCheckDouble, BiRightArrowAlt, BiUser, BiUse
 export default function Admin_Dashboard_View({
     dataStatistik,
     totalVerifikasiInstansi,
-    totalVerifikasiPesertaDiklat
+    totalVerifikasiPesertaDiklat,
+    totalVerifikasiKelulusanDiklat
 }: {
     dataStatistik: any
     totalVerifikasiInstansi: number
     totalVerifikasiPesertaDiklat: number
+    totalVerifikasiKelulusanDiklat: number
 }) {
     return (
         <>
@@ -34,6 +36,17 @@ export default function Admin_Dashboard_View({
                     <AlertTitle>Lakukan verifikasi peserta diklat</AlertTitle>
                     <AlertDescription className='mb-2'>Silahkan lakukan verifikasi peserta diklat segera, terdapat {totalVerifikasiPesertaDiklat} peserta diklat menunggu verifikasi.</AlertDescription>
                     <Link className='ml-7' href="/admin/kelola-diklat/verifikasi-peserta">
+                        <Button size='sm' className='ml-auto' variant='outline'>Verifikasi Sekarang <BiRightArrowAlt /></Button>
+                    </Link>
+                </Alert>
+            }
+            {totalVerifikasiKelulusanDiklat > 0 &&
+                <Alert variant='danger'>
+                    <BiCheckDouble />
+                    <AlertTitle>Lakukan verifikasi kelulusan diklat</AlertTitle>
+                    <AlertDescription className='mb-2'>Silahkan lakukan verifikasi kelulusan diklat segera, terdapat {totalVerifikasiKelulusanDiklat} diklat menunggu verifikasi.</AlertDescription>
+                    <Link className='ml-7' href="/admin/kelola-diklat/verif-kelulusan">
+
                         <Button size='sm' className='ml-auto' variant='outline'>Verifikasi Sekarang <BiRightArrowAlt /></Button>
                     </Link>
                 </Alert>

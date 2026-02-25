@@ -159,7 +159,7 @@ export async function downloadSertifikatAction(kodeSertifikasiInput: string) {
         })
 
         page.drawText(namaPeserta, {
-            x: 280,
+            x: width / 2 - fontBold.widthOfTextAtSize(namaPeserta, 24) / 2,
             y: height - 205,
             size: 24,
             font: fontBold,

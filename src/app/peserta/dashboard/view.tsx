@@ -6,22 +6,22 @@ import { BiBookOpen } from "react-icons/bi";
 
 export default function Peserta_Dashboard_View({
     dataStatistik,
-    totalDiklatSedangDiikuti
+    totalDiklatDiikutiAktif
 }: {
     dataStatistik: {
         diklatDiikuti: number
     },
-    totalDiklatSedangDiikuti?: number
+    totalDiklatDiikutiAktif?: number
 }) {
     return (
         <>
             {
-                (totalDiklatSedangDiikuti ?? 0) > 0 &&
+                (totalDiklatDiikutiAktif ?? 0) > 0 &&
                 <Alert>
                     <AlertTitle>Informasi Diklat Aktif</AlertTitle>
                     <AlertDescription>
                         <p>
-                            Anda sedang mengikuti {totalDiklatSedangDiikuti} diklat yang masih aktif.
+                            Anda sedang mengikuti {totalDiklatDiikutiAktif} diklat yang masih aktif.
                         </p>
                         <Link href="/peserta/diklat/aktif">
                             <Button size="sm" className="mt-2">Lihat Diklat Aktif</Button>

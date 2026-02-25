@@ -76,7 +76,7 @@ export default async function Peserta_DiklatHasilAkhir_Page({
 
     const apakahDiklatSudahSelesai = totalAbsensi === totalMateri
     const apakahLulus = pesertaDiklat?.statusKelulusanPesertaDiklat?.nama === "Lulus"
-    const kodeSertifikasi = pesertaDiklat?.kelulusanPesertaDiklat[0]?.kodeSertifikasi ?? null
+    const kodeSertifikasi = pesertaDiklat?.kelulusanPesertaDiklat[0]?.kodeSertifikasi || null
 
     return (
         <PesertaDiklatHasilAkhir
@@ -85,7 +85,8 @@ export default async function Peserta_DiklatHasilAkhir_Page({
             dataHasilAkhir={{
                 apakahDiklatSudahSelesai: apakahDiklatSudahSelesai,
                 apakahLulus,
-                kodeSertifikasi
+                kodeSertifikasi,
+                statusKelulusan: pesertaDiklat?.statusKelulusanPesertaDiklat?.nama ?? "Belum Dinilai"
             }} />
     )
 }

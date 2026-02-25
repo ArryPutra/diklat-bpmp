@@ -19,7 +19,7 @@ export default function Peserta_DiklatAktif_View({
 
             <PesertaDiklatList
                 daftarDiklat={daftarDiklatAktifDiikuti}
-                detailBasePath="/peserta/diklat/aktif"
+                detailBasePath="/peserta/diklat/aktif/[diklatId]/materi-diklat"
                 emptyTitle="Belum ada diklat aktif yang Anda ikuti."
                 emptyDescription="Daftar akan tampil saat Anda terdaftar pada diklat aktif." />
         </ContentCanvas>

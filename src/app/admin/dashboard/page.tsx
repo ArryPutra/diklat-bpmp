@@ -23,10 +23,44 @@ export default async function AdminDashboardPage() {
         }
     })
 
+    // const totalVerifikasiKelulusanDiklat = await getTotalDiklatButuhVerifikasiKelulusanAction()
+    const totalVerifikasiKelulusanDiklat = await prisma.diklat.count({
+        where: {
+            AND: [
+                {
+                    materiDiklat: {
+                        some: {}
+                    }
+                },
+                {
+                    materiDiklat: {
+                        every: {
+                            isSelesai: true
+                        }
+                    }
+                }
+            ], 
+            pesertaDiklat: {
+                every: {
+                    kelulusanPesertaDiklat: {
+                        every: {
+                            NOT: {
+                                id: {
+                                    in: [2, 3]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
     return (
-        <Admin_Dashboard_View 
-        dataStatistik={dataStatistik} 
-        totalVerifikasiInstansi={totalVerifikasiInstansi}
-        totalVerifikasiPesertaDiklat={totalVerifikasiPesertaDiklat} />
+        <Admin_Dashboard_View
+            dataStatistik={dataStatistik}
+            totalVerifikasiInstansi={totalVerifikasiInstansi}
+            totalVerifikasiPesertaDiklat={totalVerifikasiPesertaDiklat}
+            totalVerifikasiKelulusanDiklat={totalVerifikasiKelulusanDiklat} />
     )
 }

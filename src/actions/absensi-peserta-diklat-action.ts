@@ -80,26 +80,55 @@ export async function upsertManyAbsensiPesertaDiklatAction({
     }
 
     try {
-        await prisma.$transaction(
-            absensi.map((item) =>
-                prisma.absensiPesertaDiklat.upsert({
-                    where: {
-                        pesertaDiklatId_materiDiklatId: {
+        await prisma.$transaction(async (tx) => {
+            await Promise.all(
+                absensi.map((item) =>
+                    tx.absensiPesertaDiklat.upsert({
+                        where: {
+                            pesertaDiklatId_materiDiklatId: {
+                                pesertaDiklatId: item.pesertaDiklatId,
+                                materiDiklatId,
+                            }
+                        },
+                        update: {
+                            statusAbsensiId: item.statusAbsensiId,
+                        },
+                        create: {
                             pesertaDiklatId: item.pesertaDiklatId,
                             materiDiklatId,
+                            statusAbsensiId: item.statusAbsensiId,
                         }
-                    },
-                    update: {
-                        statusAbsensiId: item.statusAbsensiId,
-                    },
-                    create: {
-                        pesertaDiklatId: item.pesertaDiklatId,
-                        materiDiklatId,
-                        statusAbsensiId: item.statusAbsensiId,
-                    }
-                })
+                    })
+                )
             )
-        )
+
+            const totalPesertaValid = await tx.pesertaDiklat.count({
+                where: {
+                    diklatId: materiDiklat.diklatId,
+                    statusDaftarPesertaDiklatId: 2,
+                }
+            })
+
+            const totalPesertaTerabsensi = await tx.absensiPesertaDiklat.count({
+                where: {
+                    materiDiklatId,
+                    pesertaDiklat: {
+                        diklatId: materiDiklat.diklatId,
+                        statusDaftarPesertaDiklatId: 2,
+                    }
+                }
+            })
+
+            await tx.materiDiklat.update({
+                where: {
+                    id: materiDiklatId,
+                },
+                data: {
+                    isSelesai:
+                        totalPesertaValid > 0 && totalPesertaTerabsensi === totalPesertaValid,
+                }
+            })
+        })
 
         revalidatePath(`/narasumber/diklat/aktif/${materiDiklatId}`)
 

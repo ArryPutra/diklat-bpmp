@@ -20,6 +20,11 @@ export default async function AdminSelesaikanDiklatPage({ params }: { params: Pr
                     }
                 },
                 include: {
+                    statusKelulusanPesertaDiklat: {
+                        select: {
+                            nama: true
+                        }
+                    },
                     peserta: {
                         include: {
                             user: true,
@@ -67,6 +72,11 @@ export default async function AdminSelesaikanDiklatPage({ params }: { params: Pr
         const persenKehadiran = totalSesiMateri > 0 ? Math.round((totalKehadiran / totalSesiMateri) * 100) : 0
         const isLulusByMinimalKehadiran = persenKehadiran >= diklat.minimalKehadiranPersen
         const statusRekomendasiKelulusan: "Lulus" | "Tidak Lulus" = isLulusByMinimalKehadiran ? "Lulus" : "Tidak Lulus"
+        const statusAkhirKelulusan: "Lulus" | "Tidak Lulus" | null =
+            pesertaDiklat.statusKelulusanPesertaDiklat?.nama === "Lulus" ||
+                pesertaDiklat.statusKelulusanPesertaDiklat?.nama === "Tidak Lulus"
+                ? pesertaDiklat.statusKelulusanPesertaDiklat.nama
+                : null
 
         const totalStatusAbsensi = {
             hadir: pesertaDiklat.absensiPesertaDiklat.filter((absensi) => absensi.statusAbsensiPesertaDiklat.nama === "Hadir").length,
@@ -93,6 +103,7 @@ export default async function AdminSelesaikanDiklatPage({ params }: { params: Pr
             totalSesiMateri,
             persenKehadiran,
             statusRekomendasiKelulusan,
+            statusAkhirKelulusan,
             totalStatusAbsensi,
             detailAbsensiPerMateri
         }

@@ -18,12 +18,15 @@ export default async function Peserta_Dashboard_Page() {
         where: {
             pesertaId: currentPeserta?.id,
             statusDaftarPesertaDiklatId: 2, // diterima sebagai peserta
+            diklat: {
+                statusPelaksanaanAcaraDiklatId: 2
+            }
         }
     })
 
     return (
         <Peserta_Dashboard_View
-            totalDiklatSedangDiikuti={totalDiklatSedangDiikuti}
+            totalDiklatDiikutiAktif={totalDiklatSedangDiikuti}
             dataStatistik={{
                 diklatDiikuti: totalDiklatDiikuti
             }} />

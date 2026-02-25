@@ -25,6 +25,7 @@ export default function PesertaDiklatHasilAkhir({
         apakahDiklatSudahSelesai: boolean
         apakahLulus: boolean
         kodeSertifikasi: string | null
+        statusKelulusan: string
     }
 }) {
     const [isPending, startTransition] = useTransition()
@@ -34,7 +35,7 @@ export default function PesertaDiklatHasilAkhir({
         setDownloadError(null)
 
         startTransition(async () => {
-            const result = await downloadSertifikatAction(kodeSertifikasi)
+            const result: any = await downloadSertifikatAction(kodeSertifikasi)
 
             if (!result.success) {
                 setDownloadError(result.message)
@@ -121,11 +122,19 @@ export default function PesertaDiklatHasilAkhir({
                         </Alert>
                     }
                     {
+                        // jika diklat sudah selesai tetapi peserta belum dapat status
+                        (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.statusKelulusan === "Belum Dinilai") &&
+                        <Alert>
+                            <AlertTitle>Status Kelulusan Belum Tersedia</AlertTitle>
+                            <AlertDescription>Hasil akhir Anda sedang diproses. Silakan cek kembali secara berkala.</AlertDescription>
+                        </Alert>
+                    }
+                    {
                         // jika diklat sudah selesai dan peserta lullus
                         (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
                         <Button
                             disabled={isPending}
-                            onClick={() => handleDownloadSertifikat(dataHasilAkhir.kodeSertifikasi)}>
+                            onClick={() => handleDownloadSertifikat(dataHasilAkhir.kodeSertifikasi!)}>
                             <BiCheckDouble />
                             {isPending ? "Mengunduh..." : "Unduh Sertifikasi"}
                         </Button>
@@ -140,7 +149,7 @@ export default function PesertaDiklatHasilAkhir({
                     }
                     {
                         // jika diklat sudah selesai dan peserta tidak lullus
-                        (dataHasilAkhir.apakahDiklatSudahSelesai && !dataHasilAkhir.apakahLulus) &&
+                        (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.statusKelulusan === "Tidak Lulus") &&
                         <Alert variant='danger'>
                             <AlertTitle>Hasil Akhir:</AlertTitle>
                             <AlertDescription>Mohon maaf, Anda tidak lulus pada diklat ini. Jika ada pengaduan, silakan hubungi admin.</AlertDescription>
