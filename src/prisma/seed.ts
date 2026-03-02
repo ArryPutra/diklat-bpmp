@@ -56,14 +56,6 @@ async function main() {
         ]
     })
 
-    await prisma.statusPelaksanaanPesertaDiklat.createMany({
-        data: [
-            { nama: "Sedang Berlangsung" },
-            { nama: "Mengundurkan Diri" },
-            { nama: "Diskualifikasi" }
-        ]
-    })
-
     await prisma.statusKelulusanPesertaDiklat.createMany({
         data: [
             { nama: "Belum Dinilai" },
@@ -97,7 +89,6 @@ async function main() {
     await instansiSeed()
     await diklatSeed()
     await narasumberSeed()
-    // await materiDiklatSeed()
 }
 
 main()

@@ -1,46 +1,43 @@
 "use server"
 
-import logger from "@/lib/logger";
-import prisma from "@/lib/prisma";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { z } from "zod";
+import logger from "@/lib/logger"
+import prisma from "@/lib/prisma"
+import { formatDateId } from "@/utils/dateFormatted"
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 
-const GetSertifikasiSchema = z.object({
-    kodeSertifikasi: z.string().min(1, "Kode sertifikasi wajib diisi")
-})
+export type GetSertifikasiActionState = {
+    success: boolean
+    message?: string
+    data?: any
+}
 
-const DownloadSertifikatSchema = z.object({
-    kodeSertifikasi: z.string().min(1, "Kode sertifikasi wajib diisi")
-})
+export async function getSertifikasiAction(
+    _prevState: GetSertifikasiActionState | null,
+    formData: FormData
+): Promise<GetSertifikasiActionState> {
+    const kodeSertifikasi = (formData.get("kodeSertifikasi") as string | null)?.trim().toUpperCase() || ""
 
-export async function getSertifikasiAction(_prev: any, formData: FormData) {
-    const result = GetSertifikasiSchema.safeParse(Object.fromEntries(formData));
-
-    if (!result.success) {
+    if (!kodeSertifikasi) {
         return {
             success: false,
-            message: "Kode Sertifikasi wajib diisi",
-        };
+            message: "Kode sertifikasi wajib diisi"
+        }
     }
-
-    const kodeSertifikasi = result.data.kodeSertifikasi.trim().toUpperCase();
 
     try {
         const data = await prisma.kelulusanPesertaDiklat.findFirst({
             where: {
-                kodeSertifikasi: kodeSertifikasi
+                kodeSertifikasi: {
+                    equals: kodeSertifikasi,
+                    mode: "insensitive"
+                }
             },
             include: {
                 pesertaDiklat: {
                     include: {
                         peserta: {
                             include: {
-                                user: {
-                                    select: {
-                                        name: true,
-                                        email: true
-                                    }
-                                }
+                                user: true
                             }
                         },
                         diklat: {
@@ -52,166 +49,185 @@ export async function getSertifikasiAction(_prev: any, formData: FormData) {
                     }
                 }
             }
-        });
+        })
 
         if (!data) {
             return {
                 success: false,
-                message: "Sertifikat tidak ditemukan dengan kode ini"
-            };
+                message: "Kode sertifikasi tidak ditemukan"
+            }
         }
 
         return {
             success: true,
-            data: data
-        };
+            data
+        }
     } catch (error) {
-        logger.error("Gagal fetch sertifikasi", "sertifikasi-action", error)
+        logger.error("Gagal cek sertifikasi", "sertifikasi-action", error)
+
         return {
             success: false,
-            message: "Terjadi kesalahan pada server"
-        };
+            message: "Terjadi kesalahan saat memeriksa sertifikasi"
+        }
     }
 }
 
-export async function downloadSertifikatAction(kodeSertifikasiInput: string) {
-    const result = DownloadSertifikatSchema.safeParse({
-        kodeSertifikasi: kodeSertifikasiInput,
-    })
+export async function downloadSertifikatAction(kodeSertifikasi: string) {
+    const kode = kodeSertifikasi.trim().toUpperCase()
 
-    if (!result.success) {
+    if (!kode) {
         return {
             success: false,
-            message: "Kode Sertifikasi wajib diisi",
+            message: "Kode sertifikasi tidak valid"
         }
     }
 
-    const kodeSertifikasi = result.data.kodeSertifikasi.trim().toUpperCase()
-
     try {
-        const dataKelulusan = await prisma.kelulusanPesertaDiklat.findUnique({
+        const data = await prisma.kelulusanPesertaDiklat.findFirst({
             where: {
-                kodeSertifikasi,
+                kodeSertifikasi: {
+                    equals: kode,
+                    mode: "insensitive"
+                }
             },
             include: {
                 pesertaDiklat: {
                     include: {
                         peserta: {
                             include: {
-                                user: {
-                                    select: {
-                                        name: true,
-                                    },
-                                },
-                            },
+                                user: true
+                            }
                         },
-                        diklat: {
-                            select: {
-                                judul: true,
-                            },
-                        },
-                    },
-                },
-            },
+                        diklat: true,
+                    }
+                }
+            }
         })
 
-        if (!dataKelulusan) {
+        if (!data) {
             return {
                 success: false,
-                message: "Sertifikat tidak ditemukan",
+                message: "Sertifikat tidak ditemukan"
             }
         }
 
-        const namaPeserta = dataKelulusan.pesertaDiklat.peserta.user.name
-        const judulDiklat = dataKelulusan.pesertaDiklat.diklat.judul
+        const pesertaNama = data.pesertaDiklat.peserta.user.name
+        const judulDiklat = data.pesertaDiklat.diklat.judul
+        const lokasi = data.pesertaDiklat.diklat.lokasi
+        const tanggalMulai = formatDateId(data.pesertaDiklat.diklat.tanggalMulaiAcara.toISOString())
+        const tanggalSelesai = formatDateId(data.pesertaDiklat.diklat.tanggalSelesaiAcara.toISOString())
+        const tanggalTerbit = formatDateId(data.createdAt.toISOString())
 
         const pdfDoc = await PDFDocument.create()
         const page = pdfDoc.addPage([842, 595])
-
         const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica)
         const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-        const { width, height } = page.getSize()
-
         page.drawRectangle({
-            x: 24,
-            y: 24,
-            width: width - 48,
-            height: height - 48,
-            borderColor: rgb(0.12, 0.26, 0.56),
+            x: 20,
+            y: 20,
+            width: 802,
+            height: 555,
+            borderColor: rgb(0.85, 0.85, 0.85),
             borderWidth: 2,
         })
 
         page.drawText("SERTIFIKAT DIKLAT", {
-            x: 270,
-            y: height - 100,
-            size: 28,
+            x: 260,
+            y: 520,
+            size: 30,
             font: fontBold,
-            color: rgb(0.12, 0.26, 0.56),
+            color: rgb(0.1, 0.1, 0.1)
         })
 
-        page.drawText("Diberikan kepada:", {
+        page.drawText("Diberikan kepada", {
             x: 350,
-            y: height - 170,
+            y: 470,
+            size: 16,
+            font: fontRegular,
+            color: rgb(0.3, 0.3, 0.3)
+        })
+
+        page.drawText(pesertaNama, {
+            x: 120,
+            y: 430,
+            size: 32,
+            font: fontBold,
+            color: rgb(0.08, 0.24, 0.54)
+        })
+
+        page.drawText("atas partisipasi dan kelulusan pada kegiatan:", {
+            x: 250,
+            y: 390,
             size: 14,
             font: fontRegular,
-            color: rgb(0.2, 0.2, 0.2),
-        })
-
-        page.drawText(namaPeserta, {
-            x: width / 2 - fontBold.widthOfTextAtSize(namaPeserta, 24) / 2,
-            y: height - 205,
-            size: 24,
-            font: fontBold,
-            color: rgb(0.05, 0.05, 0.05),
-        })
-
-        page.drawText("Atas partisipasi dan kelulusan pada diklat:", {
-            x: 260,
-            y: height - 250,
-            size: 13,
-            font: fontRegular,
-            color: rgb(0.2, 0.2, 0.2),
+            color: rgb(0.25, 0.25, 0.25)
         })
 
         page.drawText(judulDiklat, {
-            x: 200,
-            y: height - 285,
-            size: 18,
+            x: 90,
+            y: 355,
+            size: 20,
             font: fontBold,
-            color: rgb(0.05, 0.05, 0.05),
+            color: rgb(0.1, 0.1, 0.1)
         })
 
-        page.drawText(`Kode Sertifikasi: ${dataKelulusan.kodeSertifikasi}`, {
-            x: 70,
-            y: 95,
-            size: 12,
+        page.drawText(`Lokasi: ${lokasi}`, {
+            x: 90,
+            y: 315,
+            size: 13,
             font: fontRegular,
-            color: rgb(0.2, 0.2, 0.2),
+            color: rgb(0.25, 0.25, 0.25)
         })
 
-        page.drawText(`Tanggal Terbit: ${new Date().toLocaleDateString("id-ID")}`, {
-            x: 70,
-            y: 70,
+        page.drawText(`Tanggal pelaksanaan: ${tanggalMulai} s/d ${tanggalSelesai}`, {
+            x: 90,
+            y: 292,
+            size: 13,
+            font: fontRegular,
+            color: rgb(0.25, 0.25, 0.25)
+        })
+
+        page.drawText(`Kode sertifikasi: ${data.kodeSertifikasi}`, {
+            x: 90,
+            y: 250,
+            size: 12,
+            font: fontBold,
+            color: rgb(0.1, 0.1, 0.1)
+        })
+
+        page.drawText(`Diterbitkan: ${tanggalTerbit}`, {
+            x: 90,
+            y: 230,
             size: 12,
             font: fontRegular,
-            color: rgb(0.2, 0.2, 0.2),
+            color: rgb(0.25, 0.25, 0.25)
+        })
+
+        page.drawText("BPMP Kalimantan Selatan", {
+            x: 575,
+            y: 120,
+            size: 14,
+            font: fontBold,
+            color: rgb(0.1, 0.1, 0.1)
         })
 
         const pdfBytes = await pdfDoc.save()
+        const base64Pdf = Buffer.from(pdfBytes).toString("base64")
 
         return {
             success: true,
             data: {
-                fileName: `sertifikat-${kodeSertifikasi}.pdf`,
-                base64Pdf: Buffer.from(pdfBytes).toString("base64"),
-            },
+                base64Pdf,
+                fileName: `sertifikat-${data.kodeSertifikasi}.pdf`
+            }
         }
     } catch (error) {
-        console.error("Error downloading sertifikat:", error)
+        logger.error("Gagal mengunduh sertifikat", "sertifikasi-action", error)
+
         return {
             success: false,
-            message: "Terjadi kesalahan pada server",
+            message: "Terjadi kesalahan saat menyiapkan sertifikat"
         }
     }
 }

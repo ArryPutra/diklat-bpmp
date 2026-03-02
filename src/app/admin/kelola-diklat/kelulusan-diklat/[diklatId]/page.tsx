@@ -115,7 +115,8 @@ export default async function AdminSelesaikanDiklatPage({ params }: { params: Pr
                 id: diklat.id,
                 judul: diklat.judul,
                 minimalKehadiranPersen: diklat.minimalKehadiranPersen,
-                statusPelaksanaanAcara: diklat.statusPelaksanaanAcaraDiklat?.nama ?? "-"
+                statusPelaksanaanAcara: diklat.statusPelaksanaanAcaraDiklat?.nama ?? "-",
+                pesanKelulusanPeserta: diklat.pesanKelulusanPeserta
             }}
             daftarPesertaEvaluasi={daftarPesertaEvaluasi}
         />

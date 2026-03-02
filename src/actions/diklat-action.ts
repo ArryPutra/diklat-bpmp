@@ -1,6 +1,7 @@
 "use server"
 
 import { Prisma } from "@/generated/prisma/client"
+import cloudinary from "@/lib/cloudinary"
 import logger from "@/lib/logger"
 import prisma from "@/lib/prisma"
 import { DiklatSchema } from "@/schemas/diklat.schema"

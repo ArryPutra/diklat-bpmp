@@ -1,12 +1,56 @@
 "use client"
 
+import { submitAbsensiPesertaByKodeUnikFormAction } from '@/actions/absensi-peserta-diklat-action'
 import GetStatusMateriDiklatBadge from '@/components/shared/get-status-materi-diklat-badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { Spinner } from '@/components/ui/spinner'
 import { formatDateId, formatDateTimeId } from '@/utils/dateFormatted'
 import Link from 'next/link'
+import { useActionState } from 'react'
 import { BiBlock, BiBookOpen, BiCalendar, BiLink, BiNetworkChart } from 'react-icons/bi'
+
+function SubmitAbsensiMateriForm({
+    materiId,
+    sudahAbsen,
+}: {
+    materiId: number
+    sudahAbsen: boolean
+}) {
+    const [state, formAction, pending] = useActionState(
+        submitAbsensiPesertaByKodeUnikFormAction,
+        null,
+    )
+
+    return (
+        <div className='space-y-3'>
+            {
+                state?.message &&
+                <Alert variant={state.success ? 'default' : 'destructive'}>
+                    <AlertTitle>Pesan</AlertTitle>
+                    <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
+            }
+
+            <form action={formAction} className='flex flex-col md:flex-row gap-2'>
+                <input type='hidden' name='materiDiklatId' value={materiId} />
+                <Input
+                    name='kodeUnikAbsensi'
+                    placeholder='Masukkan kode absensi'
+                    disabled={sudahAbsen || pending}
+                    autoComplete='off'
+                    maxLength={32}
+                />
+                <Button type='submit' disabled={sudahAbsen || pending}>
+                    Submit Absensi {pending && <Spinner />}
+                </Button>
+            </form>
+        </div>
+    )
+}
 
 export default function PesertaDiklatMateriDiklat({
     diklatId,
@@ -60,8 +104,8 @@ export default function PesertaDiklatMateriDiklat({
                                             }
                                         </CardContent>
                                         <Separator />
-                                        <CardFooter className='grid grid-cols-3'>
-                                            <div className='text-sm'>
+                                        <CardFooter className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                                            <div className='text-sm md:col-span-1'>
                                                 <h1>Status Absensi:</h1>
                                                 <h1>
                                                     {
@@ -72,6 +116,16 @@ export default function PesertaDiklatMateriDiklat({
                                                     }
                                                 </h1>
                                             </div>
+
+                                            {
+                                                routeSegment === 'aktif' &&
+                                                <div className='md:col-span-2'>
+                                                    <SubmitAbsensiMateriForm
+                                                        materiId={materi.id}
+                                                        sudahAbsen={Boolean(materi.absensiPesertaDiklat[0])}
+                                                    />
+                                                </div>
+                                            }
                                         </CardFooter>
                                     </Card>
                                 )

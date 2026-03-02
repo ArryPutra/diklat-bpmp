@@ -77,7 +77,6 @@ export default function Instansi_DiklatPesertaDetail_View({
                         <TableHead>No.</TableHead>
                         <TableHead>Nama</TableHead>
                         <TableHead>Status Pendaftaran</TableHead>
-                        <TableHead>Status Pelaksanaan</TableHead>
                         <TableHead>Status Kelulusan</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
@@ -96,9 +95,6 @@ export default function Instansi_DiklatPesertaDetail_View({
                                     </TableCell>
                                     <TableCell>
                                         {dataPeserta.statusDaftarPesertaDiklat.nama || "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {dataPeserta?.statusPelaksanaanPesertaDiklat?.nama || '-'}
                                     </TableCell>
                                     <TableCell>
 

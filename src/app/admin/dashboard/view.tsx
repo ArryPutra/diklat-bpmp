@@ -45,7 +45,7 @@ export default function Admin_Dashboard_View({
                     <BiCheckDouble />
                     <AlertTitle>Lakukan verifikasi kelulusan diklat</AlertTitle>
                     <AlertDescription className='mb-2'>Silahkan lakukan verifikasi kelulusan diklat segera, terdapat {totalVerifikasiKelulusanDiklat} diklat menunggu verifikasi.</AlertDescription>
-                    <Link className='ml-7' href="/admin/kelola-diklat/verif-kelulusan">
+                    <Link className='ml-7' href="/admin/kelola-diklat/kelulusan-diklat">
 
                         <Button size='sm' className='ml-auto' variant='outline'>Verifikasi Sekarang <BiRightArrowAlt /></Button>
                     </Link>

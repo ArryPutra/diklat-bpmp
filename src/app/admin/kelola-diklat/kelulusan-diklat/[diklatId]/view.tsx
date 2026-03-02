@@ -10,10 +10,89 @@ import { AlertDialogAction } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useActionState, useMemo, useState } from "react"
-import { BiCheck, BiX } from "react-icons/bi"
+import { useActionState, useMemo, useRef, useState } from "react"
+import { BiBold, BiCheck, BiItalic, BiLinkExternal, BiX } from "react-icons/bi"
+
+const escapeHtml = (value: string) =>
+    value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;")
+
+const normalizeInitialEditorValue = (value: string | null) => {
+    if (!value) {
+        return ""
+    }
+
+    const hasHtmlTag = /<\/?[a-z][\s\S]*>/i.test(value)
+
+    if (hasHtmlTag) {
+        return value
+    }
+
+    return escapeHtml(value).replace(/\n/g, "<br>")
+}
+
+const sanitizeEditorHtml = (input: string) => {
+    if (typeof window === "undefined") {
+        return input
+    }
+
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(input, "text/html")
+    const allowedTags = new Set(["A", "P", "BR", "STRONG", "B", "EM", "I", "U", "UL", "OL", "LI", "DIV"])
+
+    const elements = Array.from(doc.body.querySelectorAll("*"))
+
+    for (const element of elements) {
+        if (!allowedTags.has(element.tagName)) {
+            const parent = element.parentNode
+
+            while (element.firstChild) {
+                parent?.insertBefore(element.firstChild, element)
+            }
+
+            parent?.removeChild(element)
+            continue
+        }
+
+        for (const attr of Array.from(element.attributes)) {
+            if (element.tagName !== "A") {
+                element.removeAttribute(attr.name)
+                continue
+            }
+
+            if (!["href", "target", "rel"].includes(attr.name)) {
+                element.removeAttribute(attr.name)
+            }
+        }
+
+        if (element.tagName === "A") {
+            const href = element.getAttribute("href")?.trim() ?? ""
+            const isSafeHref = /^https?:\/\//i.test(href) || /^mailto:/i.test(href)
+
+            if (!isSafeHref) {
+                element.removeAttribute("href")
+            } else {
+                element.setAttribute("target", "_blank")
+                element.setAttribute("rel", "noopener noreferrer")
+            }
+        }
+    }
+
+    return doc.body.innerHTML
+}
+
+const stripHtml = (value: string) =>
+    value
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .trim()
 
 export default function AdminSelesaikanDiklatView({
     diklat,
@@ -24,6 +103,7 @@ export default function AdminSelesaikanDiklatView({
         judul: string
         minimalKehadiranPersen: number
         statusPelaksanaanAcara: string
+        pesanKelulusanPeserta: string | null
     },
     daftarPesertaEvaluasi: {
         id: number
@@ -70,6 +150,8 @@ export default function AdminSelesaikanDiklatView({
 
     const totalPesertaLulus = daftarPesertaEvaluasi.filter((peserta) => peserta.statusRekomendasiKelulusan === "Lulus").length
     const totalPesertaTidakLulus = daftarPesertaEvaluasi.length - totalPesertaLulus
+    const isKelulusanSudahDiterbitkan =
+        daftarPesertaEvaluasi.length > 0 && daftarPesertaEvaluasi.every((peserta) => peserta.statusAkhirKelulusan !== null)
 
     const initialStatusKelulusanByPesertaId = useMemo(
         () => Object.fromEntries(
@@ -86,6 +168,8 @@ export default function AdminSelesaikanDiklatView({
 
     const [statusKelulusanByPesertaId, setStatusKelulusanByPesertaId] =
         useState<Record<number, 2 | 3>>(initialStatusKelulusanByPesertaId)
+    const [pesanKelulusanPeserta, setPesanKelulusanPeserta] = useState(normalizeInitialEditorValue(diklat.pesanKelulusanPeserta))
+    const editorRef = useRef<HTMLDivElement>(null)
 
     const daftarKelulusanPeserta = Object.entries(statusKelulusanByPesertaId).map(([pesertaDiklatId, statusKelulusanPesertaDiklatId]) => ({
         pesertaDiklatId: Number(pesertaDiklatId),
@@ -94,10 +178,48 @@ export default function AdminSelesaikanDiklatView({
 
     const totalLulusFinal = daftarKelulusanPeserta.filter((peserta) => peserta.statusKelulusanPesertaDiklatId === 2).length
     const totalTidakLulusFinal = daftarKelulusanPeserta.filter((peserta) => peserta.statusKelulusanPesertaDiklatId === 3).length
+    const pesanKelulusanPreview = stripHtml(pesanKelulusanPeserta)
+
+    const applyEditorCommand = (command: "bold" | "italic") => {
+        editorRef.current?.focus()
+        document.execCommand(command)
+
+        const html = sanitizeEditorHtml(editorRef.current?.innerHTML ?? "")
+        setPesanKelulusanPeserta(html)
+    }
+
+    const insertLink = () => {
+        const rawUrl = window.prompt("Masukkan URL link")?.trim()
+
+        if (!rawUrl) {
+            return
+        }
+
+        const url = /^https?:\/\//i.test(rawUrl) || /^mailto:/i.test(rawUrl)
+            ? rawUrl
+            : `https://${rawUrl}`
+
+        editorRef.current?.focus()
+
+        const selection = window.getSelection()
+        const hasSelection = Boolean(selection && !selection.isCollapsed)
+
+        if (hasSelection) {
+            document.execCommand("createLink", false, url)
+        } else {
+            document.execCommand("insertHTML", false, `<a href="${url}">${url}</a>`)
+        }
+
+        const html = sanitizeEditorHtml(editorRef.current?.innerHTML ?? "")
+        if (editorRef.current) {
+            editorRef.current.innerHTML = html
+        }
+        setPesanKelulusanPeserta(html)
+    }
 
     return (
         <ContentCanvas>
-            <BackButton url="/admin/kelola-diklat/verif-kelulusan" />
+            <BackButton url="/admin/kelola-diklat/kelulusan-diklat" />
 
             <div>
                 <h1 className="font-bold">Selesaikan Diklat & Verifikasi Kelulusan Peserta</h1>
@@ -133,6 +255,16 @@ export default function AdminSelesaikanDiklatView({
                     </div>
                 </CardContent>
             </Card>
+
+            {
+                isKelulusanSudahDiterbitkan &&
+                <Alert>
+                    <AlertTitle>Status Kelulusan</AlertTitle>
+                    <AlertDescription>
+                        Kelulusan peserta untuk diklat ini sudah diterbitkan. Semua peserta telah memiliki status akhir kelulusan.
+                    </AlertDescription>
+                </Alert>
+            }
 
             <Table>
                 <TableHeader>
@@ -235,6 +367,41 @@ export default function AdminSelesaikanDiklatView({
                 </TableBody>
             </Table>
 
+            <Card>
+                <CardHeader>
+                    <CardTitle>Pesan Kelulusan untuk Peserta</CardTitle>
+                    <CardDescription>
+                        Pesan ini akan ditampilkan ke semua peserta pada halaman hasil akhir, baik yang lulus maupun tidak lulus.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <Label htmlFor="pesanKelulusanPeserta">Pesan</Label>
+                    <div className="flex gap-2">
+                        <Button type="button" size="sm" variant="outline" onClick={() => applyEditorCommand("bold")}>
+                            <BiBold /> Tebal
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => applyEditorCommand("italic")}>
+                            <BiItalic /> Miring
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={insertLink}>
+                            <BiLinkExternal /> Tambah Link
+                        </Button>
+                    </div>
+                    <div
+                        id="pesanKelulusanPeserta"
+                        ref={editorRef}
+                        contentEditable
+                        suppressContentEditableWarning
+                        className="min-h-28 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                        dangerouslySetInnerHTML={{ __html: pesanKelulusanPeserta }}
+                        onInput={(event) => {
+                            setPesanKelulusanPeserta(sanitizeEditorHtml(event.currentTarget.innerHTML))
+                        }}
+                    />
+                    <p className="text-xs text-muted-foreground">Gunakan tombol Tambah Link untuk menyisipkan tautan yang dapat diklik peserta.</p>
+                </CardContent>
+            </Card>
+
             <div className="flex justify-end">
                 <ActionDialog
                     title="Terbitkan Kelulusan Peserta"
@@ -247,7 +414,8 @@ export default function AdminSelesaikanDiklatView({
                                 { label: "Minimal Kehadiran", value: `${diklat.minimalKehadiranPersen}%` },
                                 { label: "Total Peserta Dinilai", value: String(daftarPesertaEvaluasi.length) },
                                 { label: "Lulus", value: String(totalLulusFinal) },
-                                { label: "Tidak Lulus", value: String(totalTidakLulusFinal) }
+                                { label: "Tidak Lulus", value: String(totalTidakLulusFinal) },
+                                { label: "Pesan Kelulusan", value: pesanKelulusanPreview || "-" }
                             ]
                         }
                     ]}
@@ -256,6 +424,7 @@ export default function AdminSelesaikanDiklatView({
                         <form action={formActionPublishKelulusanPesertaDiklatAction}>
                             <input type="hidden" name="diklatId" value={diklat.id} />
                             <input type="hidden" name="daftarKelulusanPeserta" value={JSON.stringify(daftarKelulusanPeserta)} />
+                            <input type="hidden" name="pesanKelulusanPeserta" value={pesanKelulusanPeserta} />
                             <input type="hidden" name="currentPath" value={pathName + "?" + searchParams.toString()} />
 
                             <AlertDialogAction type="submit">Ya, Terbitkan</AlertDialogAction>

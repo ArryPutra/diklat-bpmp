@@ -133,7 +133,11 @@ export default function DetailDiklatTabsContent({
                             <ProgressBar filledPercentage={totalPesertaDariPersentase} />
                         </div>
                         <p className="text-xs text-gray-500 mb-4">
-                            Tersisa <b>{diklat.maksimalKuota - diklat.pesertaDiklat.length}</b> kuota dari {diklat.maksimalKuota} Peserta
+                            {
+                                diklat.pesertaDiklat.length <= diklat.maksimalKuota
+                                    ? <>Tersisa <b>{diklat.maksimalKuota - diklat.pesertaDiklat.length}</b> kuota dari {diklat.maksimalKuota} Peserta</>
+                                    : <>Melebihi <b>{diklat.pesertaDiklat.length - diklat.maksimalKuota}</b> peserta dari kuota {diklat.maksimalKuota}</>
+                            }
                         </p>
 
                         <Alert variant='danger' className="mb-8">

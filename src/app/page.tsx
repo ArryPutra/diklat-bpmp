@@ -13,10 +13,6 @@ export default async function Page() {
 
   return (
     <View
-      daftarDiklat={daftarDiklat.data || []}
-      dataStatistik={{
-        totalInstansi: await prisma.instansi.count() || 0,
-        totalPeserta: await prisma.peserta.count() || 0
-      }} />
+      daftarDiklat={daftarDiklat.data || []} />
   )
 }

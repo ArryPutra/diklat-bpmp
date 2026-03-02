@@ -54,12 +54,9 @@ export async function getAllPesertaDiklatAction({
                 }
             },
             statusDaftarPesertaDiklat: true,
-            statusPelaksanaanPesertaDiklat: true,
             statusKelulusanPesertaDiklat: true,
         },
-        orderBy: {
-            createdAt: "desc",
-        },
+
     });
 
 
@@ -152,6 +149,15 @@ export async function createPendaftarPesertaDiklatAction(
         where: {
             id: diklatId,
             statusPendaftaranDiklatId: 2
+        },
+        select: {
+            id: true,
+            maksimalKuota: true,
+            pesertaDiklat: {
+                select: {
+                    id: true,
+                }
+            }
         }
     });
 
@@ -210,6 +216,10 @@ export async function createPendaftarPesertaDiklatAction(
     }
 
     try {
+        const totalPesertaSaatIni = diklat.pesertaDiklat.length
+        const totalPesertaSetelahDaftar = totalPesertaSaatIni + daftarPesertaId.length
+        const melebihiKuota = totalPesertaSetelahDaftar > diklat.maksimalKuota
+
         await prisma.pesertaDiklat.createMany({
             data: daftarPesertaId.map((pesertaId) => ({
                 diklatId: diklatId,
@@ -219,9 +229,18 @@ export async function createPendaftarPesertaDiklatAction(
 
         revalidatePath("/diklat/" + diklatId);
 
+        if (melebihiKuota) {
+            return {
+                success: true,
+                overKuota: true,
+                message: `Peserta berhasil didaftarkan. Total peserta menjadi ${totalPesertaSetelahDaftar} dari kuota ${diklat.maksimalKuota} (melebihi kuota), silahkan lakukan verifikasi peserta pada menu instansi.`
+            };
+        }
+
         return {
             success: true,
-            message: "Peserta berhasil didaftarkan, silahkan cek pada menu dashboard untuk melihat daftar peserta diklat"
+            overKuota: false,
+            message: `Peserta berhasil didaftarkan, silahkan cek pada menu "Diklat > Peserta Diklat" untuk melihat daftar peserta diklat`
         };
     } catch (error) {
         logger.error("Gagal daftar peserta diklat", "peserta-diklat-action", error)
@@ -383,6 +402,7 @@ export async function publishKelulusanPesertaDiklatAction(
     const diklatId = formData.get("diklatId") as string
     const currentPath = formData.get("currentPath") as string
     const daftarKelulusanPesertaRaw = formData.get("daftarKelulusanPeserta") as string
+    const pesanKelulusanPeserta = (formData.get("pesanKelulusanPeserta") as string | null)?.trim() || null
 
     if (!diklatId || !daftarKelulusanPesertaRaw) {
         return {
@@ -530,13 +550,14 @@ export async function publishKelulusanPesertaDiklatAction(
                     id: diklatId
                 },
                 data: {
-                    statusPelaksanaanAcaraDiklatId: statusPelaksanaanSelesai.id
+                    statusPelaksanaanAcaraDiklatId: statusPelaksanaanSelesai.id,
+                    pesanKelulusanPeserta
                 }
             })
         })
 
         revalidatePath(currentPath)
-        revalidatePath("/admin/kelola-diklat/verif-kelulusan")
+        revalidatePath("/admin/kelola-diklat/kelulusan-diklat")
 
         return {
             success: true,
@@ -586,12 +607,6 @@ export async function getPesertaNarasumberAction(diklatId: string) {
                     nama: true,
                 }
             },
-            statusPelaksanaanPesertaDiklat: {
-                select: {
-                    id: true,
-                    nama: true,
-                }
-            },
             statusKelulusanPesertaDiklat: {
                 select: {
                     id: true,
@@ -612,39 +627,6 @@ export async function getPesertaNarasumberAction(diklatId: string) {
     })
 
     return data
-}
-
-/**
- * Fungsi untuk update status pelaksanaan peserta (narasumber)
- */
-export async function updatePesertaPelaksanaanAction(
-    pesertaDiklatId: number,
-    statusPelaksanaanPesertaDiklatId: number,
-    diklatId: string
-) {
-    try {
-        await prisma.pesertaDiklat.update({
-            where: {
-                id: pesertaDiklatId
-            },
-            data: {
-                statusPelaksanaanPesertaDiklatId: statusPelaksanaanPesertaDiklatId,
-            }
-        })
-
-        revalidatePath(`/narasumber/diklat-saya`)
-
-        return {
-            success: true,
-            message: "Status peserta berhasil diupdate"
-        }
-    } catch (error) {
-        logger.error("Gagal update status peserta", "peserta-diklat-action", error)
-        return {
-            success: false,
-            message: "Gagal update status peserta"
-        }
-    }
 }
 
 /**

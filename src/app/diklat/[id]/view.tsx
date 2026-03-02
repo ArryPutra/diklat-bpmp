@@ -21,7 +21,6 @@ export default function DiklatView({
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header activeMenuLabel="Diklat" />
             <GuestLayout className="pt-40 max-md:pt-36">
                 <Badge className={`mb-2 ${diklat.statusPendaftaranDiklat.backgroundColor}!`}>
                     {diklat.statusPendaftaranDiklat.nama}

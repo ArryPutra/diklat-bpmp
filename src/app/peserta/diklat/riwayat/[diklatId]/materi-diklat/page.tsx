@@ -3,6 +3,7 @@
 import { getCurrentPeserta } from "@/actions/peserta-action"
 import PesertaDiklatMateriDiklat from "@/app/peserta/diklat/components/peserta-diklat-materi"
 import prisma from "@/lib/prisma"
+import { notFound } from "next/navigation"
 
 export default async function Peserta_DiklatRiwayatMateriDiklat_Page({
     params
@@ -15,9 +16,19 @@ export default async function Peserta_DiklatRiwayatMateriDiklat_Page({
 
     const currentPeserta = await getCurrentPeserta()
 
+    if (!currentPeserta) {
+        notFound()
+    }
+
     const diklat: any = await prisma.diklat.findUnique({
         where: {
-            id: _params.diklatId
+            id: _params.diklatId,
+            pesertaDiklat: {
+                some: {
+                    pesertaId: currentPeserta.id,
+                    statusDaftarPesertaDiklatId: 2,
+                }
+            }
         },
         include: {
             metodeDiklat: true,
@@ -47,6 +58,10 @@ export default async function Peserta_DiklatRiwayatMateriDiklat_Page({
             statusPelaksanaanAcaraDiklat: true
         }
     })
+
+    if (!diklat) {
+        notFound()
+    }
 
     return (
         <PesertaDiklatMateriDiklat

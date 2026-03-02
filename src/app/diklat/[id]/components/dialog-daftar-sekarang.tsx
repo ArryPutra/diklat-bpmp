@@ -52,6 +52,12 @@ function DialogForInstansi({
         useActionState(createPendaftarPesertaDiklatAction.bind(null, selectedValues, diklat.id), null);
     const [isPending, startTransition] = useTransition();
 
+    const totalPesertaSaatIni = diklat.pesertaDiklat.length
+    const totalSetelahPilih = totalPesertaSaatIni + selectedValues.length
+    const apakahKuotaPenuh = totalPesertaSaatIni >= diklat.maksimalKuota
+    const apakahMelebihiKuota = totalSetelahPilih > diklat.maksimalKuota
+    const totalMelebihiKuota = totalSetelahPilih - diklat.maksimalKuota
+
     function onSubmit() {
         if (isPending) return
 
@@ -84,6 +90,26 @@ function DialogForInstansi({
                 {
                     !state?.success &&
                     <FieldSet>
+                        {
+                            apakahKuotaPenuh &&
+                            <Alert variant='danger'>
+                                <AlertTitle>Kuota Diklat Sudah Penuh</AlertTitle>
+                                <AlertDescription>
+                                    Kuota saat ini {totalPesertaSaatIni}/{diklat.maksimalKuota}. Instansi tetap dapat mendaftarkan peserta meskipun melebihi kuota.
+                                </AlertDescription>
+                            </Alert>
+                        }
+
+                        {
+                            !apakahKuotaPenuh && apakahMelebihiKuota &&
+                            <Alert variant='danger'>
+                                <AlertTitle>Pendaftaran Akan Melebihi Kuota</AlertTitle>
+                                <AlertDescription>
+                                    Jika dilanjutkan, total peserta menjadi {totalSetelahPilih}/{diklat.maksimalKuota} (melebihi {totalMelebihiKuota} peserta).
+                                </AlertDescription>
+                            </Alert>
+                        }
+
                         <Field>
                             <FieldLabel>Daftar Nama Peserta</FieldLabel>
                             <MultiSelect
@@ -120,7 +146,7 @@ function DialogForInstansi({
                         !state?.success &&
                         <Button onClick={() => onSubmit()}
                             disabled={isPending}>
-                            Daftarkan Sekarang {isPending && <Spinner />}
+                            {apakahMelebihiKuota || apakahKuotaPenuh ? 'Daftarkan (Melebihi Kuota)' : 'Daftarkan Sekarang'} {isPending && <Spinner />}
                         </Button>
                     }
                 </DialogFooter>

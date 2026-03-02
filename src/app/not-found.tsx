@@ -72,25 +72,7 @@ export default function NotFound() {
                 Jelajahi Diklat {loadingDiklat && <Spinner />}
               </Button>
             </div>
-
-            {/* Info Tambahan */}
-            <div className="pt-6 border-t border-slate-200">
-              <p className="text-sm text-slate-600 mb-3">
-                <strong>Butuh bantuan?</strong>
-              </p>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li>
-                  <a href="mailto:bpmpkalsel@kemendikdasmen.go.id" className="text-primary hover:underline">
-                    Hubungi kami via email
-                  </a>
-                </li>
-                <li>
-                  <a href="#faq" className="text-primary hover:underline">
-                    Lihat FAQ untuk pertanyaan umum
-                  </a>
-                </li>
-              </ul>
-            </div>
+            
           </div>
         </div>
       </div>

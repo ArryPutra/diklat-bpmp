@@ -1,19 +1,19 @@
 "use server"
 
-import NarasumberDiklatContent from "../components/narasumber-diklat-content";
+import ListDiklatNarasumberCard from "../components/list-diklat-narasumber-card";
 import { getDaftarDiklatNarasumber } from "../data";
 
 export default async function Narasumber_DiklatSaya_Page() {
-  const daftarDiklatAktifSaya = await getDaftarDiklatNarasumber([1, 2])
+    const daftarDiklatAktifSaya = await getDaftarDiklatNarasumber([1, 2])
 
-  return (
-    <NarasumberDiklatContent
-      daftarDiklatSaya={daftarDiklatAktifSaya}
-      title='Daftar Diklat Diajarkan'
-      description='Anda telah didaftarkan oleh Admin untuk mengajarkan pada diklat ini.'
-      emptyTitle='Belum ada materi diklat aktif yang Anda ajarkan.'
-      emptyDescription='Materi diklat aktif adalah materi diklat yang tanggal pelaksanaannya hari ini atau di masa depan.'
-      detailBasePath='/narasumber/diklat/aktif'
-    />
-  )
+    return (
+        <ListDiklatNarasumberCard
+            daftarDiklatSaya={daftarDiklatAktifSaya}
+            title="Diklat Aktif Saya"
+            description="Berikut adalah daftar diklat yang sedang aktif dan Anda ikuti sebagai narasumber."
+            emptyTitle="Tidak Ada Diklat Aktif"
+            emptyDescription="Anda belum mengikuti diklat aktif apapun."
+            detailBasePath="/narasumber/diklat/aktif"
+        />
+    )
 }

@@ -28,6 +28,7 @@ export default async function Peserta_DiklatHasilAkhir_Page({
                 diklat: {
                     select: {
                         id: true,
+                        pesanKelulusanPeserta: true,
                         materiDiklat: {
                             select: {
                                 id: true
@@ -86,6 +87,7 @@ export default async function Peserta_DiklatHasilAkhir_Page({
                 apakahDiklatSudahSelesai: apakahDiklatSudahSelesai,
                 apakahLulus,
                 kodeSertifikasi,
+                pesanKelulusanPeserta: pesertaDiklat?.diklat.pesanKelulusanPeserta ?? null,
                 statusKelulusan: pesertaDiklat?.statusKelulusanPesertaDiklat?.nama ?? "Belum Dinilai"
             }} />
     )

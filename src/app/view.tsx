@@ -9,18 +9,14 @@ import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "@bprogress/next/app";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { BiAward, BiBuilding, BiCheckCircle, BiChevronDown, BiFileBlank, BiMenu, BiRightArrowAlt, BiUser, BiX } from "react-icons/bi";
+import { BiAward, BiBuilding, BiCheckCircle, BiChevronDown, BiColumns, BiFileBlank, BiMenu, BiRightArrowAlt, BiSolidLandmark, BiUser, BiX } from "react-icons/bi";
 
 export default function View({
     daftarDiklat,
-    dataStatistik
 }: {
     daftarDiklat: any[]
-    dataStatistik: {
-        totalPeserta: number
-        totalInstansi: number
-    }
 }) {
     useEffect(() => {
         document.documentElement.classList.add("scroll-smooth");
@@ -36,9 +32,9 @@ export default function View({
 
             <Beranda />
             <Bantuan />
-            {/* <Statistik dataStatistik={dataStatistik} /> */}
             <Diklat
-                daftarDiklat={daftarDiklat} />
+                daftarDiklat={daftarDiklat}
+            />
             <Faq />
 
             <Footer />
@@ -69,7 +65,7 @@ export function Header({
                     <ul className={`absolute left-1/2 flex -translate-x-1/2 gap-5 font-semibold
             max-md:flex-col max-md:static max-md:translate-0`}>
                         <li className="text-slate-700 transition hover:text-primary"><a href="/#beranda">Beranda</a></li>
-                        <li className={`text-slate-700 transition hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary"}`}><a href="/#diklat">Diklat</a></li>
+                        <li className={`text-slate-700 transition hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary!"}`}><a href="/#diklat">Diklat</a></li>
                         <li className="text-slate-700 transition hover:text-primary"><a href="/#faq">FAQ</a></li>
                     </ul>
                     <Button onClick={() => {
@@ -141,88 +137,6 @@ function Beranda() {
     )
 }
 
-function Statistik({
-    dataStatistik
-}: {
-    dataStatistik: {
-        totalPeserta: number
-        totalInstansi: number
-    }
-}) {
-    const statistikRef = useRef<HTMLDivElement | null>(null);
-
-    const [hasAnimated, setHasAnimated] = useState(false);
-    const [animatedValues, setAnimatedValues] = useState({
-        totalPeserta: 0,
-        totalInstansi: 0,
-    });
-
-    useEffect(() => {
-        const section = statistikRef.current;
-
-        if (!section || hasAnimated) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry.isIntersecting) return;
-
-                setHasAnimated(true);
-
-                const duration = 1200;
-                const start = performance.now();
-
-                const animate = (now: number) => {
-                    const progress = Math.min((now - start) / duration, 1);
-
-                    setAnimatedValues({
-                        totalPeserta: Math.round(dataStatistik.totalPeserta * progress),
-                        totalInstansi: Math.round(dataStatistik.totalInstansi * progress),
-                    });
-
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    }
-                };
-
-                requestAnimationFrame(animate);
-                observer.disconnect();
-            },
-            { threshold: 0.35 }
-        );
-
-        observer.observe(section);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [dataStatistik.totalInstansi, dataStatistik.totalPeserta, hasAnimated]);
-
-    return (
-        <GuestLayout parentClassName="bg-linear-to-b from-primary/5 to-white">
-            <div ref={statistikRef}>
-                <div className="mb-6 text-center">
-                    <h1 className="font-bold text-3xl">Data Statistik Terkini</h1>
-                    <p className="mt-2 text-slate-600">Ringkasan capaian platform diklat saat ini.</p>
-                </div>
-
-                <div className="mt-6 grid grid-cols-2 gap-6
-      max-md:grid-cols-1">
-                    <StatsCard
-                        icon={<BiUser />}
-                        label="Total Peserta"
-                        value={animatedValues.totalPeserta.toString()}
-                    />
-                    <StatsCard
-                        icon={<BiBuilding />}
-                        label="Total Instansi"
-                        value={animatedValues.totalInstansi.toString()}
-                    />
-                </div>
-            </div>
-        </GuestLayout>
-    )
-}
-
 function Diklat({
     daftarDiklat
 }: {
@@ -260,7 +174,7 @@ function Diklat({
 function Bantuan() {
     const bantuanList = [
         {
-            icon: <BiFileBlank size={32} />,
+            icon: <BiSolidLandmark size={32} />,
             title: "Daftarkan Instansi",
             description: "Daftarkan instansi Anda dan mulai proses pendaftaran peserta untuk mengikuti diklat.",
             link: "/registrasi-instansi",
@@ -292,7 +206,7 @@ function Bantuan() {
             <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1">
                 {
                     bantuanList.map((item, index) => (
-                        <div key={index} className="group rounded-2xl border border-slate-200 bg-slate-50 p-8 hover:border-primary/40 hover:bg-primary/5 transition duration-300">
+                        <div key={index} className="group rounded-2xl border border-slate-200 bg-linear-to-br from-white to-slate-50 p-8 hover:border-primary/40 hover:bg-primary/5 transition duration-300">
                             <div className="mb-4 text-primary">{item.icon}</div>
                             <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
                             <p className="text-sm text-slate-600 mb-6">{item.description}</p>
@@ -312,55 +226,24 @@ function Bantuan() {
 function Faq() {
     const [questionIndexSelected, setQuestionIndexSelected] = useState<number | null>(null);
 
-    const faqList = [
+    const faqList: Array<{ question: string; answer: ReactNode }> = [
         {
-            question: "Siapa saja aktor utama yang bisa menggunakan sistem diklat ini?",
-            answer: "Aktor utama pada MVP adalah Admin Diklat (Panitia/BPMP), Instansi (PIC/Operator), Peserta, dan Narasumber. Pada fase berikutnya bisa ditambah Verifikator, Pimpinan/Viewer, serta Petugas Absensi khusus scanning QR."
+            question: "Bagaimana alur pendaftaran instansi?",
+            answer: (
+                <>
+                    Instansi mendaftar melalui{" "}
+                    <a
+                        href="https://diklat.bpmpkalsel.web.id/registrasi-instansi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-primary underline"
+                    >
+                        /registrasi-instansi
+                    </a>
+                    . Setelah mengisi formulir, data instansi akan diverifikasi oleh admin. Setelah diverifikasi, instansi dapat mulai mendaftarkan peserta untuk mengikuti diklat.
+                </>
+            )
         },
-        {
-            question: "Apa saja modul utama yang tersedia di sistem?",
-            answer: "Modul utama mencakup Manajemen Diklat, Pendaftaran Instansi & Peserta, Verifikasi & Kuota, Absensi per sesi, Sertifikat & Evaluasi, serta Pelaporan & Arsip dokumen kegiatan."
-        },
-        {
-            question: "Bagaimana alur pendaftaran dari instansi sampai disetujui?",
-            answer: "Instansi daftar akun, lengkapi profil, pilih diklat/angkatan, input peserta, upload berkas, lalu submit. Admin memverifikasi data dan dokumen, kemudian memberi keputusan disetujui atau ditolak dengan catatan alasan."
-        },
-        {
-            question: "Status pendaftaran yang dipakai apa saja?",
-            answer: "Status standar: Draft → Diajukan → Diverifikasi → Disetujui/Ditolak → Check-in. Alur status ini memudahkan monitoring progres oleh admin, instansi, dan peserta."
-        },
-        {
-            question: "Apakah absensi hanya lewat QR?",
-            answer: "Tidak. Sistem menyediakan QR check-in/check-out per sesi sebagai metode utama, namun tetap ada input manual oleh petugas sebagai fallback saat ada kendala di lapangan."
-        },
-        {
-            question: "Bagaimana cara mencegah titip absen saat QR?",
-            answer: "QR absensi menggunakan token per sesi yang memiliki masa berlaku singkat (misalnya 1–5 menit), sehingga token selalu berubah dan lebih aman dari penyalahgunaan."
-        },
-        {
-            question: "Kapan sertifikat peserta diterbitkan?",
-            answer: "Sertifikat diterbitkan otomatis setelah syarat terpenuhi, seperti minimal persentase kehadiran dan (opsional) post-test/survey. Sertifikat memiliki nomor unik dan QR verifikasi dokumen."
-        },
-        {
-            question: "Apa peran narasumber di dalam aplikasi?",
-            answer: "Narasumber dapat melihat jadwal mengajar, mengunggah materi, dan mengakses rekap sesi. Jika diperlukan, narasumber juga dapat tanda tangan berita acara/rekap kegiatan."
-        },
-        {
-            question: "Apakah data sensitif seperti NIK aman?",
-            answer: "Sistem menerapkan RBAC agar akses data sesuai peran, audit log untuk aksi penting (approval, penolakan, perubahan absensi), dan kontrol privasi data agar informasi sensitif tidak bocor."
-        },
-        {
-            question: "Laporan apa saja yang dapat diunduh?",
-            answer: "Laporan tersedia per diklat, angkatan, instansi, dan periode; termasuk rekap pendaftar, kehadiran, kelulusan, serta dokumen administrasi. Export mendukung format Excel/PDF."
-        },
-        {
-            question: "Apakah modul keuangan, penginapan, dan transport sudah termasuk?",
-            answer: "Belum pada MVP. Modul tersebut disarankan masuk fase 2 setelah SOP operasional benar-benar siap, agar implementasi awal tetap fokus dan cepat stabil untuk kebutuhan inti."
-        },
-        {
-            question: "Berapa target waktu implementasi versi awal (MVP)?",
-            answer: "Dengan fokus fitur inti (Auth+RBAC, manajemen diklat, pendaftaran+verifikasi, absensi, laporan+sertifikat basic), MVP realistis diselesaikan dalam 4–6 minggu."
-        }
     ];
 
     return (

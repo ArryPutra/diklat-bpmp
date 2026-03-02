@@ -16,17 +16,12 @@ export default function CariDiklatView({
     daftarDiklat: any[]
     totalDaftarDiklat: number
 }) {
-    const [stateUpdateStatusUserAction, formActionUpdateStatusUser, pendingUpdateStatusUser] =
-        useActionState(updateStatusBannedAction, null);
-
     const params = new URLSearchParams(useSearchParams().toString());
 
     const currentPage = parseInt(params.get("page") ?? "1");
 
     return (
         <>
-            <Header activeMenuLabel="Diklat" />
-
             <GuestLayout className="pt-36 max-md:pt-36 flex flex-col min-h-screen">
                 <div className="flex flex-col w-full text-center mb-6">
                     <h1 className="font-bold text-2xl">Daftar <span className="text-primary">Diklat</span> Kami</h1>

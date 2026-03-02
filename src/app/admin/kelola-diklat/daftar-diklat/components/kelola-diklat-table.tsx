@@ -4,6 +4,7 @@ import { deleteDiklatAction } from "@/actions/diklat-action";
 import ActionDialog from "@/components/shared/dialog/action-dialog";
 import LoadingScreen from "@/components/shared/loading-screen";
 import TextLink from "@/components/shared/text-link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,7 @@ import { formatDateId } from "@/utils/dateFormatted";
 import { getRowNumber } from "@/utils/getRowNumber";
 import Link from "next/link";
 import { useActionState } from "react";
-import { BiAward, BiBookOpen, BiCertification, BiEdit, BiInfoCircle, BiShield, BiShieldAlt, BiSolidCertification, BiTrash } from "react-icons/bi";
-import { FaCertificate } from "react-icons/fa";
+import { BiAward, BiBookOpen, BiEdit, BiInfoCircle, BiTrash } from "react-icons/bi";
 
 export default function KelolaDiklatTable({
     daftarDiklat,
@@ -75,7 +75,7 @@ export default function KelolaDiklatTable({
                                         {
                                             diklat.materiDiklat.length > 0 ?
                                                 `${diklat.materiDiklat.length} Materi`
-                                                : <span className="text-red-500 font-semibold">Tidak ada materi</span>
+                                                : <span className="text-red-500 font-medium">Tidak ada</span>
                                         }
                                     </TextLink>
                                 </TableCell>
@@ -95,10 +95,6 @@ export default function KelolaDiklatTable({
                                     <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/edit`}>
                                         <Button size='icon-sm'><BiEdit /></Button>
                                     </Link>
-                                    {/* Sertifikasi */}
-                                    <Link href={`/admin/kelola-diklat/daftar-diklat/${diklat.id}/sertifikat`}>
-                                        <Button size='icon-sm' className="bg-purple-500 hover:bg-purple-500/90"><BiAward /></Button>
-                                    </Link>
                                     {/* Aksi hapus */}
                                     <ActionDialog
                                         triggerButton={
@@ -109,7 +105,10 @@ export default function KelolaDiklatTable({
                                         actionButton={
                                             <form action={formActionDeleteDiklat}>
                                                 <input type="hidden" name="diklatId" value={diklat.id} />
-                                                <AlertDialogAction variant='destructive' type="submit">Hapus</AlertDialogAction>
+                                                {
+                                                    diklat.materiDiklat.length === 0 &&
+                                                    <AlertDialogAction variant='destructive' type="submit">Hapus</AlertDialogAction>
+                                                }
                                             </form>
                                         }
                                         sections={[
@@ -121,6 +120,19 @@ export default function KelolaDiklatTable({
                                             }
                                         ]}
                                         sectionsGrid={1}
+                                        content={
+                                            diklat.materiDiklat.length > 0 &&
+                                            <Alert variant='danger'>
+                                                <BiTrash />
+                                                <AlertTitle>Peringatan</AlertTitle>
+                                                {
+                                                    diklat.materiDiklat.length > 0 &&
+                                                    <AlertDescription>
+                                                        Diklat tidak dapat dihapus karena memiliki materi diklat, silahkan hapus terlebih dahulu.
+                                                    </AlertDescription>
+                                                }
+                                            </Alert>
+                                        }
                                     />
                                 </TableCell>
                             </TableRow>

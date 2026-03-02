@@ -1,12 +1,61 @@
 "use client"
 
-import { downloadSertifikatAction } from "@/actions/sertifikasi-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { BiBookOpen, BiCheckDouble, BiSolidGraduation } from "react-icons/bi";
+
+const sanitizePesanHtml = (input: string) => {
+    if (typeof window === "undefined") {
+        return ""
+    }
+
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(input, "text/html")
+    const allowedTags = new Set(["A", "P", "BR", "STRONG", "B", "EM", "I", "U", "UL", "OL", "LI", "DIV"])
+
+    const elements = Array.from(doc.body.querySelectorAll("*"))
+
+    for (const element of elements) {
+        if (!allowedTags.has(element.tagName)) {
+            const parent = element.parentNode
+
+            while (element.firstChild) {
+                parent?.insertBefore(element.firstChild, element)
+            }
+
+            parent?.removeChild(element)
+            continue
+        }
+
+        for (const attr of Array.from(element.attributes)) {
+            if (element.tagName !== "A") {
+                element.removeAttribute(attr.name)
+                continue
+            }
+
+            if (!["href", "target", "rel"].includes(attr.name)) {
+                element.removeAttribute(attr.name)
+            }
+        }
+
+        if (element.tagName === "A") {
+            const href = element.getAttribute("href")?.trim() ?? ""
+            const isSafeHref = /^https?:\/\//i.test(href) || /^mailto:/i.test(href)
+
+            if (!isSafeHref) {
+                element.removeAttribute("href")
+            } else {
+                element.setAttribute("target", "_blank")
+                element.setAttribute("rel", "noopener noreferrer")
+            }
+        }
+    }
+
+    return doc.body.innerHTML
+}
 
 export default function PesertaDiklatHasilAkhir({
     diklatId,
@@ -25,38 +74,14 @@ export default function PesertaDiklatHasilAkhir({
         apakahDiklatSudahSelesai: boolean
         apakahLulus: boolean
         kodeSertifikasi: string | null
+        pesanKelulusanPeserta: string | null
         statusKelulusan: string
     }
 }) {
     const [isPending, startTransition] = useTransition()
-    const [downloadError, setDownloadError] = useState<string | null>(null)
-
-    const handleDownloadSertifikat = (kodeSertifikasi: string) => {
-        setDownloadError(null)
-
-        startTransition(async () => {
-            const result: any = await downloadSertifikatAction(kodeSertifikasi)
-
-            if (!result.success) {
-                setDownloadError(result.message)
-                return
-            }
-
-            const binaryString = atob(result.data.base64Pdf)
-            const bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0))
-            const blob = new Blob([bytes], { type: "application/pdf" })
-            const downloadUrl = URL.createObjectURL(blob)
-
-            const anchor = document.createElement("a")
-            anchor.href = downloadUrl
-            anchor.download = result.data.fileName
-            document.body.appendChild(anchor)
-            anchor.click()
-            anchor.remove()
-
-            URL.revokeObjectURL(downloadUrl)
-        })
-    }
+    const pesanKelulusanHtml = dataHasilAkhir.pesanKelulusanPeserta
+        ? sanitizePesanHtml(dataHasilAkhir.pesanKelulusanPeserta)
+        : ""
 
     return (
         <>
@@ -107,10 +132,12 @@ export default function PesertaDiklatHasilAkhir({
 
                 <CardFooter>
                     {
-                        downloadError &&
-                        <Alert variant='danger'>
-                            <AlertTitle>Gagal Mengunduh Sertifikat</AlertTitle>
-                            <AlertDescription>{downloadError}</AlertDescription>
+                        dataHasilAkhir.apakahDiklatSudahSelesai && pesanKelulusanHtml &&
+                        <Alert>
+                            <AlertTitle>Pesan Admin</AlertTitle>
+                            <AlertDescription className="[&_a]:text-primary [&_a]:underline">
+                                <div dangerouslySetInnerHTML={{ __html: pesanKelulusanHtml }} />
+                            </AlertDescription>
                         </Alert>
                     }
                     {
@@ -131,13 +158,8 @@ export default function PesertaDiklatHasilAkhir({
                     }
                     {
                         // jika diklat sudah selesai dan peserta lullus
-                        (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
-                        <Button
-                            disabled={isPending}
-                            onClick={() => handleDownloadSertifikat(dataHasilAkhir.kodeSertifikasi!)}>
-                            <BiCheckDouble />
-                            {isPending ? "Mengunduh..." : "Unduh Sertifikasi"}
-                        </Button>
+                        // (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
+                        
                     }
                     {
                         // jika diklat sudah selesai, lulus, tetapi sertifikasi belum tersedia

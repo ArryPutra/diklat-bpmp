@@ -21,15 +21,15 @@ export default function Admin_VerifKelulusan_View({
             </div>
 
             <SelectDropdown
-            label="Kelulusan Diklat"
-            query={{ 
-                name: "kelulusanDiklat",
-                values: [
-                    { label: "Butuh Validasi", value: "butuhValidasi" },
-                    { label: "Sudah Validasi", value: "sudahValidasi" },
-                ],
-                defaultValue: "butuhValidasi"
-             }}/>
+                label="Kelulusan Diklat"
+                query={{
+                    name: "kelulusanDiklat",
+                    values: [
+                        { label: "Butuh Validasi", value: "butuhValidasi" },
+                        { label: "Sudah Validasi", value: "sudahValidasi" },
+                    ],
+                    defaultValue: "butuhValidasi"
+                }} />
 
             <Table>
                 <TableHeader>
@@ -51,7 +51,7 @@ export default function Admin_VerifKelulusan_View({
                                     <TableCell>{formatDateId(diklat.tanggalSelesaiAcara)}</TableCell>
                                     <TableCell>{diklat._count.pesertaDiklat}</TableCell>
                                     <TableCell>
-                                        <Link href={`/admin/kelola-diklat/verif-kelulusan/${diklat.id}`}>
+                                        <Link href={`/admin/kelola-diklat/kelulusan-diklat/${diklat.id}`}>
                                             <Button size='sm'>Detail</Button>
                                         </Link>
                                     </TableCell>
