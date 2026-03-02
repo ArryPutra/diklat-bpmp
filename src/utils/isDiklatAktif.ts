@@ -1,3 +1,5 @@
+import { APP_TIMEZONE, getDateKeyInTimeZone } from "@/lib/timezone"
+
 /**
  * Mengecek apakah diklat aktif berdasarkan rentang tanggal pelaksanaan.
  * 
@@ -15,13 +17,9 @@ export function isTanggalPelaksanaanDiklatAktif(
     tanggalSelesaiAcara: Date | string,
     tanggalAcuan: Date | string = new Date()
 ): boolean {
-    const tanggalSekarang = new Date(tanggalAcuan)
-    const mulai = new Date(tanggalMulaiAcara)
-    const selesai = new Date(tanggalSelesaiAcara)
-
-    tanggalSekarang.setHours(0, 0, 0, 0)
-    mulai.setHours(0, 0, 0, 0)
-    selesai.setHours(23, 59, 59, 999)
+    const tanggalSekarang = getDateKeyInTimeZone(tanggalAcuan, APP_TIMEZONE)
+    const mulai = getDateKeyInTimeZone(tanggalMulaiAcara, APP_TIMEZONE)
+    const selesai = getDateKeyInTimeZone(tanggalSelesaiAcara, APP_TIMEZONE)
 
     return tanggalSekarang >= mulai && tanggalSekarang <= selesai
 }

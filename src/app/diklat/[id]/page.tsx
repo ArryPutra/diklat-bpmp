@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/actions/auth-action";
 import { getDiklatAction } from "@/actions/diklat-action";
 import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
 import DiklatView from "./view";
 
 export default async function DiklatPage({
@@ -14,6 +15,10 @@ export default async function DiklatPage({
     const _params = await params
 
     const diklat = await getDiklatAction(_params.id)
+    if (!diklat) {
+        notFound()
+    }
+
     const user = await getCurrentUser()
 
     const isInstansi = user?.peranId === 2
@@ -46,7 +51,7 @@ export default async function DiklatPage({
 
     // daftar peserta diklat ditampilkan publik, pastikan filter data tidak fatal
     daftarPesertaDiklat = await prisma.pesertaDiklat.findMany({
-        where: { diklatId: diklat?.id },
+        where: { diklatId: diklat.id },
         select: {
             createdAt: true,
             statusDaftarPesertaDiklat: {

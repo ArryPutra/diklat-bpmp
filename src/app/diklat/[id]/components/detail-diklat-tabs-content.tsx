@@ -85,7 +85,7 @@ export default function DetailDiklatTabsContent({
                                                         </div>
                                                     </div>
                                                     <Badge variant="secondary" className="flex-shrink-0 whitespace-nowrap text-xs">
-                                                        <BiUser /> {materi.narasumber.user.name}
+                                                        <BiUser /> {materi.narasumber?.user?.name ?? '-'}
                                                     </Badge>
                                                 </div>
                                                 {

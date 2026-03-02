@@ -86,7 +86,7 @@ async function main() {
     })
 
     await registrasiInstansiSeed()
-    await instansiSeed()
+    // await instansiSeed()
     await diklatSeed()
     await narasumberSeed()
 }

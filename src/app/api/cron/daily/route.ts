@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { getUtcDayBoundsForUtcPlus8 } from "@/lib/timezone";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,12 +19,8 @@ export async function GET(req: Request) {
     }
 
     try {
-        const now = new Date(); // waktu sekarang (UTC)
-        const startOfToday = new Date(now);
-        startOfToday.setUTCHours(0, 0, 0, 0);
-
-        const endOfToday = new Date(now);
-        endOfToday.setUTCHours(23, 59, 59, 999);
+        const now = new Date();
+        const { start: startOfToday, end: endOfToday } = getUtcDayBoundsForUtcPlus8(now)
 
         const result = await prisma.$transaction([
             // ======================

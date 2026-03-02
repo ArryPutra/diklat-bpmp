@@ -1,3 +1,4 @@
+import { APP_TIMEZONE, getDateKeyInTimeZone } from "@/lib/timezone";
 import { getCurrentHourMinute } from "@/utils/getCurrentHourMinute";
 
 type MateriDiklatLike = {
@@ -14,16 +15,13 @@ export function getStatusMateriDiklat(
 ): StatusMateriDiklat | null {
     if (!materi) return null;
 
-    const today = new Date(tanggalAcuan);
-    const materiDate = new Date(materi.tanggalPelaksanaan);
-
-    today.setHours(0, 0, 0, 0);
-    materiDate.setHours(0, 0, 0, 0);
+    const today = getDateKeyInTimeZone(tanggalAcuan, APP_TIMEZONE);
+    const materiDate = getDateKeyInTimeZone(materi.tanggalPelaksanaan, APP_TIMEZONE);
 
     const currentTime = getCurrentHourMinute(tanggalAcuan);
 
-    const isToday = materiDate.getTime() === today.getTime();
-    const isFuture = materiDate.getTime() > today.getTime();
+    const isToday = materiDate === today;
+    const isFuture = materiDate > today;
 
     if (
         isToday &&

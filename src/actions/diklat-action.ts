@@ -1,9 +1,9 @@
 "use server"
 
 import { Prisma } from "@/generated/prisma/client"
-import cloudinary from "@/lib/cloudinary"
 import logger from "@/lib/logger"
 import prisma from "@/lib/prisma"
+import { APP_TIMEZONE, getDateKeyInTimeZone } from "@/lib/timezone"
 import { DiklatSchema } from "@/schemas/diklat.schema"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
@@ -330,12 +330,9 @@ function getStatusPendaftaranDiklatId(
     tanggalBukaPendaftaran: Date,
     tanggalTutupPendaftaran: Date
 ): number {
-    const tanggalSekarang = new Date()
-    const buka = new Date(tanggalBukaPendaftaran)
-    const tutup = new Date(tanggalTutupPendaftaran)
-
-    // set ke 23:59:59.999
-    tutup.setHours(23, 59, 59, 999)
+    const tanggalSekarang = getDateKeyInTimeZone(new Date(), APP_TIMEZONE)
+    const buka = getDateKeyInTimeZone(new Date(tanggalBukaPendaftaran), APP_TIMEZONE)
+    const tutup = getDateKeyInTimeZone(new Date(tanggalTutupPendaftaran), APP_TIMEZONE)
 
     if (tanggalSekarang < buka) {
         return 1 // Belum buka
@@ -350,11 +347,9 @@ function getStatusPelaksanaanAcaraDiklatId(
     tanggalMulaiAcara: Date,
     tanggalSelesaiAcara: Date
 ): number {
-    const tanggalSekarang = new Date()
-    const mulai = new Date(tanggalMulaiAcara)
-    const selesai = new Date(tanggalSelesaiAcara)
-
-    selesai.setHours(23, 59, 59, 999)
+    const tanggalSekarang = getDateKeyInTimeZone(new Date(), APP_TIMEZONE)
+    const mulai = getDateKeyInTimeZone(new Date(tanggalMulaiAcara), APP_TIMEZONE)
+    const selesai = getDateKeyInTimeZone(new Date(tanggalSelesaiAcara), APP_TIMEZONE)
 
     if (tanggalSekarang < mulai) {
         return 1 // Belum dimulai
@@ -370,13 +365,9 @@ function isTanggalPelaksanaanDiklatAktif(
     tanggalSelesaiAcara: Date,
     tanggalAcuan: Date = new Date()
 ): boolean {
-    const tanggalSekarang = new Date(tanggalAcuan)
-    const mulai = new Date(tanggalMulaiAcara)
-    const selesai = new Date(tanggalSelesaiAcara)
-
-    tanggalSekarang.setHours(0, 0, 0, 0)
-    mulai.setHours(0, 0, 0, 0)
-    selesai.setHours(23, 59, 59, 999)
+    const tanggalSekarang = getDateKeyInTimeZone(new Date(tanggalAcuan), APP_TIMEZONE)
+    const mulai = getDateKeyInTimeZone(new Date(tanggalMulaiAcara), APP_TIMEZONE)
+    const selesai = getDateKeyInTimeZone(new Date(tanggalSelesaiAcara), APP_TIMEZONE)
 
     return tanggalSekarang >= mulai && tanggalSekarang <= selesai
 }

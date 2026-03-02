@@ -28,9 +28,9 @@ export default function DaftarPesertaTabsContent({
                             daftarPesertaDiklat.map((dataPeserta, index) => (
                                 <TableRow key={index}>
                                     <TableCell>{index + 1}</TableCell>
-                                    <TableCell className="font-semibold">{dataPeserta.peserta.user.name}</TableCell>
-                                    <TableCell>{dataPeserta.peserta.instansi.user.name}</TableCell>
-                                    <TableCell>{dataPeserta.statusDaftarPesertaDiklat.nama}</TableCell>
+                                    <TableCell className="font-semibold">{dataPeserta.peserta?.user?.name ?? '-'}</TableCell>
+                                    <TableCell>{dataPeserta.peserta?.instansi?.user?.name ?? '-'}</TableCell>
+                                    <TableCell>{dataPeserta.statusDaftarPesertaDiklat?.nama ?? '-'}</TableCell>
                                     <TableCell>{formatDateTimeId(dataPeserta.createdAt)}</TableCell>
                                 </TableRow>
                             ))
