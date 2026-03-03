@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useActionState, useMemo, useRef, useState } from "react"
+import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import { BiBold, BiCheck, BiItalic, BiLinkExternal, BiX } from "react-icons/bi"
 
 const escapeHtml = (value: string) =>
@@ -171,6 +171,14 @@ export default function AdminSelesaikanDiklatView({
     const [pesanKelulusanPeserta, setPesanKelulusanPeserta] = useState(normalizeInitialEditorValue(diklat.pesanKelulusanPeserta))
     const editorRef = useRef<HTMLDivElement>(null)
 
+    useEffect(() => {
+        if (!editorRef.current) {
+            return
+        }
+
+        editorRef.current.innerHTML = pesanKelulusanPeserta
+    }, [])
+
     const daftarKelulusanPeserta = Object.entries(statusKelulusanByPesertaId).map(([pesertaDiklatId, statusKelulusanPesertaDiklatId]) => ({
         pesertaDiklatId: Number(pesertaDiklatId),
         statusKelulusanPesertaDiklatId
@@ -179,6 +187,7 @@ export default function AdminSelesaikanDiklatView({
     const totalLulusFinal = daftarKelulusanPeserta.filter((peserta) => peserta.statusKelulusanPesertaDiklatId === 2).length
     const totalTidakLulusFinal = daftarKelulusanPeserta.filter((peserta) => peserta.statusKelulusanPesertaDiklatId === 3).length
     const pesanKelulusanPreview = stripHtml(pesanKelulusanPeserta)
+    const isPesanKelulusanKosong = stripHtml(pesanKelulusanPeserta).length === 0
 
     const applyEditorCommand = (command: "bold" | "italic") => {
         editorRef.current?.focus()
@@ -387,17 +396,24 @@ export default function AdminSelesaikanDiklatView({
                             <BiLinkExternal /> Tambah Link
                         </Button>
                     </div>
-                    <div
-                        id="pesanKelulusanPeserta"
-                        ref={editorRef}
-                        contentEditable
-                        suppressContentEditableWarning
-                        className="min-h-28 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                        dangerouslySetInnerHTML={{ __html: pesanKelulusanPeserta }}
-                        onInput={(event) => {
-                            setPesanKelulusanPeserta(sanitizeEditorHtml(event.currentTarget.innerHTML))
-                        }}
-                    />
+                    <div className="relative">
+                        {
+                            isPesanKelulusanKosong &&
+                            <p className="pointer-events-none absolute left-3 top-2 text-sm text-muted-foreground">
+                                Silakan tambahkan informasi hasil kelulusan, sertifikasi peserta, serta dokumen pendukung lain yang diperlukan peserta.
+                            </p>
+                        }
+                        <div
+                            id="pesanKelulusanPeserta"
+                            ref={editorRef}
+                            contentEditable
+                            suppressContentEditableWarning
+                            className="min-h-28 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                            onInput={(event) => {
+                                setPesanKelulusanPeserta(sanitizeEditorHtml(event.currentTarget.innerHTML))
+                            }}
+                        />
+                    </div>
                     <p className="text-xs text-muted-foreground">Gunakan tombol Tambah Link untuk menyisipkan tautan yang dapat diklik peserta.</p>
                 </CardContent>
             </Card>

@@ -6,15 +6,45 @@ import { BiBookOpen } from "react-icons/bi";
 
 export default function Peserta_Dashboard_View({
     dataStatistik,
-    totalDiklatDiikutiAktif
+    totalDiklatDiikutiAktif,
+    daftarDiklatBaruSelesai
 }: {
     dataStatistik: {
         diklatDiikuti: number
     },
-    totalDiklatDiikutiAktif?: number
+    totalDiklatDiikutiAktif?: number,
+    daftarDiklatBaruSelesai?: {
+        id: string
+        judul: string
+        tanggalSelesaiAcara: Date
+    }[]
 }) {
     return (
         <>
+            {
+                (daftarDiklatBaruSelesai?.length ?? 0) > 0 &&
+                <Alert>
+                    <AlertTitle>Selamat! Anda telah menyelesaikan diklat</AlertTitle>
+                    <AlertDescription>
+                        {
+                            (daftarDiklatBaruSelesai?.length ?? 0) === 1
+                                ? <p>Selamat, Anda telah menyelesaikan diklat <strong>{daftarDiklatBaruSelesai?.[0]?.judul}</strong>.</p>
+                                : <p>Selamat, Anda telah menyelesaikan {daftarDiklatBaruSelesai?.length} diklat dalam 3 hari terakhir.</p>
+                        }
+                        <ul className="mt-2 list-disc pl-5">
+                            {
+                                daftarDiklatBaruSelesai?.map((diklat) => (
+                                    <li key={diklat.id}>{diklat.judul}</li>
+                                ))
+                            }
+                        </ul>
+                        <Link href="/peserta/diklat/riwayat">
+                            <Button size="sm" className="mt-2">Lihat Riwayat Diklat</Button>
+                        </Link>
+                    </AlertDescription>
+                </Alert>
+            }
+
             {
                 (totalDiklatDiikutiAktif ?? 0) > 0 &&
                 <Alert>

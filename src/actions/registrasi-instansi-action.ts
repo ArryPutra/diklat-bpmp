@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import RegistrasiInstansi from "@/models/RegistrasiInstansi";
 import { CreateRegistrasiInstansiSchema, GetRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
 import { revalidatePath } from "next/cache";
+import { sendEmailAction } from "./send-email-action";
 
 function maskEmail(email: string): string {
     const [localPart, domain] = email.split("@");
@@ -296,6 +297,89 @@ export async function updateStatusRegistrasiInstansiAction(
             message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil diterima. Silahkan cek di halaman daftar instansi.`;
         } else if (messageData.status === "Ditolak") {
             message = `Registrasi instansi pada ${messageData.namaInstansi} berhasil ditolak.`;
+        }
+
+        const picEmail = updateRegistrasiInstansi.registrasiPicInstansi?.email;
+
+        if (picEmail && ["Diterima", "Ditolak"].includes(messageData.status)) {
+            const subject = messageData.status === "Diterima"
+                ? "Status Registrasi Instansi Anda: Diterima"
+                : "Status Registrasi Instansi Anda: Ditolak";
+
+            const html = messageData.status === "Diterima"
+                ? `
+                <div style="font-family: Arial, sans-serif; max-width: 620px; margin: auto; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; background-color: #ffffff;">
+                    <div style="background: linear-gradient(135deg, #0ea5e9, #2563eb); color: #ffffff; padding: 26px 24px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 24px;">Registrasi Instansi Diterima 🎉</h1>
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: .95;">Diklat BPMP Kalsel</p>
+                    </div>
+
+                    <div style="padding: 24px; color: #1f2937;">
+                        <p style="font-size: 16px; margin: 0 0 14px 0;">Halo <strong>${updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "PIC Instansi"}</strong> 👋</p>
+
+                        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 14px 0;">
+                            Registrasi instansi <strong>${messageData.namaInstansi}</strong> telah <strong>diterima</strong>.
+                        </p>
+
+                        <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px; margin: 0 0 18px 0;">
+                            <p style="margin: 0; font-size: 14px; color: #0c4a6e;">
+                                Akun instansi Anda sudah aktif. Anda dapat login melalui tautan berikut:
+                            </p>
+                        </div>
+
+                        <div style="text-align: center; margin: 22px 0;">
+                            <a href="https://diklat.bpmpkalsel.web.id/login" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px;">
+                                Login Akun Instansi
+                            </a>
+                        </div>
+
+                        <p style="font-size: 13px; color: #6b7280; margin: 0; text-align: center;">
+                            Jika tombol tidak berfungsi, buka link ini: <br/>
+                            <a href="https://diklat.bpmpkalsel.web.id/login" style="color: #2563eb;">https://diklat.bpmpkalsel.web.id/login</a>
+                        </p>
+                    </div>
+                </div>
+                `
+                : `
+                <div style="font-family: Arial, sans-serif; max-width: 620px; margin: auto; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; background-color: #ffffff;">
+                    <div style="background: linear-gradient(135deg, #f97316, #dc2626); color: #ffffff; padding: 26px 24px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 24px;">Registrasi Instansi Ditolak</h1>
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: .95;">Diklat BPMP Kalsel</p>
+                    </div>
+
+                    <div style="padding: 24px; color: #1f2937;">
+                        <p style="font-size: 16px; margin: 0 0 14px 0;">Halo <strong>${updateRegistrasiInstansi.registrasiPicInstansi?.nama ?? "PIC Instansi"}</strong> 👋</p>
+
+                        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 14px 0;">
+                            Registrasi instansi <strong>${messageData.namaInstansi}</strong> saat ini berstatus <strong>ditolak</strong>.
+                        </p>
+
+                        <div style="background-color: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 14px; margin: 0 0 18px 0;">
+                            <p style="margin: 0; font-size: 14px; color: #9a3412;">
+                                Jika ingin mengajukan kembali, Anda bisa menghubungi layanan BPMP Kalsel melalui web utama.
+                            </p>
+                        </div>
+
+                        <p style="font-size: 13px; color: #6b7280; margin: 0; text-align: center;">
+                            Email ini dikirim otomatis oleh sistem Diklat BPMP.
+                        </p>
+                    </div>
+                </div>
+                `;
+
+            try {
+                await sendEmailAction({
+                    toEmail: picEmail,
+                    subject,
+                    html,
+                });
+            } catch (error) {
+                logger.error("Gagal kirim email status registrasi instansi ke PIC", "registrasi-instansi-action", error, {
+                    registrasiInstansiId: updateRegistrasiInstansi.id,
+                    status: messageData.status,
+                    picEmail,
+                });
+            }
         }
 
         revalidatePath('/admin/dashboard/verifikasi-registrasi-instansi')

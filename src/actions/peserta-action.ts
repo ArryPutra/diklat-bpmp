@@ -335,6 +335,18 @@ export async function updatePesertaAction(
                     headers: await headers()
                 })
             }
+
+            if (data.nama !== peserta.user.name) {
+                await auth.api.adminUpdateUser({
+                    body: {
+                        userId: peserta.user.id,
+                        data: {
+                            name: data.nama
+                        }
+                    },
+                    headers: await headers()
+                })
+            }
         })
 
     } catch (error: any) {
