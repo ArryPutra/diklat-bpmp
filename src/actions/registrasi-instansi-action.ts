@@ -8,6 +8,22 @@ import RegistrasiInstansi from "@/models/RegistrasiInstansi";
 import { CreateRegistrasiInstansiSchema, GetRegistrasiInstansiSchema, UpdateRegistrasiInstansiStatusSchema } from "@/schemas/registrasi-instansi.schema";
 import { revalidatePath } from "next/cache";
 
+function maskEmail(email: string): string {
+    const [localPart, domain] = email.split("@");
+
+    if (!domain) return "***";
+    if (localPart.length <= 2) return `${localPart[0] ?? "*"}***@${domain}`;
+
+    return `${localPart.slice(0, 2)}${"*".repeat(Math.min(localPart.length - 2, 5))}@${domain}`;
+}
+
+function maskPhone(phone: string): string {
+    if (phone.length <= 4) return phone;
+
+    const maskedLength = Math.max(phone.length - 7, 0);
+    return `${phone.slice(0, 4)}${"*".repeat(maskedLength)}${phone.slice(-3)}`;
+}
+
 export async function getAllRegistrasiInstansiAction({
     search = "",
     page = "1",
@@ -106,7 +122,20 @@ export async function getRegistrasiInstansi(_prev: any, formData: FormData) {
             return { success: false, message: "Data tidak ditemukan" };
         }
 
-        return { success: true, data: data };
+        const maskedData = {
+            ...data,
+            email: maskEmail(data.email),
+            nomorTelepon: maskPhone(data.nomorTelepon),
+            registrasiPicInstansi: data.registrasiPicInstansi
+                ? {
+                    ...data.registrasiPicInstansi,
+                    email: maskEmail(data.registrasiPicInstansi.email),
+                    nomorTelepon: maskPhone(data.registrasiPicInstansi.nomorTelepon),
+                }
+                : null,
+        };
+
+        return { success: true, data: maskedData };
     } catch (error) {
         logger.error("Gagal fetch status registrasi instansi", "registrasi-instansi-action", error)
         return { success: false, message: "Terjadi kesalahan pada server" };

@@ -1,12 +1,12 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet, FieldTitle } from '@/components/ui/field'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { BiLeftArrowAlt } from 'react-icons/bi'
+import { BiLeftArrowAlt, BiLock } from 'react-icons/bi'
 import RegistrasiInstansi from '../../../models/RegistrasiInstansi'
-import { useState } from 'react'
 
 export default function InstansiForm({
     setData,
@@ -194,7 +194,19 @@ export default function InstansiForm({
                             }
                         </Field>
                         <Field>
-                            <FieldLabel>Password</FieldLabel>
+                            <FieldLabel>Alamat Instansi</FieldLabel>
+                            <Textarea placeholder='Contoh: Jl. Gotong Royong No.85, Loktabat Utara, Kec. Banjarbaru Utara, Kota Banjar Baru, Kalimantan Selatan 70714'
+                                value={data.alamat}
+                                onChange={(e) =>
+                                    setData(prev => ({ ...prev, alamat: e.target.value }))
+                                } />
+                            {
+                                errorMessages.alamat &&
+                                <FieldError>{errorMessages.alamat}</FieldError>
+                            }
+                        </Field>
+                         <Field>
+                            <FieldLabel>Password Akun</FieldLabel>
                             <PasswordInput placeholder='Masukkan password'
                                 name='password'
                                 value={data.password}
@@ -207,7 +219,7 @@ export default function InstansiForm({
                             }
                         </Field>
                         <Field>
-                            <FieldLabel>Konfirmasi Password</FieldLabel>
+                            <FieldLabel>Konfirmasi Password Akun</FieldLabel>
                             <PasswordInput placeholder='Masukkan konfirmasi password' name='konfirmasiPassword'
                                 value={data.konfirmasiPassword}
                                 onChange={(e) =>
@@ -218,18 +230,11 @@ export default function InstansiForm({
                                 <FieldError>{errorMessages.konfirmasiPassword}</FieldError>
                             }
                         </Field>
-                        <Field>
-                            <FieldLabel>Alamat Instansi</FieldLabel>
-                            <Textarea placeholder='Contoh: Jl. Gotong Royong No.85, Loktabat Utara, Kec. Banjarbaru Utara, Kota Banjar Baru, Kalimantan Selatan 70714'
-                                value={data.alamat}
-                                onChange={(e) =>
-                                    setData(prev => ({ ...prev, alamat: e.target.value }))
-                                } />
-                            {
-                                errorMessages.alamat &&
-                                <FieldError>{errorMessages.alamat}</FieldError>
-                            }
-                        </Field>
+                        <Alert>
+                            <BiLock/>
+                            <AlertTitle>Pastikan Anda mengingat password</AlertTitle>
+                            <AlertDescription>Password digunakan untuk masuk ke aplikasi. Simpan dengan aman agar mudah diingat saat login.</AlertDescription>
+                        </Alert>
                     </FieldSet>
 
                     <div className='flex animate-fade-in-up'>

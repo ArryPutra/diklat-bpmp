@@ -2,7 +2,6 @@
 
 import GuestLayout from "@/components/layouts/guest-layout";
 import { DiklatCard } from "@/components/shared/cards/diklat-card";
-import StatsCard from "@/components/shared/cards/stats-card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -10,8 +9,8 @@ import { useRouter } from "@bprogress/next/app";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState, useTransition } from "react";
-import { BiAward, BiBuilding, BiCheckCircle, BiChevronDown, BiColumns, BiFileBlank, BiMenu, BiRightArrowAlt, BiSolidLandmark, BiUser, BiX } from "react-icons/bi";
+import { useEffect, useState, useTransition } from "react";
+import { BiAward, BiBookOpen, BiCheckCircle, BiChevronDown, BiFileBlank, BiMenu, BiRightArrowAlt, BiSolidLandmark, BiX } from "react-icons/bi";
 
 export default function View({
     daftarDiklat,
@@ -62,7 +61,7 @@ export function Header({
                 <div className={`flex items-center
           max-md:absolute max-md:left-0 max-md:top-0 max-md:mt-28 max-md:w-full max-md:flex-col max-md:items-start max-md:gap-4 max-md:overflow-hidden max-md:rounded-xl max-md:bg-white max-md:p-4 max-md:duration-500
           ${menuOpen ? 'max-md:h-46 max-md:py-4 max-md:shadow max-md:border-primary/15 max-md:border' : 'max-md:h-0 max-md:py-0 max-md:shadow-none max-md:border-transparent max-md:border-0'}`}>
-                    <ul className={`absolute left-1/2 flex -translate-x-1/2 gap-5 font-semibold
+                    <ul className={`absolute left-1/2 flex -translate-x-1/2 gap-3 font-semibold
             max-md:flex-col max-md:static max-md:translate-0`}>
                         <li className="text-slate-700 transition hover:text-primary"><a href="/#beranda">Beranda</a></li>
                         <li className={`text-slate-700 transition hover:text-primary ${activeMenuLabel === "Diklat" && "text-primary!"}`}><a href="/#diklat">Diklat</a></li>
@@ -157,7 +156,15 @@ function Diklat({
                                 diklat={diklat} />
                         ))
                         :
-                        <p className="col-span-3 rounded-xl border border-dashed py-10 text-center text-slate-500">Belum ada diklat</p>
+                        <div className="col-span-3 rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-6 py-14 text-center">
+                            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                                <BiBookOpen size={28} />
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-800">Belum Ada Diklat Tersedia</h3>
+                            <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+                                Saat ini belum ada program diklat yang ditampilkan. Silakan cek kembali dalam beberapa waktu.
+                            </p>
+                        </div>
                 }
             </div>
             <div className="flex justify-end">

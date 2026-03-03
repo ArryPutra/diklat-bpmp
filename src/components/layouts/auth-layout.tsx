@@ -86,7 +86,6 @@ export default function AuthLayout({ children, menuItems }: AuthLayoutProps) {
 
     return (
         <div className="bg-gray-50 flex">
-            <LoadingScreen isLoading={isPending} />
             {/* SIDEBAR */}
             <aside className={`min-w-60 bg-white px-5 h-dvh z-50 fixed flex flex-col
             max-md:shadow max-md:-left-full max-md:duration-500

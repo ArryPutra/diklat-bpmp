@@ -1,17 +1,20 @@
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
+import { Button } from '@/components/ui/button';
+import { Check, Copy, Download } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Copy, Check } from 'lucide-react'; // import icon lucide
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SuksesKirim({
     emailInstansi,
+    passwordInstansi,
     emailPicInstansi,
     nomorTeleponInstansi,
     nomorTeleponPicInstansi,
     kodeTiketRegistrasi
 }: {
     emailInstansi: string,
+    passwordInstansi: string,
     emailPicInstansi: string,
     nomorTeleponInstansi: string,
     nomorTeleponPicInstansi: string,
@@ -19,6 +22,96 @@ export default function SuksesKirim({
 }) {
     const router = useRouter();
     const [copied, setCopied] = useState(false);
+    const hasDownloadedRef = useRef(false);
+
+    const downloadAkunPdf = async () => {
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([595.28, 841.89]);
+        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+        const marginX = 56;
+        let cursorY = 785;
+
+        page.drawText('Data Akun Registrasi Instansi', {
+            x: marginX,
+            y: cursorY,
+            size: 20,
+            font: helveticaBold,
+            color: rgb(0.1, 0.2, 0.4),
+        });
+
+        cursorY -= 34;
+        page.drawText('Berikut data akun yang dapat digunakan untuk login dan pemantauan status registrasi.', {
+            x: marginX,
+            y: cursorY,
+            size: 11,
+            font: helvetica,
+            color: rgb(0.25, 0.25, 0.25),
+        });
+
+        cursorY -= 40;
+
+        const rows: Array<{ label: string; value: string }> = [
+            { label: 'Email Instansi', value: emailInstansi || '-' },
+            { label: 'Password', value: passwordInstansi || '-' },
+            { label: 'Nomor Telepon Instansi', value: nomorTeleponInstansi || '-' },
+            { label: 'Email PIC Instansi', value: emailPicInstansi || '-' },
+            { label: 'Nomor Telepon PIC Instansi', value: nomorTeleponPicInstansi || '-' },
+            { label: 'Kode Tiket Registrasi', value: kodeTiketRegistrasi || '-' },
+            { label: 'Tanggal Unduh', value: new Date().toLocaleString('id-ID') },
+        ];
+
+        rows.forEach((row) => {
+            page.drawText(`${row.label}:`, {
+                x: marginX,
+                y: cursorY,
+                size: 11,
+                font: helveticaBold,
+                color: rgb(0.12, 0.12, 0.12),
+            });
+
+            page.drawText(row.value, {
+                x: marginX + 170,
+                y: cursorY,
+                size: 11,
+                font: helvetica,
+                color: rgb(0.18, 0.18, 0.18),
+            });
+
+            cursorY -= 24;
+        });
+
+        cursorY -= 8;
+        page.drawText('Simpan file ini dengan aman dan jangan bagikan password kepada pihak lain.', {
+            x: marginX,
+            y: cursorY,
+            size: 10,
+            font: helvetica,
+            color: rgb(0.45, 0.08, 0.08),
+        });
+
+        const bytes = await pdfDoc.save();
+        const buffer = new ArrayBuffer(bytes.length);
+        new Uint8Array(buffer).set(bytes);
+        const blob = new Blob([buffer], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = `data-akun-registrasi-instansi-${kodeTiketRegistrasi || 'tanpa-kode'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    useEffect(() => {
+        if (hasDownloadedRef.current) return;
+        hasDownloadedRef.current = true;
+
+        downloadAkunPdf();
+    }, [emailInstansi, passwordInstansi, nomorTeleponInstansi, emailPicInstansi, nomorTeleponPicInstansi, kodeTiketRegistrasi]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(kodeTiketRegistrasi)
@@ -67,7 +160,10 @@ export default function SuksesKirim({
                             {copied ? <Check className='w-4 h-4 text-green-500' /> : <Copy className='w-4 h-4' />}
                         </Button>
                     </div>
-                    <p className='text-xs text-gray-500 mt-2'>Kode Tiket Registrasi dapat digunakan untuk melacak status verifikasi.</p>
+                    <p className='text-xs text-gray-500 mt-2 mb-4'>Kode Tiket Registrasi dapat digunakan untuk melacak status verifikasi.</p>
+                    <Button variant='outline' onClick={downloadAkunPdf} className='hover-lift'>
+                        <Download className='w-4 h-4' /> Unduh Data Akun (PDF)
+                    </Button>
                 </div>
             </div>
 

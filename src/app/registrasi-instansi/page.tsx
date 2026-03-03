@@ -1,17 +1,17 @@
 "use client"
 
-import Layout from '@/components/layouts/guest-layout'
-import { Separator } from '@/components/ui/separator'
 import { useDaftarInstansi } from '@/app/registrasi-instansi/useDaftarInstansi'
-import Image from 'next/image'
-import PicForm from './views/PicForm'
-import InstansiForm from './views/InstansiForm'
+import Layout from '@/components/layouts/guest-layout'
 import { Button } from '@/components/ui/button'
-import { BiLeftArrowAlt } from 'react-icons/bi'
+import { Separator } from '@/components/ui/separator'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import KonfirmasiData from './views/KonfirmasiData'
-import SuksesKirim from './views/SuksesKirim'
 import { useEffect } from 'react'
+import { BiLeftArrowAlt } from 'react-icons/bi'
+import InstansiForm from './views/InstansiForm'
+import KonfirmasiData from './views/KonfirmasiData'
+import PicForm from './views/PicForm'
+import SuksesKirim from './views/SuksesKirim'
 
 export default function RegistrasiIntansiView() {
     const daftarInstansi = useDaftarInstansi();
@@ -107,6 +107,7 @@ export default function RegistrasiIntansiView() {
                     {daftarInstansi.step === 4 &&
                         <SuksesKirim
                             emailInstansi={daftarInstansi.instansi.email}
+                            passwordInstansi={daftarInstansi.instansi.password}
                             emailPicInstansi={daftarInstansi.picInstansi.email}
                             nomorTeleponInstansi={daftarInstansi.instansi.nomorTelepon}
                             nomorTeleponPicInstansi={daftarInstansi.picInstansi.nomorTelepon}

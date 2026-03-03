@@ -24,7 +24,7 @@ export default function Masuk() {
     return (
         <Layout
             parentClassName='px-0! overflow-hidden'
-            className='min-h-screen flex gap-8 py-0! max-w-full! 
+            className='min-h-dvh flex gap-8 py-0! max-w-full! 
         max-md:flex-col-reverse max-md:justify-end'>
             <div className='w-[60%] flex items-center justify-center px-5
             max-md:w-full'>

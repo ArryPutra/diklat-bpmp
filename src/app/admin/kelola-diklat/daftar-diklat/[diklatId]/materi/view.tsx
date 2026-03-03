@@ -36,7 +36,7 @@ export default function Admin_DaftarDiklatMateri_View({
     return (
         <ContentCanvas>
             <div>
-                <BackButton />
+                <BackButton url="/admin/kelola-diklat/daftar-diklat" />
             </div>
 
             <DialogTambahMateri

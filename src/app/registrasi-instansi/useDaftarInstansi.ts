@@ -35,26 +35,48 @@ export function useDaftarInstansi() {
     }
 
     const emptyRegistrasiPicInstansiObject: RegistrasiPicInstansi = {
-        nama: "Arry Kusuma Putra",
-        email: "arrykusumaputra@gmail.com",
-        nomorTelepon: "081350445065",
-        jabatan: "Pranata Komputer"
+        nama: "",
+        email: "",
+        nomorTelepon: "",
+        jabatan: ""
     }
 
     const emptyRegistrasiInstansiObject: RegistrasiInstansi = {
-        nama: "BPMP Provinsi Kalsel",
-        email: "bpmpkalsel@kemendikdasmen.ac.id",
-        nomorTelepon: "08123456789",
+        nama: "",
+        email: "",
+        nomorTelepon: "",
         desaKelurahan: "",
         kecamatan: "",
         kabupatenKota: "",
         desaKelurahanKode: "",
         kecamatanKode: "",
         kabupatenKotaKode: "",
-        password: "password123",
-        konfirmasiPassword: "password123",
-        alamat: "Jl. Gotong Royong"
+        password: "",
+        konfirmasiPassword: "",
+        alamat: ""
     }
+
+    // const emptyRegistrasiPicInstansiObject: RegistrasiPicInstansi = {
+    //     nama: "Arry Kusuma Putra",
+    //     email: "arrykusumaputra@gmail.com",
+    //     nomorTelepon: "081350445065",
+    //     jabatan: "Pranata Komputer"
+    // }
+
+    // const emptyRegistrasiInstansiObject: RegistrasiInstansi = {
+    //     nama: "BPMP Provinsi Kalsel",
+    //     email: "bpmpkalsel@kemendikdasmen.ac.id",
+    //     nomorTelepon: "08123456789",
+    //     desaKelurahan: "",
+    //     kecamatan: "",
+    //     kabupatenKota: "",
+    //     desaKelurahanKode: "",
+    //     kecamatanKode: "",
+    //     kabupatenKotaKode: "",
+    //     password: "password123",
+    //     konfirmasiPassword: "password123",
+    //     alamat: "Jl. Gotong Royong"
+    // }
 
     const [picInstansi, setPicInstansi] = useState<RegistrasiPicInstansi>(emptyRegistrasiPicInstansiObject);
     const [picInstansiErrorMessages, setPicInstansiErrorMessages] = useState<RegistrasiPicInstansi>(emptyRegistrasiPicInstansiObject);
@@ -216,7 +238,7 @@ export function useDaftarInstansi() {
     </p>
     
     <p style="text-align: center; margin: 20px 0;">
-      <a href="https://diklatbpmp.web.id/daftar-instansi/cek-status" 
+      <a href="https://diklatbpmp.web.id/registrasi-instansi/cek-status" 
          style="background-color: #1abc9c; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold;">
         Cek Status Registrasi
       </a>

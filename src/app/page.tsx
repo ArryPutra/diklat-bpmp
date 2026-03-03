@@ -1,8 +1,7 @@
-"use server"
-
 import { getAllDiklatAction } from "@/actions/diklat-action";
-import prisma from "@/lib/prisma";
 import View from "./view";
+
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
 

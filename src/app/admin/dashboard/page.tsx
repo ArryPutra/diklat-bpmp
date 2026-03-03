@@ -39,7 +39,7 @@ export default async function AdminDashboardPage() {
                         }
                     }
                 }
-            ], 
+            ],
             pesertaDiklat: {
                 every: {
                     kelulusanPesertaDiklat: {

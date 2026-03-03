@@ -7,8 +7,10 @@ import InfoDialog from '@/components/shared/dialog/info-dialog';
 import LoadingScreen from '@/components/shared/loading-screen';
 import { PaginationWithLinks } from '@/components/shared/pagination-with-links';
 import Search from '@/components/shared/search';
+import SelectDropdown from '@/components/shared/select-dropdown';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertDialogAction } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,7 +39,6 @@ export default function Admin_VerifikasiInstansi_View({
 
     function onChangeStatus(value: string) {
         params.set("status", value);
-
         router.push(`?${params.toString()}`);
     }
 
@@ -54,25 +55,19 @@ export default function Admin_VerifikasiInstansi_View({
             </div>
 
             <div className='flex items-end justify-between gap-3 flex-wrap'>
-                <Field className='w-fit'>
-                    <FieldLabel>
-                        Status
-                    </FieldLabel>
-                    <Select
-                        defaultValue={params.get("status") ?? "1"}
-                        onValueChange={onChangeStatus}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select page size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value='1'>Diajukan</SelectItem>
-                                <SelectItem value='2'>Diterima</SelectItem>
-                                <SelectItem value='3'>Ditolak</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </Field>
+                
+                    <SelectDropdown
+                        label='Status'
+                        query={{
+                            name: "status",
+                            values: [
+                                { label: "Diajukan", value: '1' },
+                                { label: "Diterima", value: '2' },
+                                { label: "Ditolak", value: '3' }
+                            ],
+                            defaultValue: '1',
+                            deleteValue: '1'
+                        }} />
 
                 <Search />
             </div>
@@ -170,7 +165,7 @@ export default function Admin_VerifikasiInstansi_View({
                                                     {
                                                         title: 'Status Pendaftaran',
                                                         fields: [
-                                                            { label: 'Status', value: item.statusRegistrasiInstansi.nama },
+                                                            { label: 'Status', value: <Badge className={item.statusRegistrasiInstansi.backgroundColor}>{item.statusRegistrasiInstansi.nama}</Badge> },
                                                             { label: 'Tanggal Pendaftaran', value: format(new Date(item.createdAt), 'EEEE, dd MMMM yyyy', { locale: id }) }
                                                         ]
                                                     }
@@ -240,7 +235,7 @@ export default function Admin_VerifikasiInstansi_View({
                             ))
                             :
                             <TableRow>
-                                <TableCell colSpan={7} className='text-center'>Tidak ada data</TableCell>
+                                <TableCell colSpan={7} className='text-center py-6'>Tidak ada data</TableCell>
                             </TableRow>
                     }
                 </TableBody>

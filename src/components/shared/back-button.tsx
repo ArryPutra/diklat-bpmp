@@ -1,8 +1,8 @@
 "use client"
 
-import { useRouter } from "next/navigation";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { Button } from "../ui/button";
+import { useRouter } from "@bprogress/next/app";
 
 export default function BackButton({ url }: { url?: string }) {
     const router = useRouter();

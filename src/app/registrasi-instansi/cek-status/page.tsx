@@ -14,19 +14,6 @@ import { useRouter } from 'next/navigation'
 import { useActionState, useEffect, useState } from 'react'
 import { BiBuilding, BiCalendar, BiCheckCircle, BiCopy, BiEnvelope, BiLeftArrowAlt, BiMap, BiPhone, BiSearch, BiTime, BiUser, BiX } from 'react-icons/bi'
 
-// Helper untuk masking email (privasi)
-function maskEmail(email: string): string {
-    const [localPart, domain] = email.split('@')
-    if (localPart.length <= 2) return `${localPart[0]}***@${domain}`
-    return `${localPart.slice(0, 2)}${'*'.repeat(Math.min(localPart.length - 2, 5))}@${domain}`
-}
-
-// Helper untuk masking nomor telepon (privasi)
-function maskPhone(phone: string): string {
-    if (phone.length <= 4) return phone
-    return `${phone.slice(0, 4)}${'*'.repeat(phone.length - 7)}${phone.slice(-3)}`
-}
-
 // Helper untuk format tanggal
 function formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString('id-ID', {
@@ -224,13 +211,13 @@ export default function CekStatus() {
                                 <InfoItem
                                     icon={<BiEnvelope className="w-4 h-4" />}
                                     label="Email"
-                                    value={maskEmail(state.data.email)}
+                                    value={state.data.email}
                                     masked
                                 />
                                 <InfoItem
                                     icon={<BiPhone className="w-4 h-4" />}
                                     label="Nomor Telepon"
-                                    value={maskPhone(state.data.nomorTelepon)}
+                                    value={state.data.nomorTelepon}
                                     masked
                                 />
                                 <Separator />
@@ -260,13 +247,13 @@ export default function CekStatus() {
                                     <InfoItem
                                         icon={<BiEnvelope className="w-4 h-4" />}
                                         label="Email PIC"
-                                        value={maskEmail(state.data.registrasiPicInstansi.email)}
+                                        value={state.data.registrasiPicInstansi.email}
                                         masked
                                     />
                                     <InfoItem
                                         icon={<BiPhone className="w-4 h-4" />}
                                         label="Nomor Telepon PIC"
-                                        value={maskPhone(state.data.registrasiPicInstansi.nomorTelepon)}
+                                        value={state.data.registrasiPicInstansi.nomorTelepon}
                                         masked
                                     />
                                     <InfoItem
@@ -280,9 +267,9 @@ export default function CekStatus() {
 
                         {/* Info Tambahan */}
                         <Alert>
-                            <AlertTitle className="text-sm">Informasi</AlertTitle>
-                            <AlertDescription className="text-xs">
-                                Data sensitif seperti email dan nomor telepon ditampilkan dalam format tersamar untuk menjaga privasi.
+                            <AlertTitle>Informasi</AlertTitle>
+                            <AlertDescription>
+                                Data sensitif seperti email dan nomor telepon sudah diamankan dan ditampilkan dalam format tersamar dari sisi server.
                                 Jika ada pertanyaan, silahkan hubungi admin BPMP Kalsel.
                             </AlertDescription>
                         </Alert>
