@@ -63,7 +63,7 @@ export default function KelolaInstansiTable({
                                             <Button size='icon-sm' variant='outline'><BiInfoCircle /></Button>
                                         </Link>
                                         {/* Edit Action */}
-                                        <Link href={`/admin/kelola-instansi/${instansi.id}/edit`}>
+                                        <Link href={`/admin/kelola-instansi/daftar-instansi/${instansi.id}/edit`}>
                                             <Button size='icon-sm'><BiEdit /></Button>
                                         </Link>
                                         {/* Nonaktifkan/Aktifkan User Action */}

@@ -1,10 +1,11 @@
 "use client"
 
+import { downloadSertifikatPesertaAction } from "@/actions/sertifikasi-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { BiBookOpen, BiCheckDouble, BiSolidGraduation } from "react-icons/bi";
 
 const sanitizePesanHtml = (input: string) => {
@@ -79,9 +80,42 @@ export default function PesertaDiklatHasilAkhir({
     }
 }) {
     const [isPending, startTransition] = useTransition()
+    const [errorUnduhSertifikat, setErrorUnduhSertifikat] = useState<string | null>(null)
     const pesanKelulusanHtml = dataHasilAkhir.pesanKelulusanPeserta
         ? sanitizePesanHtml(dataHasilAkhir.pesanKelulusanPeserta)
         : ""
+
+    const handleUnduhSertifikat = () => {
+        setErrorUnduhSertifikat(null)
+
+        startTransition(async () => {
+            const result = await downloadSertifikatPesertaAction(diklatId)
+
+            if (!result.success || !result.data?.base64Pdf || !result.data?.fileName) {
+                setErrorUnduhSertifikat(result.message ?? "Gagal mengunduh sertifikat")
+                return
+            }
+
+            const byteCharacters = atob(result.data.base64Pdf)
+            const byteNumbers = new Array(byteCharacters.length)
+
+            for (let i = 0; i < byteCharacters.length; i += 1) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i)
+            }
+
+            const byteArray = new Uint8Array(byteNumbers)
+            const blob = new Blob([byteArray], { type: "application/pdf" })
+            const fileUrl = URL.createObjectURL(blob)
+            const link = document.createElement("a")
+
+            link.href = fileUrl
+            link.download = result.data.fileName
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(fileUrl)
+        })
+    }
 
     return (
         <>
@@ -130,7 +164,7 @@ export default function PesertaDiklatHasilAkhir({
                     </div>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="flex-col items-start gap-3">
                     {
                         dataHasilAkhir.apakahDiklatSudahSelesai && pesanKelulusanHtml &&
                         <Alert>
@@ -158,8 +192,21 @@ export default function PesertaDiklatHasilAkhir({
                     }
                     {
                         // jika diklat sudah selesai dan peserta lullus
-                        // (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
-                        
+                        (dataHasilAkhir.apakahDiklatSudahSelesai && dataHasilAkhir.apakahLulus && dataHasilAkhir.kodeSertifikasi) &&
+                        <Alert>
+                            <AlertTitle>Selamat, Anda Lulus!</AlertTitle>
+                            <AlertDescription className="space-y-2">
+                                <p>Anda dapat mengunduh sertifikat kelulusan dalam format PDF.</p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button size='sm' onClick={handleUnduhSertifikat} disabled={isPending}>
+                                        {isPending ? "Menyiapkan Sertifikat..." : "Unduh Sertifikat PDF"}
+                                    </Button>
+                                    <Link href={`/cek-sertifikasi`}>
+                                        <Button size='sm' variant='outline'>Cek Sertifikat</Button>
+                                    </Link>
+                                </div>
+                            </AlertDescription>
+                        </Alert>
                     }
                     {
                         // jika diklat sudah selesai, lulus, tetapi sertifikasi belum tersedia
@@ -175,6 +222,13 @@ export default function PesertaDiklatHasilAkhir({
                         <Alert variant='danger'>
                             <AlertTitle>Hasil Akhir:</AlertTitle>
                             <AlertDescription>Mohon maaf, Anda tidak lulus pada diklat ini. Jika ada pengaduan, silakan hubungi admin.</AlertDescription>
+                        </Alert>
+                    }
+                    {
+                        errorUnduhSertifikat &&
+                        <Alert variant='danger'>
+                            <AlertTitle>Unduh Sertifikat Gagal</AlertTitle>
+                            <AlertDescription>{errorUnduhSertifikat}</AlertDescription>
                         </Alert>
                     }
                 </CardFooter>

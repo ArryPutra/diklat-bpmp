@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
-import { BiBold, BiCheck, BiItalic, BiLinkExternal, BiX } from "react-icons/bi"
+import { BiBold, BiCheck, BiDownload, BiItalic, BiLinkExternal, BiX } from "react-icons/bi"
 
 const escapeHtml = (value: string) =>
     value
@@ -94,6 +94,22 @@ const stripHtml = (value: string) =>
         .replace(/<[^>]+>/g, "")
         .trim()
 
+const sanitizeSheetName = (name: string, index: number) => {
+    const sanitizedName = name
+        .replace(/[\\/?*\[\]:]/g, "-")
+        .trim()
+
+    if (!sanitizedName) {
+        return `Materi-${index + 1}`
+    }
+
+    if (sanitizedName.length <= 31) {
+        return sanitizedName
+    }
+
+    return sanitizedName.slice(0, 31)
+}
+
 export default function AdminSelesaikanDiklatView({
     diklat,
     daftarPesertaEvaluasi
@@ -169,6 +185,7 @@ export default function AdminSelesaikanDiklatView({
     const [statusKelulusanByPesertaId, setStatusKelulusanByPesertaId] =
         useState<Record<number, 2 | 3>>(initialStatusKelulusanByPesertaId)
     const [pesanKelulusanPeserta, setPesanKelulusanPeserta] = useState(normalizeInitialEditorValue(diklat.pesanKelulusanPeserta))
+    const [isDownloadingAbsensiReport, setIsDownloadingAbsensiReport] = useState(false)
     const editorRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -226,6 +243,60 @@ export default function AdminSelesaikanDiklatView({
         setPesanKelulusanPeserta(html)
     }
 
+    const unduhHasilAbsensiPeserta = async () => {
+        if (isDownloadingAbsensiReport || daftarPesertaEvaluasi.length === 0) {
+            return
+        }
+
+        setIsDownloadingAbsensiReport(true)
+
+        try {
+            const XLSX = await import("xlsx")
+            const workbook = XLSX.utils.book_new()
+            const daftarJudulMateri = daftarPesertaEvaluasi[0]?.detailAbsensiPerMateri.map((materi) => materi.judulMateri) ?? []
+
+            const usedSheetNames = new Set<string>()
+
+            daftarJudulMateri.forEach((judulMateri, indexMateri) => {
+                const rows = daftarPesertaEvaluasi.map((peserta, indexPeserta) => {
+                    const detailMateri = peserta.detailAbsensiPerMateri[indexMateri]
+
+                    return {
+                        No: indexPeserta + 1,
+                        "Nama Peserta": peserta.namaPeserta,
+                        "Asal Instansi": peserta.namaInstansi,
+                        "Status Absensi": detailMateri?.statusAbsensi ?? "Belum Diisi",
+                        "Kehadiran (Hadir/Sesi)": `${peserta.totalKehadiran}/${peserta.totalSesiMateri}`,
+                        "Persentase Kehadiran": `${peserta.persenKehadiran}%`,
+                        "Status Rekomendasi": peserta.statusRekomendasiKelulusan,
+                        "Status Akhir": peserta.statusAkhirKelulusan ?? "Belum Dinilai"
+                    }
+                })
+
+                const worksheet = XLSX.utils.json_to_sheet(rows)
+
+                let sheetName = sanitizeSheetName(judulMateri, indexMateri)
+                let suffix = 1
+
+                while (usedSheetNames.has(sheetName)) {
+                    const baseName = sanitizeSheetName(judulMateri, indexMateri).slice(0, 28)
+                    sheetName = `${baseName}-${suffix}`
+                    suffix += 1
+                }
+
+                usedSheetNames.add(sheetName)
+                XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
+            })
+
+            const tanggalUnduh = new Date().toISOString().slice(0, 10)
+            const namaFile = `hasil-absensi-peserta-${diklat.judul.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}-${tanggalUnduh}.xlsx`
+
+            XLSX.writeFileXLSX(workbook, namaFile)
+        } finally {
+            setIsDownloadingAbsensiReport(false)
+        }
+    }
+
     return (
         <ContentCanvas>
             <BackButton url="/admin/kelola-diklat/kelulusan-diklat" />
@@ -264,6 +335,17 @@ export default function AdminSelesaikanDiklatView({
                     </div>
                 </CardContent>
             </Card>
+
+            <div className="flex justify-end">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={unduhHasilAbsensiPeserta}
+                    disabled={isDownloadingAbsensiReport || daftarPesertaEvaluasi.length === 0 || (daftarPesertaEvaluasi[0]?.detailAbsensiPerMateri.length ?? 0) === 0}
+                >
+                    <BiDownload /> {isDownloadingAbsensiReport ? "Menyiapkan File..." : "Unduh Hasil Absensi Peserta"}
+                </Button>
+            </div>
 
             {
                 isKelulusanSudahDiterbitkan &&

@@ -1,5 +1,10 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import userSeed from "./seeds/user.seed";
+import registrasiInstansiSeed from "./seeds/registrasi-instansi.seed";
+import diklatSeed from "./seeds/diklat.seed";
+import narasumberSeed from "./seeds/narasumber.seed";
+import instansiSeed from "./seeds/instansi.seed";
 
 async function main() {
     await prisma.peran.createMany({
@@ -69,20 +74,10 @@ async function main() {
         ]
     })
 
-    await auth.api.createUser({
-        body: {
-            name: "Admin BPMP",
-            email: "admin@gmail.com",
-            password: "password123",
-            role: "admin",
-            data: {
-                peranId: 1,
-            }
-        }
-    })
+    await userSeed()
 
     // await registrasiInstansiSeed()
-    // // await instansiSeed()
+    // await instansiSeed()
     // await diklatSeed()
     // await narasumberSeed()
 }

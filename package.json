@@ -43,6 +43,7 @@
     "react-icons": "^5.5.0",
     "resend": "^6.9.1",
     "tailwind-merge": "^3.4.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.21.4",
     "zod-i18n-map": "^2.27.0"
   },
